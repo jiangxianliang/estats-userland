@@ -1,0 +1,4 @@
+#if !defined(ESTATS_CONNECTION_INT_H)
+#define ESTATS_CONNECTION_INT_H
+
+#endif /* !defined(ESTATS_CONNECTION_INT_H) */

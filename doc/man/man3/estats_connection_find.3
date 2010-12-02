@@ -1,0 +1,80 @@
+.\" $Id: estats_connection_find.3,v 1.1 2003/01/06 20:50:32 engelhar Exp $
+.TH ESTATS_CONNECTION 3 "30 September 2002" "Estats Userland" "Estats"
+.SH NAME
+estats_connection_head, estats_connection_next, estats_connection_find,
+estats_connection_find_v6, estats_connection_lookup,
+estats_connection_from_socket \- search for or iterate over Estats
+connections
+.SH SYNOPSIS
+.B #include <estats/estats.h>
+.PP
+.nf
+.BI "estats_connection* estats_connection_head(estats_agent* " agent ");"
+.BI "estats_connection* estats_connection_next(estats_connection* " conn ");"
+.BI "estats_connection* estats_connection_find(estats_agent* " agent ", struct estats_connection_spec* " spec ");"
+.BI "estats_connection* estats_connection_find_v6(estats_agent* " agent ", struct estats_connection_spec_v6* " spec ");"
+.BI "estats_connection* estats_connection_lookup(estats_agent* " agent ", int " cid ");"
+.BI "estats_connection* estats_connection_from_socket(estats_agent* " agent ", int " sockfd ");"
+.fi
+.SH DESCRIPTION
+Statistics for a Estats variable only make sense when you measure them
+for a particular connection.  This connection is represented by
+\fIestats_connection\fR, and these functions allow one to find a
+particular connection or iterate over all connections in the system.
+.PP
+\fBestats_connection_head()\fR obtains the first connection in
+\fIagent\fR, and \fBestats_connection_next()\fR returns the next
+connection in the sequence after \fIconn\fR.
+.PP
+\fBestats_connection_find()\fR searches for an IPv4 connection within
+\fIagent\fR that fits the properties described in \fIspec\fR.  The
+\fIestats_connection_spec\fR structure is defined as follows:
+.PP
+.RS
+.nf
+struct estats_connection_spec {
+    u_int16_t dst_port; /* port on the destination machine */
+    u_int32_t dst_addr; /* address of the destination machine
+                           in host byte order */
+    u_int16_t src_port; /* port on the source machine */
+    u_int32_t src_addr; /* address of the source machine in
+                           host byte order */
+};
+.fi
+.RE
+.PP
+\fBestats_connection_find_v6()\fR searches for an IPv6 connection within
+\fIagent\fR that fits the properties described in \fIspec\fR.  The
+\fIestats_connection_spec_v6\fR structure is defined as follows:
+.PP
+.RS
+.nf
+struct estats_connection_spec_v6 {
+    u_int16_t dst_port;     /* port on the destination machine */
+    char      dst_addr[16]; /* address of the destination
+                               machine */
+    u_int16_t src_port;     /* port on the source machine */
+    char      src_addr[16]; /* address of the source machine */
+};
+.fi
+.RE
+.PP
+\fBestats_connection_lookup()\fR searches for a connection within
+\fIagent\fR with a Estats connection identifier of \fIcid\fR.  On Linux,
+a Estats connection identifier corresponds to a directory in
+\fI/proc/estats\fR.
+.PP
+\fBestats_connection_from_socket()\fR searches for a connection within
+\fIagent\fR that corresponds to an connected socket \fIsockfd\fR.
+.SH RETURN VALUES
+For \fBestats_connection_head()\fR and \fBestats_connection_next()\fR,
+the value returned is the next connection in the sequence, or \fBNULL\fR
+if there is an error or there are no connections left.
+.PP
+\fBestats_connection_find()\fR, \fBestats_connection_find_v6()\fR,
+\fBestats_connection_lookup()\fR, and
+\fBestats_connection_from_socket()\fR all return the connection
+corresponding to the search parameters, or \fBNULL\fR if there is an
+error or the connection is not found.
+.SH SEE ALSO
+.BR libestats (3)

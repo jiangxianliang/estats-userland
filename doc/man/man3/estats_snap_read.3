@@ -1,0 +1,24 @@
+.\" $Id: estats_snap_read.3,v 1.1 2003/01/06 20:50:35 engelhar Exp $
+.TH ESTATS_SNAP_READ 3 "12 December 2002" "Estats Userland" "Estats"
+.SH NAME
+estats_snap_read, estats_delta_any \- read the values of variables from
+a snapshot
+.SH SYNOPSIS
+.B #include <estats/estats.h>
+.PP
+.nf
+.BI "int estats_snap_read(estats_var* " var ", estats_snapshot* " snap ", void* " buf ");"
+.BI "int estats_delta_any(estats_var* " var ", estats_snapshot* " s1 ", estats_snapshot* " s2 ", void* " buf ");"
+.fi
+.SH DESCRIPTION
+\fBestats_snap_read()\fR reads variables out of a snapshot that was
+taken using \fBestats_snap()\fR.
+.PP
+\fBestats_delta_any()\fR computes the difference (delta) of a certain
+variable between any two snapshots.
+.SH RETURN VALUES
+Both \fBwe100_snap_read()\fR and \fBestats_delta_any()\fR return
+ESTATS_ERR_SUCCESS on success, and an error code otherwise.
+.SH SEE ALSO
+.BR estats_snap (3),
+.BR libestats (3)

@@ -1,0 +1,40 @@
+bin_PROGRAMS = deltavar listconn listvars logtest readall readconn readvar writevar
+
+LIBESTATS_NOGTK_LDADDS = @STRIP_BEGIN@ \
+	$(top_builddir)/lib/estats/libestats.la \
+	@STRIP_END@
+
+LIBSESTATS_NOGTK_LDADDS = @STRIP_BEGIN@ \
+	$(top_builddir)/lib/estats/libestats.la \
+	$(top_builddir)/lib/sestats/libsestats.la \
+	@STRIP_END@
+
+INCLUDES = @STRIP_BEGIN@ \
+	-I$(top_srcdir)/lib \
+	@STRIP_END@
+
+EXTRA_DIST = old-logtest.c
+
+deltavar_SOURCES = deltavar.c scripts.h
+deltavar_LDADD = $(LIBESTATS_NOGTK_LDADDS)
+
+listconn_SOURCES = listconn.c scripts.h
+listconn_LDADD = $(LIBESTATS_NOGTK_LDADDS)
+
+listvars_SOURCES = listvars.c scripts.h
+listvars_LDADD = $(LIBESTATS_NOGTK_LDADDS)
+
+logtest_SOURCES = logtest.c scripts.h
+logtest_LDADD = $(LIBESTATS_NOGTK_LDADDS)
+
+readall_SOURCES = readall.c scripts.h
+readall_LDADD = $(LIBESTATS_NOGTK_LDADDS)
+
+readconn_SOURCES = readconn.c scripts.h
+readconn_LDADD = $(LIBESTATS_NOGTK_LDADDS)
+
+readvar_SOURCES = readvar.c scripts.h
+readvar_LDADD = $(LIBESTATS_NOGTK_LDADDS)
+
+writevar_SOURCES = writevar.c scripts.h
+writevar_LDADD = $(LIBESTATS_NOGTK_LDADDS)

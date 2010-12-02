@@ -1,0 +1,31 @@
+.\" $Id: estats_connection_accessors.3,v 1.1 2003/01/06 20:50:31 engelhar Exp $
+.TH ESTATS_CONNECTION 3 "12 December 2002" "Estats Userland" "Estats"
+.SH NAME
+estats_get_connection_agent, estats_get_connection_cid,
+estats_get_connection_spec \- get values from the Estats connection
+opaque structure
+.SH SYNOPSIS
+.B #include <estats/estats.h>
+.PP
+.nf
+.BI "estats_agent* estats_get_connection_agent(estats_connection* " conn ");"
+.BI "int           estats_get_connection_cid(estats_connection* " conn ");"
+.BI "void          estats_get_connection_spec(estats_connection* " conn ", struct estats_connection_spec* " spec ");"
+.fi
+.SH DESCRIPTION
+As the \fIestats_connection\fR structure is opaque, these functions
+exist to fetch values from it without exposing its structure.
+.SH RETURN VALUES
+\fBestats_get_connection_agent()\fR returns the agent that the
+connection was obtained from.
+.PP
+\fBestats_get_connection_cid()\fR returns the integer connection
+identifier that this connection corresponds to.
+.PP
+\fBestats_get_connection_spec()\fR returns the
+\fIestats_connection_spec\fR structure which corresponds with the
+connection.  This structure is defined in
+\fBestats_connection_find\fR(3).
+.SH SEE ALSO
+.BR estats_connection_find (3),
+.BR libestats (3)

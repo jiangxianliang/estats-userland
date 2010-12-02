@@ -1,0 +1,37 @@
+.\" $Id: estats_raw_read.3,v 1.1 2003/01/06 20:50:35 engelhar Exp $
+.TH estats_raw_read 3 "12 December 2002" "Estats Userland" "Estats"
+.SH NAME
+estats_raw_read, estats_raw_write \- immediate read and write of Estats
+variables
+.SH SYNOPSIS
+.B #include <estats/estats.h>
+.PP
+.nf
+.BI "int estats_raw_read(estats_var* " var ", estats_connection* " conn ", void* " buf ");"
+.BI "int estats_raw_write(estats_var* " var ", estats_connection* " conn ", void* " buf ");"
+.fi
+.SH DESCRIPTION
+These functions are for immediate reading and writing of variables in
+Estats connections.
+.SH RETURN VALUES
+Both \fBestats_raw_read()\fR and \fBestats_raw_write()\fR return
+ESTATS_ERR_SUCCESS on success, and an error code on failure.
+.SH EXAMPLE USE
+.nf
+/* Warning: no errorhandling below... */
+estats_agent* agent;
+estats_connection* conn;
+estats_group* group;
+estats_var* var;
+char buf[256];
+int cid;
+
+/* Initialize cid... */
+agent = estats_attach(ESTATS_AGENT_TYPE_LOCAL, NULL);
+conn = estats_connection_lookup(agent, cid);
+estats_agent_find_var_and_group(agent, "RemotePort", &group, &var);
+estats_raw_read(var, conn, buf);
+.fi
+.SH SEE ALSO
+.BR estats_value_to_text (3),
+.BR libestats (3)

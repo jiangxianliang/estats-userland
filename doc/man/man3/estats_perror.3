@@ -1,0 +1,18 @@
+.\" $Id: estats_perror.3,v 1.1 2003/01/06 20:50:34 engelhar Exp $
+.TH estats_perror 3 "26 February 2002" "Estats Userland" "Estats"
+.SH NAME
+estats_perror \- print a estats error message in the style of \fBperror\fR(3).
+.SH SYNOPSIS
+.B #include <estats/estats.h>
+.PP
+.BI "void estats_perror(const char* " s ");"
+.SH DESCRIPTION
+The \fBestats_perror\fR function prints a message on the standard error
+output describing the last error encountered during a call to a
+\fIlibestats\fR function.  The argument string \fIs\fR is printed first,
+then a colon and a blank, then the message and a new-line.  The error
+number is taken from the external variable \fIestats_errno\fR, which is
+set by \fIlibestats\fR functions upon failure.
+.SH SEE ALSO
+.BR estats_strerror (3),
+.BR libestats (3)
