@@ -1,0 +1,53 @@
+.\" $Id: estats_snap.3,v 1.1 2003/01/06 20:50:35 engelhar Exp $
+.TH ESTATS_SNAP 3 "12 December 2002" "Estats Userland" "Estats"
+.SH NAME
+estats_snap, estats_snapshot_alloc, estats_snapshot_free \- take an
+atomic snapshot of a Estats group
+.SH SYNOPSIS
+.B #include <estats/estats.h>
+.PP
+.nf
+.BI "estats_snapshot* estats_snapshot_alloc(estats_group* " group ", estats_connection* " connection ");"
+.BI "void             estats_snapshot_free(estats_snapshot* " snap ");"
+.BI "int              estats_snap(estats_snapshot* " snap ");"
+.fi
+.SH DESCRIPTION
+\fBestats_snapshot_alloc()\fR allocates the memory necessary to take a
+snapshot of the group \fIgroup\fR on the connection \fIconnection\fR.
+.PP
+\fBestats_snapshot_free()\fR frees the previously allocated snapshot.
+.PP
+\fBestats_snap()\fR takes a snapshot.
+.SH RETURN VALUES
+\fBestats_snapshot_alloc()\fR returns the allocated snapshot structure,
+or \fBNULL\fR if there is an error.
+.PP
+\fBestats_snap()\fR returns ESTATS_ERR_SUCCESS if it succeeds, or an
+error code otherwise.
+.SH EXAMPLE USE
+.nf
+/* Warning: no errorhandling below...*/
+estats_agent* agent;
+estats_group* group;
+estats_connection* conn;
+estats_snapshot* snap;
+int cid, i;
+
+/* Initialize cid */
+agent = estats_attach(ESTATS_AGENT_TYPE_LOCAL, NULL);
+group = estats_group_find(agent, "read");
+conn = estats_connection_lookup(agent, cid);
+snap = estats_snapshot_alloc(group, conn);
+for (i = 0; i < 100; i++) {
+    estats_snap(snap);
+
+    /* Use estats_snap_read, etc. */
+
+    sleep(1);
+}
+estats_snapshot_free(snap);
+.fi
+.SH SEE ALSO
+.BR estats_snap_read (3),
+.BR estats_delta_any (3),
+.BR libestats (3)

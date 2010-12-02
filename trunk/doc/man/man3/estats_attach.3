@@ -1,0 +1,39 @@
+.\" $Id: estats_attach.3,v 1.1 2003/01/06 20:50:31 engelhar Exp $
+.TH ESTATS_ATTACH 3 "12 December 2002" "Estats Userland" "Estats"
+.SH NAME
+estats_attach, estats_detach \- attach to and detach from a Estats data
+source (SNMP terminology)
+.SH SYNOPSIS
+.B #include <estats/estats.h>
+.PP
+.nf
+.BI "estats_agent* estats_attach(int " type ", void* " data ");"
+.BI "void          estats_detach(estats_agent* " agent ");"
+.fi
+.SH DESCRIPTION
+The \fBestats_attach()\fR function attaches to a Estats data source.
+Most commonly, the data source is the local machine, but future versions
+of Estats may support remote machines as a data source.  It is typically
+the first function called by users of \fIlibestats\fR, and it returns a
+\fIestats_agent\fR which may be used by subsequent functions.
+.PP
+The argument \fImethod\fR denotes how the data will be gathered.  Each
+\fImethod\fR has its own requirements for the contents of \fIdata\fR.
+These requirements are explained below.
+.PP
+Choose \fImethod\fR from the following:
+.TP
+\fBESTATS_AGENT_TYPE_LOCAL\fR
+The Estats data source is the local machine, as it is running a
+Estats-enabled kernel.  \fIdata\fR should be NULL.
+.PP
+\fBestats_detach()\fR closes and deallocates a previously obtained
+\fIagent\fR.
+.SH RETURN VALUES
+\fBestats_attach()\fR returns an initialized \fIestats_agent\fR that may
+be used by subsequent functions, or \fBNULL\fR if it fails for any
+reason.
+.PP
+\fBestats_detach()\fR returns no value.
+.SH SEE ALSO
+.BR libestats (3)

@@ -1,0 +1,20 @@
+.\" $Id: deltavar.1,v 1.1 2003/01/06 20:50:29 engelhar Exp $
+.TH deltavar 1 "26 February 2002" "Estats Userland" "Estats"
+.SH NAME
+deltavar \- monitor a single Estats variable continuously, printing out how
+much it changes each second.
+.SH SYNOPSIS
+.B deltavar
+.I connection_id
+.I var_name
+.SH DESCRIPTION
+\fBdeltavar\fR runs in an infinite loop, creating a snapshot of the
+current value of the Estats variable \fIvar_name\fR from the connection
+\fIconnection_id\fR once every second and printing out the difference
+from the previous value.
+.SH SEE ALSO
+.BR gutil (1),
+.BR readvar (1),
+.BR readall (1),
+.BR writevar (1),
+.BR estats (7)

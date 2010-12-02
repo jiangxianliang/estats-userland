@@ -1,0 +1,23 @@
+.\" $Id: estats_snap_accessors.3,v 1.1 2003/01/06 20:50:35 engelhar Exp $
+.TH ESTATS_SNAP 3 "12 December 2002" "Estats Userland" "Estats"
+.SH NAME
+estats_get_snap_group, estats_get_snap_group_name \- get values from the
+Estats snapshot opaque structure
+.SH SYNOPSIS
+.B #include <estats/estats.h>
+.PP
+.nf
+.BI "estats_group* estats_get_snap_group(estats_snapshot* " snap ");"
+.BI "const char*   estats_get_snap_group_name(estats_snapshot* " snap ");"
+.fi
+.SH DESCRIPTION
+As the \fIestats_snapshot\fR structure is opaque, these functions exist
+to fetch values from it without exposing its structure.
+.SH RETURN VALUES
+\fBestats_get_snap_group()\fR returns the group associated with the
+snapshot.
+.PP
+\fBestats_get_snap_group_name()\fR returns the name of the group
+associated with the snapshot.
+.SH SEE ALSO
+.BR libestats (3)

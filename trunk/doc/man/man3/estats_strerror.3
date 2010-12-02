@@ -1,0 +1,20 @@
+.\" $Id: estats_strerror.3,v 1.1 2003/01/06 20:50:35 engelhar Exp $
+.TH estats_strerror 3 "26 February 2002" "Estats Userland" "Estats"
+.SH NAME
+estats_strerror \- return string describing error code in the style of
+\fBstrerror\fR(3)
+.SH SYNOPSIS
+.B #include <estats/estats.h>
+.PP
+.BI "const char* estats_strerror(int " errnum ");"
+.SH DESCRIPTION
+The \fBestats_strerror\fR function returns a string describing the error
+code passed in the argument \fIerrnum\fR.  This is the same string which
+is printed after the colon in \fBestats_perror\fR.  This function is
+usually used with \fIestats_errno\fR as its argument.
+.SH RETURN VALUES
+The \fBestats_strerror\fR function returns the appropriate description
+string, or "unknown error" if the error code is unknown.
+.SH SEE ALSO
+.BR estats_perror (3),
+.BR libestats (3)
