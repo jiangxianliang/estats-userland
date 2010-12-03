@@ -1,1 +1,7 @@
-stub
+
+To generate the configure file, run "autorun.sh"; this requires autotools.
+
+To build, run ./configure, make, make install.
+
+
+All material here is based on the NSF supported projects, Web100 and Web10Gig.
