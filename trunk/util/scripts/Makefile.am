@@ -1,4 +1,4 @@
-bin_PROGRAMS = deltavar listconn listvars logtest readall readconn readvar writevar
+bin_PROGRAMS = deltavar listconn listvars logtest logrtest logwtest readall readconn readvar writevar
 
 LIBESTATS_NOGTK_LDADDS = @STRIP_BEGIN@ \
 	$(top_builddir)/lib/estats/libestats.la \
@@ -26,6 +26,12 @@ listvars_LDADD = $(LIBESTATS_NOGTK_LDADDS)
 
 logtest_SOURCES = logtest.c scripts.h
 logtest_LDADD = $(LIBESTATS_NOGTK_LDADDS)
+
+logrtest_SOURCES = logrtest.c scripts.h
+logrtest_LDADD = $(LIBESTATS_NOGTK_LDADDS)
+
+logwtest_SOURCES = logwtest.c scripts.h
+logwtest_LDADD = $(LIBESTATS_NOGTK_LDADDS)
 
 readall_SOURCES = readall.c scripts.h
 readall_LDADD = $(LIBESTATS_NOGTK_LDADDS)
