@@ -4,11 +4,6 @@ LIBESTATS_NOGTK_LDADDS = @STRIP_BEGIN@ \
 	$(top_builddir)/lib/estats/libestats.la \
 	@STRIP_END@
 
-LIBSESTATS_NOGTK_LDADDS = @STRIP_BEGIN@ \
-	$(top_builddir)/lib/estats/libestats.la \
-	$(top_builddir)/lib/sestats/libsestats.la \
-	@STRIP_END@
-
 INCLUDES = @STRIP_BEGIN@ \
 	-I$(top_srcdir)/lib \
 	@STRIP_END@
@@ -44,3 +39,4 @@ readvar_LDADD = $(LIBESTATS_NOGTK_LDADDS)
 
 writevar_SOURCES = writevar.c scripts.h
 writevar_LDADD = $(LIBESTATS_NOGTK_LDADDS)
+
