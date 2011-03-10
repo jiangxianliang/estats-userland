@@ -19,7 +19,7 @@ estats_pri_h_sources = \
 	connlist-int.h \
 	debug-int.h \
 	error-int.h \
-	estats-int.h
+	estats-int.h \
 	group-int.h \
 	libcwrap-int.h \
 	list-int.h \
