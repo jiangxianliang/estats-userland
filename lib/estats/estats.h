@@ -1,5 +1,5 @@
-#if !defined(ESTATS_ESTATS_H)
-#define ESTATS_ESTATS_H
+#if !defined(ESTATS_H)
+#define ESTATS_H
 
 /* TODO: How to handle systems without the following headers? */
 #include <sys/types.h>  /* For size_t */
@@ -16,8 +16,8 @@
 #include <estats/group.h>
 #include <estats/log.h>
 #include <estats/snapshot.h>
-#include <estats/stat.h>
+#include <estats/connlist.h>
 #include <estats/value.h>
 #include <estats/var.h>
 
-#endif /* !defined(ESTATS_ESTATS_H) */
+#endif /* !defined(ESTATS_H) */

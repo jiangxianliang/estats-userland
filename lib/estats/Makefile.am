@@ -2,45 +2,45 @@
 estats_pub_h_sources = \
 	agent.h \
 	connection.h \
+	connlist.h \
 	error.h \
+	estats.h \
 	group.h \
 	log.h \
 	snapshot.h \
-	stat.h \
 	types.h \
 	value.h \
-	var.h \
-	estats.h
+	var.h
 
 # Header files not installed
 estats_pri_h_sources = \
 	agent-int.h \
 	connection-int.h \
+	connlist-int.h \
 	debug-int.h \
 	error-int.h \
+	estats-int.h
 	group-int.h \
 	libcwrap-int.h \
 	list-int.h \
 	log-int.h \
 	snapshot-int.h \
-	stat-int.h \
 	string-int.h \
 	types-int.h \
 	value-int.h \
-	var-int.h \
-	estats-int.h
-
+	var-int.h
+	
 # C sources to build the library from
 estats_c_sources = \
 	agent.c \
 	connection.c \
+	connlist.c \
 	debug-int.c \
 	error.c \
 	group.c \
 	libcwrap-int.c \
 	log.c \
 	snapshot.c \
-	stat.c \
 	string-int.c \
 	value.c \
 	var.c

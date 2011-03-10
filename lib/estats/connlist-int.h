@@ -1,17 +1,17 @@
-#if !defined(ESTATS_STAT_INT_H)
-#define ESTATS_STAT_INT_H
+#if !defined(ESTATS_CONNLIST_INT_H)
+#define ESTATS_CONNLIST_INT_H
 
 #include <sys/stat.h>
 #include <fnmatch.h>
 
-typedef enum STAT_LIST_POS {
-    STAT_IS_HEAD = 0,
-    STAT_IS_NOT_HEAD
-} STAT_LIST_POS;
+typedef enum CONNLIST_LIST_POS {
+    CONNLIST_IS_HEAD = 0,
+    CONNLIST_IS_NOT_HEAD
+} CONNLIST_LIST_POS;
 
-struct estats_stat {
+struct estats_connlist {
   struct estats_list            list; 
-  STAT_LIST_POS			pos;
+  CONNLIST_LIST_POS		pos;
   int                           cid;
   pid_t                         pid;
   uid_t                         uid;
@@ -22,4 +22,4 @@ struct estats_stat {
   struct estats_connection_spec spec; 
 };
 
-#endif /* !defined(ESTATS_STAT_INT_H) */
+#endif /* !defined(ESTATS_CONNLIST_INT_H) */

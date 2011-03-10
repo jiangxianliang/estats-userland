@@ -124,7 +124,7 @@ _estats_agent_parse_header(estats_agent* agent, FILE* fp)
             }
 
             curGroup->nvars++;
-            _estats_list_add(&(var->list), &(curGroup->var_head.list));
+            _estats_list_add_tail(&(var->list), &(curGroup->var_head.list));
             var = NULL;
         }
     }

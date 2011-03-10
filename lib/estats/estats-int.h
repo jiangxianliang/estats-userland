@@ -1,5 +1,5 @@
-#if !defined(ESTATS_ESTATS_INT_H)
-#define ESTATS_ESTATS_INT_H
+#if !defined(ESTATS_INT_H)
+#define ESTATS_INT_H
 
 /* System headers (use config.h's results to determine whether or not to
    include them) */
@@ -33,6 +33,7 @@
 /* Estats internal headers */
 #include <estats/agent-int.h>
 #include <estats/connection-int.h>
+#include <estats/connlist-int.h>
 #include <estats/debug-int.h>
 #include <estats/error-int.h>
 #include <estats/group-int.h>
@@ -41,19 +42,18 @@
 #include <estats/log-int.h>
 #include <estats/snapshot-int.h>
 #include <estats/string-int.h>
-#include <estats/stat-int.h>
 #include <estats/value-int.h>
 #include <estats/var-int.h>
 
 /* Estats public headers */
 #include <estats/agent.h>
 #include <estats/connection.h>
+#include <estats/connlist.h>
 #include <estats/error.h>
 #include <estats/group.h>
 #include <estats/log.h>
 #include <estats/snapshot.h>
-#include <estats/stat.h>
 #include <estats/value.h>
 #include <estats/var.h>
 
-#endif /* !defined(ESTATS_ESTATS_INT_H) */
+#endif /* !defined(ESTATS_INT_H) */
