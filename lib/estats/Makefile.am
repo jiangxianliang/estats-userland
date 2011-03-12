@@ -2,7 +2,7 @@
 estats_pub_h_sources = \
 	agent.h \
 	connection.h \
-	connlist.h \
+	conninfo.h \
 	error.h \
 	estats.h \
 	group.h \
@@ -16,7 +16,6 @@ estats_pub_h_sources = \
 estats_pri_h_sources = \
 	agent-int.h \
 	connection-int.h \
-	connlist-int.h \
 	debug-int.h \
 	error-int.h \
 	estats-int.h \
@@ -34,7 +33,7 @@ estats_pri_h_sources = \
 estats_c_sources = \
 	agent.c \
 	connection.c \
-	connlist.c \
+	conninfo.c \
 	debug-int.c \
 	error.c \
 	group.c \

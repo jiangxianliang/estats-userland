@@ -540,7 +540,7 @@ _estats_connlist_get_pid_list(struct estats_connlist** head)
 		    stno = stat(buf, &st); 
 		    if (S_ISSOCK(st.st_mode)) { // add new list entry
 
-			sprintf(buf, "/proc/%d/connlistus", pid);
+			sprintf(buf, "/proc/%d/status", pid);
 
 			if ((file = fopen(buf, "r")) == NULL) continue;
 
