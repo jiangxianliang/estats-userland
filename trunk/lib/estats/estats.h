@@ -16,7 +16,7 @@
 #include <estats/group.h>
 #include <estats/log.h>
 #include <estats/snapshot.h>
-#include <estats/connlist.h>
+#include <estats/conninfo.h>
 #include <estats/value.h>
 #include <estats/var.h>
 
