@@ -177,6 +177,7 @@ estats_agent_detach(estats_agent** agent)
     struct estats_list* varCurrPos;
     struct estats_list* connCurrPos;
     struct estats_list* tmp;
+    estats_group* specGroup;
 
     if (agent == NULL || *agent == NULL)
         return;
@@ -195,6 +196,16 @@ estats_agent_detach(estats_agent** agent)
         free(currGroup);
     }
 
+    specGroup = (*agent)->spec;
+        
+    ESTATS_LIST_FOREACH_SAFE(varCurrPos, tmp, &(specGroup->var_head.list)) {
+        estats_var* currVar = ESTATS_LIST_ENTRY(varCurrPos, estats_var, list);
+        _estats_list_del(varCurrPos); /* Must be before free! */
+        free(currVar);
+    }
+
+    free(specGroup);
+
     ESTATS_LIST_FOREACH_SAFE(connCurrPos, tmp, &((*agent)->connection_head.list)) {
         estats_connection* currConn = ESTATS_LIST_ENTRY(connCurrPos, estats_connection, list);
         _estats_list_del(connCurrPos); /* Must be before free! */
@@ -211,7 +222,7 @@ estats_agent_detach(estats_agent** agent)
     default:
         break;
     }
-    
+
     free(*agent);
     *agent = NULL;
 }
