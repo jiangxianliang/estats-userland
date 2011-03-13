@@ -15,7 +15,7 @@ typedef struct estats_conninfo {
 
 estats_error* estats_get_conninfo_head(estats_conninfo** _head, estats_agent* _agent);
 
-estats_error* estats_conninfo_new(estats_conninfo** _conninfo);
+//estats_error* estats_conninfo_new(estats_conninfo** _conninfo);
 
 estats_error* estats_conninfo_next(estats_conninfo** _next, const estats_conninfo* _prev);
 
@@ -36,7 +36,7 @@ estats_error* estats_conninfo_get_state(int* _state,
 estats_error* estats_conninfo_get_cmdline(char** _cmdline,
                                       const estats_conninfo* _conninfo);
 
-estats_error* estats_conninfo_get_spec(struct estats_connection_spec* _spec,
+estats_error* estats_conninfo_copy_spec(struct estats_connection_spec* _spec,
                                    const estats_conninfo* _conninfo);
 
 #define ESTATS_CONNINFO_FOREACH(pos, head) \

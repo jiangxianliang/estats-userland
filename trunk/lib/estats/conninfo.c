@@ -6,6 +6,7 @@ static estats_error* _estats_conninfo_get_tcp_list(struct estats_conninfo** tcp_
 static estats_error* _estats_conninfo_get_ino_list(struct estats_conninfo** ino_list);
 static estats_error* _estats_conninfo_get_pid_list(struct estats_conninfo** pid_list);
 static estats_error* _estats_conninfo_spec_compare(int* res, const estats_conninfo* st1, const estats_conninfo* st2);
+static estats_error* _estats_conninfo_new_node(estats_conninfo** _conninfo);
 static void          _estats_conninfo_free_node(estats_conninfo** conninfo);
 static estats_error* _estats_conninfo_add_tail(struct estats_conninfo** head, struct estats_conninfo* ci);
 
@@ -23,7 +24,7 @@ Cleanup:
 }
 
 estats_error*
-estats_conninfo_new(estats_conninfo** ci)
+_estats_conninfo_new_node(estats_conninfo** ci)
 {
     estats_error* err = NULL; 
 
@@ -54,12 +55,17 @@ Cleanup:
 
 void
 estats_conninfo_free(estats_conninfo** conninfo)
-{ 
-  if (conninfo == NULL || *conninfo == NULL)
-    return;
+{
+    struct estats_conninfo* tmp;
 
-  // free list
-  
+    if (conninfo == NULL || *conninfo == NULL)
+        return;
+
+    while (*conninfo != NULL) {
+        tmp = *conninfo;
+        *conninfo = (*conninfo)->next;
+        _estats_conninfo_free_node(&tmp);
+    }
 }
 
 void
@@ -72,6 +78,7 @@ _estats_conninfo_free_node(estats_conninfo** conninfo)
     estats_value_free(&((*conninfo)->spec.src_port));
     estats_value_free(&((*conninfo)->spec.dst_addr));
     estats_value_free(&((*conninfo)->spec.dst_port));
+    Free((void**) &(*conninfo)->cmdline);
 
     Free((void**) conninfo);
 }
@@ -129,14 +136,14 @@ Cleanup:
 
 
 estats_error*
-estats_conninfo_get_spec(struct estats_connection_spec *spec, const estats_conninfo* st)
+estats_conninfo_copy_spec(struct estats_connection_spec *spec, const estats_conninfo* st)
 {
     estats_error* err = NULL;
     const struct estats_connection_spec* sp;
 
     ErrIf(spec == NULL || st == NULL, ESTATS_ERR_INVAL);
     ErrIf((sp = &st->spec) == NULL, ESTATS_ERR_INVAL);
-    
+
     Chk(_estats_value_copy(&spec->src_addr, sp->src_addr));
     Chk(_estats_value_copy(&spec->src_port, sp->src_port));
     Chk(_estats_value_copy(&spec->dst_addr, sp->dst_addr));
@@ -164,9 +171,9 @@ static estats_error*
 _estats_conninfo_refresh(struct estats_conninfo** ecl, estats_agent* agent)
 {
     estats_error* err = NULL;
-    estats_conninfo* tcp_head;
-    estats_conninfo* ino_head;
-    estats_conninfo* pid_head;
+    estats_conninfo* tcp_head = NULL;
+    estats_conninfo* ino_head = NULL;
+    estats_conninfo* pid_head = NULL;
     estats_conninfo* tcp_pos;
     estats_conninfo* ino_pos;
     estats_conninfo* pid_pos;
@@ -204,7 +211,7 @@ _estats_conninfo_refresh(struct estats_conninfo** ecl, estats_agent* agent)
 		    if(pid_pos->ino == ino_pos->ino) { //then create entry 
 			fd_entry = 1;
 
-                        Chk(estats_conninfo_new(&newcl));
+                        Chk(_estats_conninfo_new_node(&newcl));
 
 			newcl->pid = pid_pos->pid; 
 			Chk(Strdup(&newcl->cmdline, pid_pos->cmdline));
@@ -216,14 +223,14 @@ _estats_conninfo_refresh(struct estats_conninfo** ecl, estats_agent* agent)
 
 			newcl->addrtype = tcp_pos->addrtype; 
 
-			Chk(estats_conninfo_get_spec(&newcl->spec, tcp_pos));
+			Chk(estats_conninfo_copy_spec(&newcl->spec, tcp_pos));
 
                         Chk(_estats_conninfo_add_tail(ecl, newcl));
 		    }
 	       	}
 	       	if(!fd_entry) { // add entry w/out cmdline 
 
-                        Chk(estats_conninfo_new(&newcl));
+                        Chk(_estats_conninfo_new_node(&newcl));
 
 			newcl->pid = 0;
 			newcl->uid = ino_pos->uid;
@@ -231,7 +238,7 @@ _estats_conninfo_refresh(struct estats_conninfo** ecl, estats_agent* agent)
 
 			newcl->cid = tcp_pos->cid;
 			newcl->addrtype = tcp_pos->addrtype; 
-			Chk(estats_conninfo_get_spec(&newcl->spec, tcp_pos));
+			Chk(estats_conninfo_copy_spec(&newcl->spec, tcp_pos));
 
 			Chk(Strdup(&newcl->cmdline, "\0")); 
 
@@ -242,11 +249,11 @@ _estats_conninfo_refresh(struct estats_conninfo** ecl, estats_agent* agent)
 	if(!tcp_entry) { // then connection has vanished; add residual cid info
 			 // (only for consistency with entries in /proc/web100) 
 
-            Chk(estats_conninfo_new(&newcl));
+            Chk(_estats_conninfo_new_node(&newcl));
 
 	    newcl->cid = tcp_pos->cid; 
 	    newcl->addrtype = tcp_pos->addrtype; 
-	    Chk(estats_conninfo_get_spec(&newcl->spec, tcp_pos));
+	    Chk(estats_conninfo_copy_spec(&newcl->spec, tcp_pos));
 	    Chk(Strdup(&newcl->cmdline, "\0")); 
 
             Chk(_estats_conninfo_add_tail(ecl, newcl));
@@ -258,6 +265,10 @@ _estats_conninfo_refresh(struct estats_conninfo** ecl, estats_agent* agent)
     }
     printf("ii = %d\n", ii);
 Cleanup:
+    estats_conninfo_free(&tcp_pos);
+    estats_conninfo_free(&ino_pos);
+    estats_conninfo_free(&pid_pos);
+
     return err;
 }
 
@@ -276,7 +287,7 @@ _estats_conninfo_get_tcp_list(struct estats_conninfo** head, estats_agent* agent
     while (conn != NULL) { 
 	estats_conninfo* conninfo = NULL; 
 
-        Chk(estats_conninfo_new(&conninfo));
+        Chk(_estats_conninfo_new_node(&conninfo));
 
 	Chk(estats_connection_get_cid(&conninfo->cid, conn));
        	Chk(estats_connection_get_spec(&conninfo->spec, conn));
@@ -317,7 +328,7 @@ _estats_conninfo_get_ino_list(struct estats_conninfo** head)
 
        	while (fgets(buf, sizeof(buf), file) != NULL) {
 
-	    Chk(estats_conninfo_new(&conninfo));
+	    Chk(_estats_conninfo_new_node(&conninfo));
 
 	    if ((scan = sscanf(buf,
 			    "%*u: %x:%hx %x:%hx %x %*x:%*x %*x:%*x %*x %u %*u %lu",
@@ -353,7 +364,7 @@ _estats_conninfo_get_ino_list(struct estats_conninfo** head)
 
 	while (fgets(buf, sizeof(buf), file6) != NULL) {
 
-	    Chk(estats_conninfo_new(&conninfo));
+	    Chk(_estats_conninfo_new_node(&conninfo));
 
 	    if ((scan = sscanf(buf,
 			    "%*u: %64[0-9A-Fa-f]:%hx %64[0-9A-Fa-f]:%hx %x %*x:%*x %*x:%*x %*x %u %*u %u",
@@ -429,7 +440,7 @@ _estats_conninfo_get_pid_list(struct estats_conninfo** head)
 			if (fgets(buf, sizeof(buf), file) == NULL)
 			    goto FileCleanup; 
        	
-	                Chk(estats_conninfo_new(&ecl));
+	                Chk(_estats_conninfo_new_node(&ecl));
                         Chk(Malloc((void**) &ecl->cmdline, PATH_MAX));
 
 			if (sscanf(buf, "Name: %s\n", ecl->cmdline) != 1) {
