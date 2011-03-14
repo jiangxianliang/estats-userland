@@ -209,6 +209,10 @@ estats_agent_detach(estats_agent** agent)
     ESTATS_LIST_FOREACH_SAFE(connCurrPos, tmp, &((*agent)->connection_head.list)) {
         estats_connection* currConn = ESTATS_LIST_ENTRY(connCurrPos, estats_connection, list);
         _estats_list_del(connCurrPos); /* Must be before free! */
+        estats_value_free(&currConn->spec.dst_port);
+        estats_value_free(&currConn->spec.dst_addr);
+        estats_value_free(&currConn->spec.src_port);
+        estats_value_free(&currConn->spec.src_addr);
         free(currConn);
     }
     

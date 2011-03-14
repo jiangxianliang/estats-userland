@@ -33,6 +33,10 @@ _estats_conninfo_new_node(estats_conninfo** ci)
 
     Chk(Malloc((void**) ci, sizeof(estats_conninfo)));
 
+    (*ci)->spec.dst_port = NULL;
+    (*ci)->spec.dst_addr = NULL;
+    (*ci)->spec.src_port = NULL;
+    (*ci)->spec.src_addr = NULL;
     (*ci)->cmdline = NULL;
     (*ci)->next = NULL;
 
@@ -265,9 +269,9 @@ _estats_conninfo_refresh(struct estats_conninfo** ecl, estats_agent* agent)
     }
     printf("ii = %d\n", ii);
 Cleanup:
-    estats_conninfo_free(&tcp_pos);
-    estats_conninfo_free(&ino_pos);
-    estats_conninfo_free(&pid_pos);
+    estats_conninfo_free(&tcp_head);
+    estats_conninfo_free(&ino_head);
+    estats_conninfo_free(&pid_head);
 
     return err;
 }
