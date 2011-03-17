@@ -56,6 +56,8 @@ _estats_var_next_undeprecated(estats_var** next, estats_var* prev)
 
     ErrIf(next == NULL || prev == NULL, ESTATS_ERR_INVAL);
 
+//    *next = NULL;
+
     head = &(prev->group->var_head.list);
     iter = &(prev->list);
 
@@ -82,6 +84,18 @@ estats_var_next(estats_var** next, estats_var* prev)
     return _estats_var_next_undeprecated(next, prev);
 }
 
+estats_var*
+estats_var_next_utility(const estats_var* prev)
+{
+    estats_error* err = NULL;
+    estats_var* next = NULL;
+
+    Chk(estats_var_next(&next, prev));
+
+Cleanup:
+    if (err) return NULL;
+    else return next;
+}
 
 estats_error*
 estats_var_get_name(const char** name, const estats_var* var)
