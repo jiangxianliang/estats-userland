@@ -4,9 +4,9 @@ int main(int argc, char *argv[])
 {
     estats_error* err = NULL;
     estats_agent* agent = NULL;
-    estats_group* grp_head = NULL;
+    estats_group* grp_head;
     estats_group* grp_pos;
-    estats_var* var_head = NULL;
+    estats_var* var_head;
     estats_var* var_pos;
     estats_connection* conn;
     int i;
