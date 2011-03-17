@@ -20,6 +20,18 @@ Cleanup:
     return err;
 }
 
+estats_connection*
+estats_connection_next_utility(const estats_connection* prev)
+{
+    estats_error* err = NULL;
+    estats_connection* next = NULL;
+
+    Chk(estats_connection_next(&next, prev));
+
+Cleanup:
+    if (err) return NULL;
+    else return next;
+}
 
 estats_error*
 estats_connection_get_agent(estats_agent** agent, const estats_connection* connection)
