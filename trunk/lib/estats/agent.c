@@ -55,7 +55,7 @@ _estats_agent_parse_header(estats_agent* agent, FILE* fp)
             group->size = 0;
             group->nvars = 0;
             group->agent = agent;
-            _estats_list_init(&(group->var_head.list));
+            _estats_list_init(&(group->var_list_head));
 
             strlcpy(group->name, linebuf + 1, sizeof(group->name));
 
@@ -70,7 +70,7 @@ _estats_agent_parse_header(estats_agent* agent, FILE* fp)
                 agent->spec = group;
                 group = NULL;
             } else {
-                _estats_list_add_tail(&(group->list), &(agent->group_head.list));
+                _estats_list_add_tail(&(group->list), &(agent->group_list_head));
                 group = NULL;
             }
         } else {
@@ -124,7 +124,7 @@ _estats_agent_parse_header(estats_agent* agent, FILE* fp)
             }
 
             curGroup->nvars++;
-            _estats_list_add_tail(&(var->list), &(curGroup->var_head.list));
+            _estats_list_add_tail(&(var->list), &(curGroup->var_list_head));
             var = NULL;
         }
     }
@@ -146,8 +146,8 @@ estats_agent_attach(estats_agent** agent, const ESTATS_AGENT_TYPE type, const vo
 
     ErrIf(agent == NULL, ESTATS_ERR_INVAL);
     Chk(Malloc((void**) agent, sizeof(estats_agent)));
-    _estats_list_init(&((*agent)->group_head.list));
-    _estats_list_init(&((*agent)->connection_head.list));
+    _estats_list_init(&((*agent)->group_list_head));
+    _estats_list_init(&((*agent)->connection_list_head));
 
     switch (type) {
     case ESTATS_AGENT_TYPE_LOCAL:
@@ -182,11 +182,11 @@ estats_agent_detach(estats_agent** agent)
     if (agent == NULL || *agent == NULL)
         return;
 
-    ESTATS_LIST_FOREACH_SAFE(groupCurrPos, tmp, &((*agent)->group_head.list)) {
+    ESTATS_LIST_FOREACH_SAFE(groupCurrPos, tmp, &((*agent)->group_list_head)) {
         struct estats_list* tmp2;
         estats_group* currGroup = ESTATS_LIST_ENTRY(groupCurrPos, estats_group, list);
         
-        ESTATS_LIST_FOREACH_SAFE(varCurrPos, tmp2, &(currGroup->var_head.list)) {
+        ESTATS_LIST_FOREACH_SAFE(varCurrPos, tmp2, &(currGroup->var_list_head)) {
             estats_var* currVar = ESTATS_LIST_ENTRY(varCurrPos, estats_var, list);
             _estats_list_del(varCurrPos); /* Must be before free! */
             free(currVar);
@@ -198,7 +198,7 @@ estats_agent_detach(estats_agent** agent)
 
     specGroup = (*agent)->spec;
         
-    ESTATS_LIST_FOREACH_SAFE(varCurrPos, tmp, &(specGroup->var_head.list)) {
+    ESTATS_LIST_FOREACH_SAFE(varCurrPos, tmp, &(specGroup->var_list_head)) {
         estats_var* currVar = ESTATS_LIST_ENTRY(varCurrPos, estats_var, list);
         _estats_list_del(varCurrPos); /* Must be before free! */
         free(currVar);
@@ -206,7 +206,7 @@ estats_agent_detach(estats_agent** agent)
 
     free(specGroup);
 
-    ESTATS_LIST_FOREACH_SAFE(connCurrPos, tmp, &((*agent)->connection_head.list)) {
+    ESTATS_LIST_FOREACH_SAFE(connCurrPos, tmp, &((*agent)->connection_list_head)) {
         estats_connection* currConn = ESTATS_LIST_ENTRY(connCurrPos, estats_connection, list);
         _estats_list_del(connCurrPos); /* Must be before free! */
         estats_value_free(&currConn->spec.dst_port);
@@ -240,7 +240,7 @@ estats_agent_get_connection_head(estats_connection** conn, estats_agent* agent)
 
     ErrIf(conn == NULL || agent == NULL, ESTATS_ERR_INVAL);
     Chk(_estats_agent_refresh_connections(agent)); 
-    head = &(agent->connection_head.list);
+    head = &(agent->connection_list_head);
     *conn = _estats_list_empty(head) ? NULL : ESTATS_LIST_ENTRY(head->next, estats_connection, list);
 
 Cleanup:
@@ -255,7 +255,7 @@ estats_agent_get_group_head(estats_group** group, estats_agent* agent)
     struct estats_list* head;
 
     ErrIf(group == NULL || agent == NULL, ESTATS_ERR_INVAL);
-    head = &(agent->group_head.list);
+    head = &(agent->group_list_head);
     *group = _estats_list_empty(head) ? NULL : ESTATS_LIST_ENTRY(head->next, estats_group, list);
 
 Cleanup:
@@ -300,7 +300,7 @@ estats_agent_foreach_connection(estats_agent* agent, estats_connection_foreach_f
     
     Chk(_estats_agent_refresh_connections(agent));
     
-    head = &(agent->connection_head.list);
+    head = &(agent->connection_list_head);
     ESTATS_LIST_FOREACH(currItem, head) {
         int flags = 0;
         estats_connection* currConn = ESTATS_LIST_ENTRY(currItem, estats_connection, list);
@@ -328,7 +328,7 @@ estats_agent_foreach_group(estats_agent* agent, estats_group_foreach_func f, voi
 
     ErrIf(agent == NULL || f == NULL, ESTATS_ERR_INVAL);
 
-    head = &(agent->group_head.list);
+    head = &(agent->group_list_head);
     ESTATS_LIST_FOREACH(currItem, head) {
         int flags = 0;
         estats_group* currGroup = ESTATS_LIST_ENTRY(currItem, estats_group, list);
@@ -359,7 +359,7 @@ estats_agent_find_connection_from_cid(estats_connection** conn,
     *conn = NULL;
     
     Chk(_estats_agent_refresh_connections(agent));
-    ESTATS_LIST_FOREACH(currItem, &(agent->connection_head.list)) {
+    ESTATS_LIST_FOREACH(currItem, &(agent->connection_list_head)) {
         estats_connection* currConn = ESTATS_LIST_ENTRY(currItem, estats_connection, list);
         if (currConn->cid == cid) {
             *conn = currConn;
@@ -388,7 +388,7 @@ estats_agent_find_connection_from_spec(estats_connection** conn,
     *conn = NULL;
     
     Chk(_estats_agent_refresh_connections(agent)); 
-    ESTATS_LIST_FOREACH(currItem, &(agent->connection_head.list)) {
+    ESTATS_LIST_FOREACH(currItem, &(agent->connection_list_head)) {
         estats_connection* currConn = ESTATS_LIST_ENTRY(currItem, estats_connection, list);
 	Chk(estats_value_compare(&res, currConn->spec.dst_port, spec->dst_port));
 	if (res) continue;
@@ -485,7 +485,7 @@ estats_agent_find_group_from_name(estats_group** group,
 
     *group = NULL;
 
-    ESTATS_LIST_FOREACH(currItem, &(agent->group_head.list)) {
+    ESTATS_LIST_FOREACH(currItem, &(agent->group_list_head)) {
         estats_group* currGroup = ESTATS_LIST_ENTRY(currItem, estats_group, list);
         if (strcmp(currGroup->name, groupName) == 0) {
             *group = currGroup;
@@ -512,7 +512,7 @@ estats_agent_find_var_and_group(estats_var** var, estats_group** group,
     
     ErrIf(var == NULL || agent == NULL || varname == NULL, ESTATS_ERR_INVAL);
     
-    head = &(agent->group_head.list);
+    head = &(agent->group_list_head);
     ESTATS_LIST_FOREACH(currItem, head) {
         g = ESTATS_LIST_ENTRY(currItem, estats_group, list);
 
@@ -555,7 +555,7 @@ _estats_agent_refresh_connections(estats_agent* agent)
 
     ErrIf(agent == NULL, ESTATS_ERR_INVAL);
     
-    connHead = &(agent->connection_head.list);
+    connHead = &(agent->connection_list_head);
     ESTATS_LIST_FOREACH_SAFE(connCurrPos, tmp, connHead) {
         estats_connection* currConn = ESTATS_LIST_ENTRY(connCurrPos, estats_connection, list);
         _estats_list_del(connCurrPos); /* Must be before free! */
@@ -653,8 +653,8 @@ _estats_agent_attach_log(estats_agent** agent, FILE* header)
 
 //    Chk(Malloc((void**) agent, sizeof(estats_agent)));
     (*agent)->type = ESTATS_AGENT_TYPE_LOG;
-//    _estats_list_init(&((*agent)->group_head.list));
-//    _estats_list_init(&((*agent)->connection_head.list));
+//    _estats_list_init(&((*agent)->group_list_head));
+//    _estats_list_init(&((*agent)->connection_list_head));
     Chk(_estats_agent_parse_header(*agent, header));
 
 Cleanup:

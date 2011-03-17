@@ -48,7 +48,7 @@ _estats_var_dep_check(estats_var* var)
 
 
 estats_error*
-_estats_var_next_undeprecated(estats_var** next, estats_var* prev)
+_estats_var_next_undeprecated(estats_var** next, const estats_var* prev)
 {
     estats_error* err = NULL;
     struct estats_list* head;
@@ -58,7 +58,7 @@ _estats_var_next_undeprecated(estats_var** next, estats_var* prev)
 
 //    *next = NULL;
 
-    head = &(prev->group->var_head.list);
+    head = &(prev->group->var_list_head);
     iter = &(prev->list);
 
     do {
@@ -79,7 +79,7 @@ _estats_var_next_undeprecated(estats_var** next, estats_var* prev)
 
 
 estats_error*
-estats_var_next(estats_var** next, estats_var* prev)
+estats_var_next(estats_var** next, const estats_var* prev)
 {
     return _estats_var_next_undeprecated(next, prev);
 }

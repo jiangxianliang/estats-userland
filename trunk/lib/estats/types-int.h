@@ -37,14 +37,14 @@ struct estats_group {
     int                  size;
     int                  nvars;
     struct estats_agent* agent;
-    struct estats_var    var_head;
+    struct estats_list   var_list_head;
 };
 
 struct estats_agent {
     ESTATS_AGENT_TYPE         type;
     char                      version[ESTATS_VERSTR_LEN_MAX];
-    struct estats_group       group_head;
-    struct estats_connection  connection_head;
+    struct estats_list        group_list_head;
+    struct estats_list        connection_list_head;
     struct estats_group*      spec;
 };
 
