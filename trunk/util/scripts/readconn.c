@@ -1,20 +1,13 @@
-/*
- * TODO:
- * - Add back in ability to optionally read variables only from a certain
- *   group?
- * - Print connection info?
- * - Separate variables into groups?
- */
 #include "scripts.h"
 
-static ESTATS_FOREACH_RET group_handler(estats_group* group, int flags, void* userData);
-static ESTATS_FOREACH_RET var_handler(estats_var* var, int flags, void* userData);
-
-int
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
     estats_error* err = NULL;
     estats_agent* agent = NULL;
+    estats_group* grp_head = NULL;
+    estats_group* grp_pos;
+    estats_var* var_head = NULL;
+    estats_var* var_pos;
     estats_connection* conn;
     int i;
 
@@ -27,9 +20,32 @@ main(int argc, char *argv[])
     
     for (i = 1; i < argc; i++) {
         int cid = atoi(argv[i]);
+
         fprintf(stdout, "Connection %d\n", cid);
+
         Chk(estats_agent_find_connection_from_cid(&conn, agent, cid));
-        Chk(estats_agent_foreach_group(agent, group_handler, conn));
+
+        Chk(estats_agent_get_group_head(&grp_head, agent));
+
+        ESTATS_GROUP_FOREACH(grp_pos, grp_head) {
+
+            Chk(estats_group_get_var_head(&var_head, grp_pos));
+
+            ESTATS_VAR_FOREACH(var_pos, var_head) {
+                const char* varName;
+                estats_value* value = NULL;
+                char* text = NULL;
+
+                Chk(estats_var_get_name(&varName, var_pos));
+                Chk(estats_connection_read_value(&value, conn, var_pos));
+                Chk(estats_value_as_string(&text, value));
+
+                fprintf(stdout, "    %-20s: %s\n", varName, text);
+
+                free(text);
+                estats_value_free(&value);
+            }
+        }
     }
 
  Cleanup:
@@ -41,49 +57,4 @@ main(int argc, char *argv[])
     }
     
     return EXIT_SUCCESS;
-}
-
-static ESTATS_FOREACH_RET
-group_handler(estats_group* group, int flags, void* userData)
-{
-    estats_error* err = NULL;
-    
-    Chk(estats_group_foreach_var(group, var_handler, userData));
-
- Cleanup:
-    if (err != NULL) {
-        PRINT_AND_FREE(err);
-        return ESTATS_FOREACH_STOP;
-    }
-
-    return ESTATS_FOREACH_CONTINUE;
-}
-
-static ESTATS_FOREACH_RET
-var_handler(estats_var* var, int flags, void* userData)
-{
-    estats_error* err = NULL;
-    estats_connection* conn;
-    const char* varName;
-    estats_value* value = NULL;
-    char* text = NULL;
-    
-    conn = (estats_connection*) userData;
-
-    Chk(estats_var_get_name(&varName, var));
-    Chk(estats_connection_read_value(&value, conn, var));
-    Chk(estats_value_as_string(&text, value));
-
-    fprintf(stdout, "    %-20s: %s\n", varName, text);
-
- Cleanup:
-    free(text);
-    estats_value_free(&value);
-    
-    if (err != NULL) {
-        PRINT_AND_FREE(err);
-        return ESTATS_FOREACH_STOP;
-    }
-
-    return ESTATS_FOREACH_CONTINUE;
 }

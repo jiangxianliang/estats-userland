@@ -19,6 +19,18 @@ Cleanup:
     return err;
 }
 
+estats_group*
+estats_group_next_utility(const estats_group* prev)
+{
+    estats_error* err = NULL;
+    estats_group* next = NULL;
+
+    Chk(estats_group_next(&next, prev));
+
+Cleanup:
+    if (err) return NULL;
+    else return next;
+}
 
 estats_error*
 estats_group_get_var_head(estats_var** var, estats_group* group)
@@ -27,6 +39,8 @@ estats_group_get_var_head(estats_var** var, estats_group* group)
 
     ErrIf(var == NULL || group == NULL, ESTATS_ERR_INVAL);
     ErrIf(group->agent == NULL, ESTATS_ERR_INVAL);
+
+//    *var = NULL;
 
     Chk(_estats_var_next_undeprecated(var, &(group->var_head)));
 
