@@ -10,7 +10,7 @@ estats_group_next(estats_group** next, const estats_group* prev)
     ErrIf(next == NULL || prev == NULL, ESTATS_ERR_INVAL);
 
     l = prev->list.next;
-    if (l == &(prev->agent->group_head.list))
+    if (l == &(prev->agent->group_list_head))
         *next = NULL;
     else
         *next = ESTATS_LIST_ENTRY(l, estats_group, list);
@@ -36,13 +36,17 @@ estats_error*
 estats_group_get_var_head(estats_var** var, estats_group* group)
 {
     estats_error* err = NULL;
+    struct estats_list* lp = NULL;
 
     ErrIf(var == NULL || group == NULL, ESTATS_ERR_INVAL);
     ErrIf(group->agent == NULL, ESTATS_ERR_INVAL);
 
-//    *var = NULL;
-
-    Chk(_estats_var_next_undeprecated(var, &(group->var_head)));
+    lp = (group->var_list_head).next;
+    if (lp) { 
+    *var = ESTATS_LIST_ENTRY(lp, estats_var, list);
+    Chk(_estats_var_next_undeprecated(var, *var));
+    }
+    else *var = NULL;
 
 Cleanup:
     return err;
@@ -113,8 +117,9 @@ estats_group_foreach_var(estats_group* group, estats_var_foreach_func f, void* u
     
     ErrIf(group == NULL || f == NULL, ESTATS_ERR_INVAL);
 
-    head = &(group->var_head.list);
-    Chk(_estats_var_next_undeprecated(&var, &(group->var_head)));
+    head = &(group->var_list_head);
+    var = ESTATS_LIST_ENTRY(&head->next, estats_var, list);
+    Chk(_estats_var_next_undeprecated(&var, var));
 
     while (var != NULL) {
         int flags = 0;
@@ -147,7 +152,7 @@ estats_group_find_var_from_name(estats_var** var, const estats_group* group, con
 
     *var = NULL;
     
-    ESTATS_LIST_FOREACH(currItem, &(group->var_head.list)) {
+    ESTATS_LIST_FOREACH(currItem, &(group->var_list_head)) {
         estats_var* currVar = ESTATS_LIST_ENTRY(currItem, estats_var, list);
         if (strcmp(currVar->name, name) == 0) {
             *var = currVar;

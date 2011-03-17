@@ -11,7 +11,7 @@ estats_connection_next(estats_connection** next, const estats_connection* prev)
     ErrIf(prev->agent->type != ESTATS_AGENT_TYPE_LOCAL, ESTATS_ERR_AGENT_TYPE);
 
     l = prev->list.next;
-    if (l == &(prev->agent->connection_head.list))
+    if (l == &(prev->agent->connection_list_head))
         *next = NULL;
     else
         *next = ESTATS_LIST_ENTRY(l, estats_connection, list);

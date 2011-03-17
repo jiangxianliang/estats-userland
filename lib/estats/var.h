@@ -2,7 +2,7 @@
 #define ESTATS_VAR_H
 
 estats_error* estats_var_next(estats_var** _next,
-                              estats_var* _prev);
+                              const estats_var* _prev);
 
 estats_error* estats_var_get_name(const char** _name,
                                   const estats_var* _var);
