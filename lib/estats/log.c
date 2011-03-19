@@ -402,7 +402,7 @@ Cleanup:
 }
 
 estats_error*
-estats_log_get_spec(struct estats_connection_spec* spec, const estats_log* log)
+estats_log_get_connection_spec(struct estats_connection_spec* spec, const estats_log* log)
 { 
     estats_error* err = NULL;
 

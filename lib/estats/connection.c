@@ -72,7 +72,7 @@ Cleanup:
 }
 
 estats_error*
-estats_connection_get_spec(struct estats_connection_spec *spec, const estats_connection* conn)
+estats_connection_get_connection_spec(struct estats_connection_spec *spec, const estats_connection* conn)
 {
     estats_error* err = NULL;
 

@@ -13,7 +13,7 @@ estats_error* estats_log_get_agent(estats_agent** _agent, const estats_log* _log
 
 estats_error* estats_log_get_mode(int* mode, const estats_log* _log);
 
-estats_error* estats_log_get_spec(struct estats_connection_spec* _spec, const estats_log* _log);
+estats_error* estats_log_get_connection_spec(struct estats_connection_spec* _spec, const estats_log* _log);
 estats_error* estats_log_get_annotation(char** _ann, const estats_log* _log);
 estats_error* estats_log_set_annotation(estats_log* _log, const char* _ann);
 estats_error* estats_log_eof(int* _eof, const estats_log* _log);
