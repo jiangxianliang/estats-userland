@@ -1,13 +1,15 @@
 #if !defined(ESTATS_CONNINFO_H)
 #define ESTATS_CONNINFO_H
 
+#define ESTATS_CMDLINE_LEN_MAX 32
+
 typedef struct estats_conninfo {
+    char                           cmdline[ESTATS_CMDLINE_LEN_MAX];
     int                            cid;
     pid_t                          pid;
     uid_t                          uid;
     ino_t                          ino;
     int                            state;
-    char*                          cmdline;
     ESTATS_ADDRTYPE                addrtype;
     struct estats_connection_spec  spec;
     struct estats_conninfo        *next;

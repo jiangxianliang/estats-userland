@@ -32,15 +32,11 @@
 
 /* Estats internal headers */
 #include <estats/agent-int.h>
-#include <estats/connection-int.h>
-#include <estats/connlist-int.h>
 #include <estats/debug-int.h>
 #include <estats/error-int.h>
-#include <estats/group-int.h>
 #include <estats/libcwrap-int.h>
 #include <estats/list-int.h>
 #include <estats/log-int.h>
-#include <estats/snapshot-int.h>
 #include <estats/string-int.h>
 #include <estats/value-int.h>
 #include <estats/var-int.h>

@@ -15,15 +15,12 @@ estats_pub_h_sources = \
 # Header files not installed
 estats_pri_h_sources = \
 	agent-int.h \
-	connection-int.h \
 	debug-int.h \
 	error-int.h \
 	estats-int.h \
-	group-int.h \
 	libcwrap-int.h \
 	list-int.h \
 	log-int.h \
-	snapshot-int.h \
 	string-int.h \
 	types-int.h \
 	value-int.h \

@@ -2,6 +2,7 @@
 #define ESTATS_H
 
 /* TODO: How to handle systems without the following headers? */
+/* TODO: answer---add check to configure */
 #include <sys/types.h>  /* For size_t */
 #include <netinet/in.h> /* For struct in_addr, in6_addr */
 #include <inttypes.h>   /* For uint8_t and friends, C99 standard header */
