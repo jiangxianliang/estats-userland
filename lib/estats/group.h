@@ -14,11 +14,7 @@ estats_error* estats_group_get_size(int* _size,
                                     const estats_group* _group);
 estats_error* estats_group_get_nvars(int* _nvars,
                                      const estats_group* _group);
-/*
-estats_error* estats_group_foreach_var(estats_group* _group,
-                                       estats_var_foreach_func _f,
-                                       void* _userData);
-*/
+
 estats_error* estats_group_find_var_from_name(estats_var** _var,
                                               const estats_group* _group,
                                               const char* _name);

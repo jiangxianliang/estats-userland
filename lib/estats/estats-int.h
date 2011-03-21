@@ -44,7 +44,6 @@
 /* Estats public headers */
 #include <estats/agent.h>
 #include <estats/connection.h>
-#include <estats/connlist.h>
 #include <estats/error.h>
 #include <estats/group.h>
 #include <estats/log.h>

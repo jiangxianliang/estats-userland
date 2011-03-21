@@ -107,40 +107,6 @@ estats_group_get_nvars(int* nvars,
     return err;
 }
 
-
-estats_error*
-estats_group_foreach_var(estats_group* group, estats_var_foreach_func f, void* userData)
-{
-    estats_error* err = NULL;
-    struct estats_list* head;
-    estats_var* var;
-    
-    ErrIf(group == NULL || f == NULL, ESTATS_ERR_INVAL);
-
-    head = &(group->var_list_head);
-    var = ESTATS_LIST_ENTRY(&head->next, estats_var, list);
-    Chk(_estats_var_next_undeprecated(&var, var));
-
-    while (var != NULL) {
-        int flags = 0;
-        struct estats_list* iter = &(var->list);
-
-        if (iter->prev == head)
-            flags |= ESTATS_FOREACH_FLAGS_IS_FIRST;
-        if (iter->next == head)
-            flags |= ESTATS_FOREACH_FLAGS_IS_LAST;
-        
-        if (f(var, flags, userData) == ESTATS_FOREACH_STOP)
-            break;
-
-        Chk(_estats_var_next_undeprecated(&var, var));
-    }
-
-Cleanup:
-    return err;
-}
-
-
 estats_error*
 estats_group_find_var_from_name(estats_var** var, const estats_group* group, const char* name)
 {

@@ -4,10 +4,6 @@ int main(int argc, char *argv[])
 {
     estats_error* err = NULL;
     estats_agent* agent = NULL;
-            char* srcAddr = NULL;
-            char* dstAddr = NULL;
-            char* srcPort = NULL;
-            char* dstPort = NULL;
     estats_group* grp_head;
     estats_group* grp_pos;
     estats_connection* c_head;
@@ -28,6 +24,10 @@ int main(int argc, char *argv[])
             estats_var* var_head;
             estats_var* var_pos;
             struct estats_connection_spec spec; 
+            char* srcAddr = NULL;
+            char* dstAddr = NULL;
+            char* srcPort = NULL;
+            char* dstPort = NULL;
             int cid;
 
             /* If no permission to access group, ignore and go to next connection */
@@ -35,9 +35,6 @@ int main(int argc, char *argv[])
                 estats_error_free(&err);
                 continue;
             }
-
-//    if (!(flags & ESTATS_FOREACH_FLAGS_IS_FIRST))
-//        fputc('\n', stdout);
 
             Chk(estats_connection_get_cid(&cid, c_pos));
             Chk(estats_connection_get_connection_spec(&spec, c_pos));
@@ -63,10 +60,11 @@ int main(int argc, char *argv[])
                 free(text);
                 estats_value_free(&value);
             }
-            free(srcAddr);
-            free(dstAddr);
-            free(srcPort);
-            free(dstPort);
+            estats_value_free(&spec.src_addr);
+            estats_value_free(&spec.src_port);
+            estats_value_free(&spec.dst_addr);
+            estats_value_free(&spec.dst_port);
+            free(srcAddr); free(srcPort); free(dstAddr); free(dstPort);
         }
     }
 

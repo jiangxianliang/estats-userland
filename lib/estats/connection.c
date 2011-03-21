@@ -182,8 +182,6 @@ estats_connection_spec_compare(int* result,
 {
     estats_error* err = NULL;
     int sa, sp, da, dp;
-//    ESTATS_ADDRTYPE type1;
-//    ESTATS_ADDRTYPE type2;
 
     ESTATS_VALUE_TYPE type1;
     ESTATS_VALUE_TYPE type2;
