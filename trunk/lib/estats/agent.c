@@ -288,65 +288,6 @@ Cleanup:
     return err;
 }
 
-
-estats_error*
-estats_agent_foreach_connection(estats_agent* agent, estats_connection_foreach_func f, void* userData)
-{
-    estats_error* err = NULL;
-    struct estats_list* head;
-    struct estats_list* currItem;
-
-    ErrIf(agent == NULL || f == NULL, ESTATS_ERR_INVAL);
-    
-    Chk(_estats_agent_refresh_connections(agent));
-    
-    head = &(agent->connection_list_head);
-    ESTATS_LIST_FOREACH(currItem, head) {
-        int flags = 0;
-        estats_connection* currConn = ESTATS_LIST_ENTRY(currItem, estats_connection, list);
-
-        if (currItem->prev == head)
-            flags |= ESTATS_FOREACH_FLAGS_IS_FIRST;
-        if (currItem->next == head)
-            flags |= ESTATS_FOREACH_FLAGS_IS_LAST;
-        
-        if (f(currConn, flags, userData) == ESTATS_FOREACH_STOP)
-            break;
-    }
-
-Cleanup:
-    return err;
-}
-
-
-estats_error*
-estats_agent_foreach_group(estats_agent* agent, estats_group_foreach_func f, void* userData)
-{
-    estats_error* err = NULL;
-    struct estats_list* head;
-    struct estats_list* currItem;
-
-    ErrIf(agent == NULL || f == NULL, ESTATS_ERR_INVAL);
-
-    head = &(agent->group_list_head);
-    ESTATS_LIST_FOREACH(currItem, head) {
-        int flags = 0;
-        estats_group* currGroup = ESTATS_LIST_ENTRY(currItem, estats_group, list);
-
-        if (currItem->prev == head)
-            flags |= ESTATS_FOREACH_FLAGS_IS_FIRST;
-        if (currItem->next == head)
-            flags |= ESTATS_FOREACH_FLAGS_IS_LAST;
-        
-        if (f(currGroup, flags, userData) == ESTATS_FOREACH_STOP)
-            break;
-    }
-
-Cleanup:
-    return err;
-}
-
-
 estats_error*
 estats_agent_find_connection_from_cid(estats_connection** conn,
                                       estats_agent *agent,

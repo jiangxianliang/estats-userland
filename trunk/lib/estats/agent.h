@@ -15,13 +15,6 @@ estats_error* estats_agent_get_type(ESTATS_AGENT_TYPE* _type,
 estats_error* estats_agent_get_version(const char** _version,
                                        const estats_agent* _agent);
 
-estats_error* estats_agent_foreach_connection(estats_agent* _agent,
-                                              estats_connection_foreach_func _f,
-                                              void* _userData);
-estats_error* estats_agent_foreach_group(estats_agent* _agent,
-                                         estats_group_foreach_func _f,
-                                         void* _userData);
-
 estats_error* estats_agent_find_connection_from_cid(estats_connection** _conn,
                                                     estats_agent* _agent,
                                                     int _cid);

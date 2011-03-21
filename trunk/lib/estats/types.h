@@ -5,9 +5,6 @@
 # define NULL 0
 #endif
 
-#define ESTATS_FOREACH_FLAGS_IS_FIRST (1 << 0)
-#define ESTATS_FOREACH_FLAGS_IS_LAST  (1 << 1)
-
 typedef enum ESTATS_ADDRTYPE {
     ESTATS_ADDRTYPE_UNKNOWN = 0,
     ESTATS_ADDRTYPE_IPV4,
@@ -45,11 +42,6 @@ typedef enum ESTATS_ERROR {
     ESTATS_ERR_ACCESS               = 21,
     ESTATS_ERR_CHKSUM               = 22,
 } ESTATS_ERROR;
-
-typedef enum ESTATS_FOREACH_RET {
-    ESTATS_FOREACH_STOP = 0,
-    ESTATS_FOREACH_CONTINUE = 1,
-} ESTATS_FOREACH_RET;
 
 typedef enum ESTATS_LOG_MODE {
     ESTATS_LOG_READ = 0,
@@ -97,9 +89,5 @@ typedef struct estats_log        estats_log;
 typedef struct estats_snapshot   estats_snapshot;
 typedef struct estats_value      estats_value;
 typedef struct estats_var        estats_var;
-
-typedef ESTATS_FOREACH_RET (*estats_connection_foreach_func)(estats_connection* conn, int flags, void* userData);
-typedef ESTATS_FOREACH_RET (*estats_group_foreach_func)(estats_group* group, int flags, void* userData);
-typedef ESTATS_FOREACH_RET (*estats_var_foreach_func)(estats_var* _var, int flags, void* _userData);
 
 #endif /* !defined(ESTATS_TYPES_H) */
