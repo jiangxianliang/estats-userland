@@ -3,7 +3,9 @@
 prefix="@PREFIX@"
 exec_prefix="@EXEC_PREFIX@"
 cflags="-I@ESTATS_INCLUDE_DIR@"
+includedir="@ESTATS_INCLUDE_DIR@"
 libs="-L@LIBDIR@ -lestats"
+libdir="@LIBDIR@"
 version="@ESTATS_VERSION@"
 
 usage()
@@ -38,8 +40,14 @@ while test $# -gt 0; do
     --cflags)
       echo ${cflags}
       ;;
+    --includedir)
+      echo ${includedir}
+      ;;
     --libs)
       echo ${libs}
+      ;;
+    --libdir)
+      echo ${libdir}
       ;;
     *)
       usage 1 1>&2
