@@ -52,7 +52,6 @@ struct estats_snapshot {
     struct estats_group*           group;
     int                            cid;
     struct estats_connection_spec  spec;
-//    struct estats_connection* connection;
     void*                          data;
 };
 
@@ -68,6 +67,7 @@ struct estats_error {
 struct estats_value {
     ESTATS_VALUE_TYPE type;
     union {
+        uint8_t         u8_val;
         uint16_t        u16_val;
         int32_t         s32_val;
         uint32_t        u32_val;

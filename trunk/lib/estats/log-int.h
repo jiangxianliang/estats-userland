@@ -17,4 +17,27 @@ struct estats_log {
     char*                          note;
 };
 
+#include <endian.h>
+#include <byteswap.h>
+
+# if __BYTE_ORDER == __LITTLE_ENDIAN
+#  define htolog16(x) (x)
+#  define log16toh(x) (x)
+
+#  define htolog32(x) (x)
+#  define log32toh(x) (x)
+
+#  define htolog64(x) (x)
+#  define log64toh(x) (x)
+# else
+#  define htolog16(x) bswap_16 (x)
+#  define log16toh(x) bswap_16 (x)
+
+#  define htolog32(x) bswap_32 (x)
+#  define log32toh(x) bswap_32 (x)
+
+#  define htolog64(x) bswap_64 (x)
+#  define log64toh(x) bswap_64 (x)
+# endif
+
 #endif /* !defined(ESTATS_LOG_INT_H) */
