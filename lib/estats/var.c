@@ -26,6 +26,9 @@ _estats_var_size_from_type(int* size, ESTATS_TYPE type)
     case ESTATS_TYPE_INET_ADDRESS_IPV6:
         *size = 17;
         break;
+    case ESTATS_TYPE_OCTET:
+        *size = 1;
+        break;
     default:
         Err(ESTATS_ERR_UNKNOWN_TYPE);
         break;

@@ -14,7 +14,7 @@ _estats_value_from_var_buf(estats_value** value,
     *value = NULL;
     
     if (type == ESTATS_TYPE_INET_ADDRESS) {
-        type = ((char*) buf)[16] == ESTATS_ADDRTYPE_IPV4 ? //JSE fix
+        type = ((char*) buf)[16] == ESTATS_ADDRTYPE_IPV4 ?
             ESTATS_TYPE_INET_ADDRESS_IPV4 :
             ESTATS_TYPE_INET_ADDRESS_IPV6;
     }
@@ -76,6 +76,10 @@ _estats_value_to_var_buf(void** buf,
         srcAddr = &(realValue->u.ip6addr_val);
         s = 16;
         break;
+    case ESTATS_VALUE_TYPE_OCTET:
+        srcAddr = &(realValue->u.u8_val);
+        s = 1;
+        break;
     default:
         Err(ESTATS_ERR_UNHANDLED_VALUE_TYPE);
         break;
@@ -129,6 +133,9 @@ _estats_value_copy(estats_value** copyVal,
     case ESTATS_VALUE_TYPE_IP6ADDR:
         newVal->u.ip6addr_val = origVal->u.ip6addr_val;
         break;
+    case ESTATS_VALUE_TYPE_OCTET:
+        newVal->u.u8_val = origVal->u.u8_val;
+        break;
     default:
         Err(ESTATS_ERR_UNKNOWN_TYPE);
         break;
@@ -180,6 +187,9 @@ estats_value_new(estats_value** value,
         break;
     case ESTATS_VALUE_TYPE_IP6ADDR:
         memcpy((*value)->u.ip6addr_val.s6_addr, (uint8_t*) buf, 16);
+        break;
+    case ESTATS_VALUE_TYPE_OCTET:
+        (*value)->u.u8_val = *((uint8_t*) buf);
         break;
     default:
         Err(ESTATS_ERR_UNKNOWN_TYPE);
@@ -550,6 +560,9 @@ _estats_var_type_to_value_type(ESTATS_VALUE_TYPE* valType,
         break;
     case ESTATS_TYPE_INET_ADDRESS_IPV6:
         *valType = ESTATS_VALUE_TYPE_IP6ADDR;
+        break;
+    case ESTATS_TYPE_OCTET:
+        *valType = ESTATS_VALUE_TYPE_OCTET;
         break;
     default:
         Err(ESTATS_ERR_UNKNOWN_TYPE);
