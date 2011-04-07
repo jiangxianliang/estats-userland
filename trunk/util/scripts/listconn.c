@@ -17,7 +17,7 @@ main(int argc, char *argv[])
     Chk(estats_get_conninfo_head(&ci_head, agent));
 
     ESTATS_CONNINFO_FOREACH(ci_pos, ci_head) {
-        int cid;
+        int cid, pid, uid;
         char cmdline[20];
 	char* srcAddr = NULL;
        	char* dstAddr = NULL;
@@ -25,6 +25,9 @@ main(int argc, char *argv[])
        	char* dstPort = NULL;
 
         cid = ci_pos->cid;
+        pid = ci_pos->pid;
+        uid = ci_pos->uid;
+        
         strncpy(&cmdline, ci_pos->cmdline, 20);
         cmdline[19] = '\0';
 
@@ -33,7 +36,7 @@ main(int argc, char *argv[])
        	Chk(estats_value_as_string(&dstAddr, (ci_pos->spec).dst_addr));
        	Chk(estats_value_as_string(&dstPort, (ci_pos->spec).dst_port));
 
-        printf("%-12d %-20s %-40s %-8s %-40s %-8s\n", cid, cmdline, srcAddr, srcPort, dstAddr, dstPort);
+        printf("%-12d %-12d %-12d %-20s %-40s %-8s %-40s %-8s\n", cid, pid, uid, cmdline, srcAddr, srcPort, dstAddr, dstPort);
 
         free(srcAddr);
         free(dstAddr);

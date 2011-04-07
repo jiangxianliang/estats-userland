@@ -38,6 +38,8 @@ _estats_conninfo_new_node(estats_conninfo** ci)
     (*ci)->spec.src_port = NULL;
     (*ci)->spec.src_addr = NULL;
     strlcpy((*ci)->cmdline, "\0", 1);
+    (*ci)->pid = 0;
+    (*ci)->uid = 0;
     (*ci)->next = NULL;
 
 Cleanup:
@@ -184,7 +186,6 @@ _estats_conninfo_refresh(struct estats_conninfo** ecl, estats_agent* agent)
     estats_conninfo* tst_pos;
     int dif;
     int tcp_entry, fd_entry;
-    int ii;
 
     /* associate cid with address */ 
     Chk(_estats_conninfo_get_tcp_list(&tcp_head, agent));
@@ -262,11 +263,7 @@ _estats_conninfo_refresh(struct estats_conninfo** ecl, estats_agent* agent)
             Chk(_estats_conninfo_add_tail(ecl, newcl));
        	}
     }
-    ii = 0;
-    ESTATS_CONNINFO_FOREACH(tcp_pos, tcp_head) {
-        ii++;
-    }
-    printf("ii = %d\n", ii);
+
 Cleanup:
     estats_conninfo_free(&tcp_head);
     estats_conninfo_free(&ino_head);
