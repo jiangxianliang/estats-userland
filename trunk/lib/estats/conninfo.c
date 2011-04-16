@@ -59,6 +59,19 @@ Cleanup:
     return err;
 }
 
+estats_conninfo*
+estats_conninfo_next_utility(const estats_conninfo* prev)
+{
+    estats_error* err = NULL;
+    estats_conninfo* next = NULL;
+
+    Chk(estats_conninfo_next(&next, prev));
+
+Cleanup:
+    if (err) return NULL;
+    else return next;
+}
+
 void
 estats_conninfo_free(estats_conninfo** conninfo)
 {
