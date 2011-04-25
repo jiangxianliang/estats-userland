@@ -14,7 +14,6 @@ estats_pub_h_sources = \
 
 # Header files not installed
 estats_pri_h_sources = \
-	agent-int.h \
 	debug-int.h \
 	error-int.h \
 	estats-int.h \
