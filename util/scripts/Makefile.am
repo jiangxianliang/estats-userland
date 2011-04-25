@@ -8,8 +8,6 @@ INCLUDES = @STRIP_BEGIN@ \
 	-I$(top_srcdir)/lib \
 	@STRIP_END@
 
-EXTRA_DIST = old-logtest.c
-
 deltavar_SOURCES = deltavar.c scripts.h
 deltavar_LDADD = $(LIBESTATS_NOGTK_LDADDS)
 
