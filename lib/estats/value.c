@@ -277,6 +277,9 @@ estats_value_change_type(estats_value** value,
             Chk(Malloc((void**) &(tmpValue->u.str_val), INET6_ADDRSTRLEN));
             Chk(Inet_ntop(AF_INET6, &((*value)->u.ip6addr_val), tmpValue->u.str_val, INET6_ADDRSTRLEN));
             break;
+        case ESTATS_VALUE_TYPE_OCTET:
+            Chk(Asprintf(NULL, &(tmpValue->u.str_val), "%u", (*value)->u.u8_val));
+            break;
         default:
             Err(ESTATS_ERR_UNHANDLED_VALUE_TYPE);
             break;
@@ -314,6 +317,11 @@ estats_value_change_type(estats_value** value,
             break;
         case ESTATS_VALUE_TYPE_IP6ADDR:
             Chk(Inet_pton(AF_INET6, (*value)->u.str_val, &(tmpValue->u.ip6addr_val)));
+            break;
+        case ESTATS_VALUE_TYPE_OCTET:
+            Chk(Strtoul(&u32, (*value)->u.str_val, NULL, 10));
+            ErrIf(u32 > 256, ESTATS_ERR_RANGE);
+            tmpValue->u.u8_val = u32;
             break;
         default:
             Err(ESTATS_ERR_UNHANDLED_VALUE_TYPE);
