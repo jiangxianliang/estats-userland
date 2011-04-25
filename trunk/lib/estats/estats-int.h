@@ -31,7 +31,6 @@
 #include <estats/types-int.h>
 
 /* Estats internal headers */
-#include <estats/agent-int.h>
 #include <estats/debug-int.h>
 #include <estats/error-int.h>
 #include <estats/libcwrap-int.h>
