@@ -1,3 +1,23 @@
+
+/*
+ * Copyright (c) 2011 The Board of Trustees of the University of Illinois,
+ *                    Carnegie Mellon University.
+ *
+ * This library is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation; either version 2.1 of the License, or (at your
+ * option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation,
+ * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA
+ *
+ */
 #if !defined(ESTATS_LOG_INT_H)
 #define ESTATS_LOG_INT_H
 
@@ -16,28 +36,5 @@ struct estats_log {
     struct estats_connection_spec  spec;
     char*                          note;
 };
-
-#include <endian.h>
-#include <byteswap.h>
-
-# if __BYTE_ORDER == __LITTLE_ENDIAN
-#  define htolog16(x) (x)
-#  define log16toh(x) (x)
-
-#  define htolog32(x) (x)
-#  define log32toh(x) (x)
-
-#  define htolog64(x) (x)
-#  define log64toh(x) (x)
-# else
-#  define htolog16(x) bswap_16 (x)
-#  define log16toh(x) bswap_16 (x)
-
-#  define htolog32(x) bswap_32 (x)
-#  define log32toh(x) bswap_32 (x)
-
-#  define htolog64(x) bswap_64 (x)
-#  define log64toh(x) bswap_64 (x)
-# endif
 
 #endif /* !defined(ESTATS_LOG_INT_H) */
