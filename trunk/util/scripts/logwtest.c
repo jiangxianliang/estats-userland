@@ -24,8 +24,6 @@ main(int argc, char *argv[])
     estats_snapshot* snap = NULL;
     estats_log* log = NULL;
     int cid;
-    char* text = NULL;
-    int eof = 0;
     int ii;
 
     argv0 = argv[0];
@@ -47,11 +45,10 @@ main(int argc, char *argv[])
     Chk(estats_snapshot_alloc(&snap, group, conn)); 
     for (ii = 0; ii < 5; ii++) {
         Chk(estats_snap(snap));
-	Chk(estats_log_write(log, snap));
+	Chk(estats_log_data_write(log, snap));
 	sleep(1);
     }
     estats_log_close(&log);
-//    estats_agent_detach(&agent);
 
 Cleanup:
     estats_snapshot_free(&snap);

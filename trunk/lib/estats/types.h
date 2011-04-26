@@ -1,23 +1,3 @@
-
-/*
- * Copyright (c) 2011 The Board of Trustees of the University of Illinois,
- *                    Carnegie Mellon University.
- *
- * This library is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the
- * Free Software Foundation; either version 2.1 of the License, or (at your
- * option) any later version.
- *
- * This library is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this library; if not, write to the Free Software Foundation,
- * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA
- *
- */
 #if !defined(ESTATS_TYPES_H)
 #define ESTATS_TYPES_H
 
@@ -34,7 +14,7 @@ typedef enum ESTATS_ADDRTYPE {
 
 typedef enum ESTATS_AGENT_TYPE {
     ESTATS_AGENT_TYPE_LOCAL = 0,
-    ESTATS_AGENT_TYPE_LOG = 1,
+    ESTATS_AGENT_TYPE_LOG   = 1,
 } ESTATS_AGENT_TYPE;
 
 typedef enum ESTATS_ERROR {
@@ -62,11 +42,6 @@ typedef enum ESTATS_ERROR {
     ESTATS_ERR_ACCESS               = 21,
     ESTATS_ERR_CHKSUM               = 22,
 } ESTATS_ERROR;
-
-typedef enum ESTATS_LOG_MODE {
-    ESTATS_LOG_READ = 0,
-    ESTATS_LOG_WRITE = 1,
-} ESTATS_LOG_MODE;
 
 typedef enum ESTATS_TYPE {
     ESTATS_TYPE_INTEGER = 0,
@@ -96,6 +71,11 @@ typedef enum ESTATS_VALUE_TYPE {
     ESTATS_VALUE_TYPE_OCTET   = 7,
 } ESTATS_VALUE_TYPE;
 
+typedef enum ESTATS_LOG_MODE {
+    R_MODE,
+    W_MODE
+} ESTATS_LOG_MODE;
+
 struct estats_connection_spec {
     struct estats_value *dst_port;
     struct estats_value *dst_addr;
@@ -103,11 +83,19 @@ struct estats_connection_spec {
     struct estats_value *src_addr;
 };
 
+struct estats_list {
+    struct estats_list* next;
+    struct estats_list* prev;
+};
+
+#define ESTATS_LIST_FOREACH(pos, head) \
+    for (pos = (head)->next; pos != (head); pos = pos->next)
+
 typedef struct estats_agent      estats_agent;
 typedef struct estats_connection estats_connection;
 typedef struct estats_error      estats_error;
 typedef struct estats_group      estats_group;
-typedef struct estats_log        estats_log;
+//typedef struct estats_log        estats_log;
 typedef struct estats_snapshot   estats_snapshot;
 typedef struct estats_value      estats_value;
 typedef struct estats_var        estats_var;
