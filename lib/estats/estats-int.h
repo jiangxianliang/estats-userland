@@ -26,6 +26,7 @@
 #include "config.h"
 #include <sys/param.h> /* For PATH_MAX */
 #include <sys/socket.h>
+#include <sys/stat.h>
 #include <sys/types.h>
 #include <arpa/inet.h> /* For inet_ntop */
 #include <netinet/in.h> /* For ntohs and friends */

@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2011 The Board of Trustees of the University of Illinois,
  *                    Carnegie Mellon University.
@@ -20,20 +19,208 @@
  */
 #include <estats/estats-int.h>
 
-#define BEGIN_HEADER_MARKER  "----Begin-Header-----"
-#define END_OF_HEADER_MARKER "----End-Of-Header---- -1 -1"
-#define BEGIN_SNAP_DATA      "----Begin-Snap-Data----"
-#define MAX_TMP_BUF_SIZE     32 
-#define ANNOTATION_LEN_MAX   255
+static estats_error* _estats_log_new(estats_log** _log);
+static estats_error* _estats_log_open_read(estats_log* _log, const char* _path);
+static estats_error* _estats_log_open_write(estats_log* _log, const char* _path);
+static estats_error* _estats_log_calculate_checksum(estats_log* _log, uint16_t* _sum);
+static estats_error* _estats_log_write_checksum(estats_log* _log);
+static void          _estats_log_free(estats_log** _log);
 
-static estats_error* _estats_log_open_read(estats_log* log, const char* path);
-static void          _estats_log_close_read(estats_log* log);
-static estats_error* _estats_log_open_write(estats_log* log, const char* path);
-static void          _estats_log_close_write(estats_log* log);
-static void          _estats_log_write_annotation(estats_log* log);
-static void          _estats_log_write_checksum(estats_log* log);
-static estats_error* _estats_log_calculate_checksum(estats_log* log, uint16_t* sum);
+estats_error*
+estats_log_open(estats_log** log, const char* path, const char* mode)
+{
+    estats_error* err = NULL;
 
+    Chk(_estats_log_new(log));
+
+    switch (mode[0]) {
+       	case 'r':
+	    Chk(_estats_log_open_read(*log, path));
+	    break;
+       	case 'w':
+	    Chk(_estats_log_open_write(*log, path));
+	    break;
+       	default:
+	    Err(ESTATS_ERR_INVAL);
+	    break; /* not reached */
+    }
+
+Cleanup:
+    if (err != NULL) {
+	Free((void**) log);
+    }
+
+    return err;
+}
+
+estats_error*
+estats_log_close(estats_log** log)
+{
+    estats_error* err = NULL;
+
+    ErrIf(log == NULL || *log == NULL, ESTATS_ERR_INVAL);
+
+    if ((*log)->mode == W_MODE) {
+        Chk(_estats_log_write_checksum(*log));
+    }
+
+Cleanup:
+    _estats_log_free(log);
+
+    return err;
+}
+
+
+static estats_error*
+_estats_log_data_new(estats_log_data** data, estats_log* log)
+{
+    estats_error* err = NULL;
+
+    Chk(Malloc((void**) data, sizeof(estats_log_data)));
+
+    Chk(Malloc((void**) &((*data)->buf), log->bufsize));
+
+Cleanup:
+
+    return err;
+}
+
+static void*
+_estats_log_data_free(estats_log_data** data)
+{
+    Free(&((*data)->buf));
+    Free((void**) data);
+}
+
+estats_error*
+estats_log_data_read(struct estats_list** log_data_head, estats_log* log)
+{
+    estats_error* err = NULL;
+
+    ErrIf(log_data_head == NULL || log == NULL, ESTATS_ERR_INVAL);
+    ErrIf(log->mode != R_MODE, ESTATS_ERR_ACCESS);
+    ErrIf(log->fp == NULL, ESTATS_ERR_FILE);
+
+    while (1) {
+        estats_log_data* ldata = NULL;
+
+        Chk(_estats_log_data_new(&ldata, log));
+
+        if ((err = Fread(NULL, ldata->buf, log->bufsize, 1, log->fp)) != NULL) {
+    
+            if (estats_error_get_number(err) == ESTATS_ERR_EOF) {
+                dbgprintf("   ... caught expected EOF at %s:%d in function %s\n", __FILE__, __LINE__, __FUNCTION__);
+
+                estats_error_free(&err);
+            }
+            _estats_log_data_free(&ldata);
+            break;
+        }
+
+        _estats_list_add_tail(&(ldata->list), &(log->data_list_head));
+    }
+
+    *log_data_head = &(log->data_list_head);
+
+Cleanup:
+    if (err != NULL) {
+        *log_data_head = NULL;
+    }
+
+    return err;
+}
+
+estats_error*
+estats_log_data_write(estats_log* log, estats_snapshot* snap)
+{
+    estats_error* err = NULL;
+
+    ErrIf(log == NULL || snap == NULL, ESTATS_ERR_INVAL);
+    ErrIf(log->mode != W_MODE, ESTATS_ERR_ACCESS);
+    ErrIf(log->fp == NULL, ESTATS_ERR_FILE);
+
+    Chk(Fwrite(NULL, snap->data, snap->group->size, 1, log->fp));
+
+Cleanup:
+
+    return err;
+}
+
+estats_error*
+estats_log_find_var_from_name(estats_var** var,
+                              const estats_log* log,
+                              const char* name)
+{
+    estats_error* err = NULL;
+    struct estats_list* lpos;
+    
+    ErrIf(var == NULL || log == NULL || name == NULL, ESTATS_ERR_INVAL);
+
+    *var = NULL;
+    
+    ESTATS_LIST_FOREACH(lpos, &(log->var_list_head)) {
+        estats_var* currVar = ESTATS_LIST_ENTRY(lpos, estats_var, list);
+        if (strcmp(currVar->name, name) == 0) {
+            *var = currVar;
+            break;
+        }
+    }
+
+    Err2If(*var == NULL, ESTATS_ERR_NOVAR, name);
+    CHECK_VAR(*var);
+
+Cleanup:
+
+    return err;
+}
+
+estats_error*
+estats_log_data_read_value(estats_value** value,
+                           const estats_log_data* data,
+                           const estats_var* var)
+{
+    estats_error* err = NULL;
+    int size;
+    char* buf = NULL;
+    
+    ErrIf(value == NULL || data == NULL || var == NULL, ESTATS_ERR_INVAL);
+
+    Chk(_estats_var_size_from_type(&size, var->type));
+    Chk(Malloc((void**) &buf, size));
+    memcpy(buf, (void *)((unsigned long)(data->buf) + var->offset), size);
+    Chk(_estats_value_from_var_buf(value, buf, var->type));
+
+Cleanup:
+    Free((void**) &buf);
+    
+    return err;
+}
+
+estats_log_data*
+estats_log_data_from_list(struct estats_list* ps)
+{
+    return ESTATS_LIST_ENTRY(ps, estats_log_data, list);
+}
+
+static estats_error*
+_estats_log_new(estats_log** log)
+{
+    estats_error* err = NULL;
+
+    ErrIf(log == NULL, ESTATS_ERR_INVAL);
+    *log = NULL;
+
+    Chk(Malloc((void**) log, sizeof(estats_log)));
+    (*log)->fp = NULL;
+    _estats_list_init(&((*log)->var_list_head));
+    _estats_list_init(&((*log)->data_list_head));
+
+Cleanup:
+
+    return err;
+}
+
+static estats_error* _estats_log_parse_header(estats_log* _log, FILE* _fp);
 
 static estats_error*
 _estats_log_open_read(estats_log* log, const char* path)
@@ -43,88 +230,51 @@ _estats_log_open_read(estats_log* log, const char* path)
     estats_snapshot* snap = NULL;
     estats_agent* agent;
     FILE* header = NULL;
-    char tmpbuf[MAX_TMP_BUF_SIZE];
-    char annbuf[ANNOTATION_LEN_MAX + 1];
+    
+    uint16_t h_siz;
+   
     uint16_t sum;
     fpos_t pos;
     int c; 
 
+    unsigned char wtf;
+
+    uint8_t end;
+
     ErrIf(log == NULL, ESTATS_ERR_INVAL);
-    log->fp = NULL; 
-    log->agent = NULL;
-    log->note = NULL;
 
     Chk(Fopen(&(log->fp), path, "r"));
 
     Chk(_estats_log_calculate_checksum(log, &sum));
     ErrIf(sum != 0, ESTATS_ERR_CHKSUM);
 
-    Chk(Fread(NULL, annbuf, ANNOTATION_LEN_MAX + 1, 1, log->fp));
-    Chk(Strndup(&log->note, annbuf, ANNOTATION_LEN_MAX));
+    Chk(Fread(NULL, &end, 1, 1, log->fp));
 
-    Chk(Fgets(tmpbuf, MAX_TMP_BUF_SIZE, log->fp));
-    ErrIf(strncmp(tmpbuf, BEGIN_HEADER_MARKER, strlen(BEGIN_HEADER_MARKER)) != 0, ESTATS_ERR_FILE);
+    Chk(Fread(NULL, &h_siz, 2, 1, log->fp));
+    if (end != LOG_HOST_ORDER) h_siz = bswap_16(h_siz);
 
     Chk(Fopen(&header, "./log_header", "w+"));
 
-    while ((c = fgetc(log->fp)) != '\0') {
+    while (h_siz-- > 0) {
+        c = fgetc(log->fp);
        	Chk(Fputc(c, header));
     }
 
-    Chk(Fgets(tmpbuf, MAX_TMP_BUF_SIZE, log->fp));
-    ErrIf(strncmp(tmpbuf, END_OF_HEADER_MARKER, strlen(END_OF_HEADER_MARKER)) != 0, ESTATS_ERR_FILE);
+    Chk(Fseek(header, 0, SEEK_SET)); // rewind
 
-    rewind(header);
+    Chk(_estats_log_parse_header(log, header));
 
-    Chk(estats_agent_attach(&log->agent, ESTATS_AGENT_TYPE_LOG, header));
-
-    Chk(estats_log_snapshot_alloc(&snap, log));
-
-    Chk(Fgets(tmpbuf, MAX_TMP_BUF_SIZE, log->fp));
-    ErrIf(strncmp(tmpbuf, BEGIN_SNAP_DATA, strlen(BEGIN_SNAP_DATA)) != 0, ESTATS_ERR_FILE);
-
-    if (fgetpos(log->fp, &pos))
-       	Err(ESTATS_ERR_LIBC);
-
-    Chk(Fread(NULL, snap->data, snap->group->size, 1, log->fp));
-
-    if (fsetpos(log->fp, &pos))
-       	Err(ESTATS_ERR_LIBC);
-
-    Chk(estats_group_find_var_from_name(&var, snap->group, "RemAddress"));
-    Chk(estats_snapshot_read_value(&log->spec.dst_port, snap, var));
-
-    Chk(estats_group_find_var_from_name(&var, snap->group, "RemPort"));
-    Chk(estats_snapshot_read_value(&log->spec.dst_addr, snap, var));
-
-    Chk(estats_group_find_var_from_name(&var, snap->group, "LocalAddress"));
-    Chk(estats_snapshot_read_value(&log->spec.src_port, snap, var));
-
-    Chk(estats_group_find_var_from_name(&var, snap->group, "LocalPort"));
-    Chk(estats_snapshot_read_value(&log->spec.src_addr, snap, var));
-
-    log->mode = LOG_READ;
+    log->mode = R_MODE;
 
 Cleanup: 
     Fclose(&header);
     Remove("./log_header");
 
-    estats_snapshot_free(&snap);
-
     if (err != NULL) {
-        _estats_log_close_read(log);
+        _estats_log_free(&log);
     }
         
     return err;
-}
-
-static void
-_estats_log_close_read(estats_log* log)
-{
-    if (log == NULL) return;
-
-    Fclose(&(log->fp));
-    estats_agent_detach(&log->agent);
 }
 
 static estats_error*
@@ -132,61 +282,45 @@ _estats_log_open_write(estats_log* log, const char* path)
 {
     estats_error* err = NULL; 
     FILE* header = NULL;
-    char ann[ANNOTATION_LEN_MAX];
     int c;
+    uint16_t h_siz = 0;
+    uint8_t end = LOG_HOST_ORDER;
+    fpos_t pos;
 
     ErrIf(log == NULL, ESTATS_ERR_INVAL);
-    log->fp = NULL; 
-    log->note = NULL;
 
-    Chk(Fopen(&log->fp, path, "w+")); // Need to read back for checksum calc 
+    Chk(Fopen(&log->fp, path, "w+")); // need to read back for checksum calc 
 
-    memset(ann, 0, ANNOTATION_LEN_MAX);
-    Chk(Fwrite(NULL, ann, 1, ANNOTATION_LEN_MAX, log->fp));    
-    Chk(Fprintf(NULL, log->fp, "\n"));
+    Chk(Fwrite(NULL, &end, 1, 1, log->fp)); // indicate endianness of write
 
-    Chk(Fprintf(NULL, log->fp, "%s\n", BEGIN_HEADER_MARKER));
+    Chk(Fwrite(NULL, &h_siz, 2, 1, log->fp)); // place holder for size of header
 
     Chk(Fopen(&header, ESTATS_HEADER_FILE, "r"));
+
     while ((c = fgetc(header)) != EOF) {
         Chk(Fputc(c, log->fp));
+        h_siz++;
     }
-    Chk(Fputc('\0', log->fp));
 
-    Chk(Fprintf(NULL, log->fp, "%s\n", END_OF_HEADER_MARKER));
+    ErrIf(fgetpos(log->fp, &pos) != 0, ESTATS_ERR_LIBC);
 
-    log->mode = LOG_WRITE;
-    log->first_write = 1;
+    Chk(Fseek(log->fp, 1, SEEK_SET)); // rewind to write size of header
+
+    Chk(Fwrite(NULL, &h_siz, 2, 1, log->fp));
+
+    ErrIf(fsetpos(log->fp, &pos) != 0, ESTATS_ERR_LIBC);
+
+    log->mode = W_MODE;
 
 Cleanup:
     Fclose(&header);
 
     if (err != NULL) {
-        _estats_log_close_write(log);
+        _estats_log_free(&log);
     }
 
     return err;
 }
-
-
-static void
-_estats_log_close_write(estats_log* log) 
-{ 
-    if (log == NULL) return;
-
-    Fclose(&(log->fp));
-}
-
-
-static void
-_estats_log_write_annotation(estats_log* log)
-{ 
-    if (log == NULL || log->fp == NULL) return;
-
-    Fseek(log->fp, 0, SEEK_SET);
-    if (log->note) fputs(log->note, log->fp);
-}
-
 
 static estats_error*
 _estats_log_calculate_checksum(estats_log* log, uint16_t* csum)
@@ -236,250 +370,177 @@ Cleanup:
 }
 
 
-static void
+static estats_error*
 _estats_log_write_checksum(estats_log* log)
 {
+    estats_error* err = NULL;
     uint16_t sum;
     uint8_t sum1, sum2;
 
-    if (log == NULL || log->fp == NULL) return;
+    ErrIf(log == NULL || log->fp == NULL || log->mode != W_MODE, ESTATS_ERR_INVAL);
 
-    (void) _estats_log_calculate_checksum(log, &sum);
+    Chk(_estats_log_calculate_checksum(log, &sum));
 
     sum1 = (sum & 0xFF00) >> 8;
     sum2 = sum & 0xFF;
 
-    Fseek(log->fp, 0, SEEK_END);
+    Chk(Fseek(log->fp, 0, SEEK_END));
 
-    Fwrite(NULL, &sum1, sizeof(uint8_t), 1, log->fp);
-    Fwrite(NULL, &sum2, sizeof(uint8_t), 1, log->fp);
-}
-
-
-estats_error*
-estats_log_open(estats_log** log, const char* path, const char* mode)
-{
-    estats_error* err = NULL;
-
-    ErrIf(log == NULL, ESTATS_ERR_INVAL);
-    *log = NULL;
-
-    Chk(Malloc((void**) log, sizeof(estats_log)));
-
-    switch (*mode) {
-       	case 'r':
-	    Chk(_estats_log_open_read(*log, path));
-	    break;
-       	case 'w':
-	    Chk(_estats_log_open_write(*log, path));
-	    break;
-       	default:
-	    Err(ESTATS_ERR_INVAL);
-	    break; /* not reached */
-    }
+    Chk(Fwrite(NULL, &sum1, sizeof(uint8_t), 1, log->fp));
+    Chk(Fwrite(NULL, &sum2, sizeof(uint8_t), 1, log->fp));
 
 Cleanup:
-    if (err != NULL) {
-	Free((void**) log);
-    }
-
+    
     return err;
 }
 
-
-void
-estats_log_close(estats_log** log)
-{ 
-    uint16_t sum;
+static void
+_estats_log_free(estats_log** log)
+{
+    struct estats_list* pos;
+    struct estats_list* tmp;
 
     if (log == NULL || *log == NULL) return;
 
-    switch ((*log)->mode) {
-	case LOG_READ:
-	    _estats_log_close_read(*log);
-	    break;
-	case LOG_WRITE:
-	    _estats_log_write_annotation(*log);
-	    _estats_log_write_checksum(*log);
-	    _estats_log_close_write(*log);
-	    break;
-	default:
-	    return;
+    Fclose(&(*log)->fp);
+
+    ESTATS_LIST_FOREACH_SAFE(pos, tmp, &((*log)->data_list_head)) {
+        estats_log_data* data = ESTATS_LIST_ENTRY(pos, estats_log_data, list);
+        _estats_list_del(pos);
+        _estats_log_data_free(&data);
     }
-    Free((void**) &(*log)->note);
-    Free((void**) log);
+
+    ESTATS_LIST_FOREACH_SAFE(pos, tmp, &((*log)->var_list_head)) {
+        estats_var* var = ESTATS_LIST_ENTRY(pos, estats_var, list);
+        _estats_list_del(pos);
+        free(var);
+    }
+
+    Free((void**)log);
 }
 
-
 estats_error*
-estats_log_snapshot_alloc(estats_snapshot** snap, estats_log* log)
+_estats_log_parse_header(estats_log* log, FILE* fp)
 {
     estats_error* err = NULL;
-    estats_group* group;
-   
-    ErrIf(snap == NULL, ESTATS_ERR_INVAL);
-    *snap = NULL;
+    estats_var* var = NULL;
+    char version[ESTATS_VERSTR_LEN_MAX];
+    char group_name[ESTATS_GROUPNAME_LEN_MAX];
+    char linebuf[256];
+    int have_len = 0;
 
-    ErrIf(log == NULL, ESTATS_ERR_INVAL);
+    ErrIf(log == NULL || fp == NULL, ESTATS_ERR_INVAL);
 
-    Chk(Malloc((void**) snap, sizeof(estats_snapshot)));
+    /* First line is version string */
+    Chk(Fgets(linebuf, sizeof(linebuf), fp));
+    strlcpy(version, linebuf, sizeof(version));
 
-    Chk(estats_agent_find_group_from_name(&((*snap)->group), log->agent, "read"));
+    if (strncmp(version, "1.", 2) != 0)
+        have_len = 1;
 
-    Chk(Malloc((void**) &((*snap)->data), (*snap)->group->size));
+    while (1) {
+        size_t len;
+        
+        if ((err = Fgets(linebuf, sizeof(linebuf), fp)) != NULL) {
+            if (estats_error_get_number(err) == ESTATS_ERR_EOF) {
+                dbgprintf("   ... caught expected EOF at %s:%d in function %s\n", __FILE__, __LINE__, __FUNCTION__);
+                estats_error_free(&err);
+                break;
+            } else {
+                goto Cleanup;
+            }
+        }
 
-    memset((*snap)->data, 0, (*snap)->group->size);
+        /* Trim out trailing \n if it exists */
+        len = strlen(linebuf);
+        if (len > 0 && linebuf[len - 1] == '\n')
+            linebuf[len - 1] = '\0';
+
+        /* Skip over blank lines */
+        if (strisspace(linebuf))
+            continue;
+
+        if (linebuf[0] == '/') {
+            strlcpy(group_name, linebuf + 1, sizeof(group_name));
+            dbgprintf("New group: %s\n", group_name);
+        } else {
+            int nRead;
+            int fsize;
+            int varsize;
+
+            if (strcmp(group_name, "read") != 0) continue;
+
+            log->bufsize = 0;
+            log->nvars = 0;
+            
+            /* Add a new variable */
+            Chk(Malloc((void**) &var, sizeof(estats_var)));
+
+            if (!have_len) {
+                Chk(Sscanf(&nRead, linebuf, "%s%d%d", var->name, &var->offset, &var->type));
+                ErrIf(nRead != 3, ESTATS_ERR_HEADER);
+                var->len = -1;
+            } else {
+                Chk(Sscanf(&nRead, linebuf, "%s%d%d%d", var->name, &var->offset, &var->type, &var->len));
+                ErrIf(nRead != 4, ESTATS_ERR_HEADER);
+            }
+
+            /* Deprecated variable check */
+            var->flags = 0;
+            if (var->name[0] == '_') {
+                var->flags |= ESTATS_VAR_FL_DEP;
+                memmove(var->name, var->name + 1, strlen(var->name)); /* Purposely move the NULL byte */
+            }
+
+#if defined(DEBUG)
+            dbgprintf("    New ");
+            if (var->flags & ESTATS_VAR_FL_DEP)
+                dbgprintf_no_prefix("(deprecated) ");
+            dbgprintf_no_prefix("var: %s offset=%d type=%d len=%d\n", var->name, var->offset, var->type, var->len);
+#endif /* defined(DEBUG) */
+
+            if ((err = _estats_var_size_from_type(&varsize, var->type)) != NULL) {
+                estats_error_free(&err);
+                varsize = 0;
+            }
+            
+            /* increment group (== file) size if necessary */ 
+            fsize = var->offset + varsize;
+            log->bufsize = ((log->bufsize < fsize) ? fsize : log->bufsize); 
+
+            /* if size_from_type 0 (i.e., type unrecognized),
+               forgo adding the variable */
+            if (varsize == 0) {
+                Free((void**) &var);
+                continue;
+            }
+
+            log->nvars++;
+            _estats_list_add_tail(&(var->list), &(log->var_list_head));
+            var = NULL;
+        }
+    }
 
 Cleanup:
     if (err != NULL) {
-        estats_snapshot_free(snap);
+       	Free((void**) &var);
     }
 
     return err;
 }
 
 
-estats_error*
-estats_log_snap(estats_snapshot* snap, estats_log* log)
-{
-    estats_error* err = NULL;
-    
-    ErrIf(snap == NULL || log == NULL, ESTATS_ERR_INVAL); 
-    ErrIf(snap->group == NULL, ESTATS_ERR_INVAL);
-    ErrIf(snap->group->agent == NULL, ESTATS_ERR_INVAL);
-    ErrIf(snap->group->agent->type != ESTATS_AGENT_TYPE_LOG, ESTATS_ERR_AGENT_TYPE);
-
-    ErrIf(log->mode != LOG_READ, ESTATS_ERR_ACCESS);
-    ErrIf(log->fp == NULL, ESTATS_ERR_FILE);
-
-    if ((err = Fread(NULL, snap->data, snap->group->size, 1, log->fp)) != NULL) {
-	if (estats_error_get_number(err) == ESTATS_ERR_EOF) {
-	   dbgprintf("   ... caught expected EOF at %s:%d in function %s\n", __FILE__, __LINE__, __FUNCTION__);
-	  estats_error_free(&err);
-       	} 
-    }
-
-Cleanup:
-
-    return err;
-}
 
 
-estats_error*
-estats_log_write(estats_log* log, const estats_snapshot* snap)
-{ 
-    estats_error* err = NULL;
-    const char* name;
-    estats_group* gp;
-    struct estats_connection_spec snap_spec;
-    int res;
-
-    ErrIf(log == NULL || snap == NULL, ESTATS_ERR_INVAL);
-    ErrIf(log->mode != LOG_WRITE, ESTATS_ERR_ACCESS);
-    ErrIf(log->fp == NULL, ESTATS_ERR_FILE);
-
-    Chk(estats_snapshot_get_group_name(&name, snap));
-    ErrIf(strcmp(name, "read"), ESTATS_ERR_INVAL);
-
-    if (log->first_write == 1) {
-	Chk(estats_connection_spec_copy(&log->spec, &snap->spec));
-       	Chk(Fprintf(NULL, log->fp, "%s\n", BEGIN_SNAP_DATA));
-	log->first_write = 0;
-    }
-
-    Chk(estats_connection_spec_compare(&res, &log->spec, &snap->spec));
-    ErrIf(res, ESTATS_ERR_INVAL);
-
-    Chk(Fwrite(NULL, snap->data, snap->group->size, 1, log->fp));
-
-Cleanup:
-    return err;
-}
 
 
-estats_error*
-estats_log_get_agent(estats_agent** agent, const estats_log* log)
-{
-    estats_error* err = NULL;
-
-    ErrIf(agent == NULL || log == NULL, ESTATS_ERR_INVAL);
-
-    *agent = log->agent;
-
-Cleanup:
-    return err;
-}
-
-estats_error*
-estats_log_get_mode(int* mode, const estats_log* log)
-{
-    estats_error* err = NULL;
-
-    *mode = (int) log->mode;
-
-Cleanup:
-    return err;
-}
-
-estats_error*
-estats_log_get_connection_spec(struct estats_connection_spec* spec, const estats_log* log)
-{ 
-    estats_error* err = NULL;
-
-    ErrIf(spec == NULL || log == NULL, ESTATS_ERR_INVAL);
-
-    if (log->mode == LOG_WRITE && log->first_write == 1) { // log->spec not yet recorded
-	spec = NULL;
-	return;
-    }
-
-    Chk(_estats_value_copy(&spec->dst_port, log->spec.dst_port));
-    Chk(_estats_value_copy(&spec->dst_addr, log->spec.dst_addr));
-    Chk(_estats_value_copy(&spec->src_port, log->spec.src_port));
-    Chk(_estats_value_copy(&spec->src_addr, log->spec.src_addr));
-
-Cleanup:
-    return err;
-}
 
 
-estats_error*
-estats_log_get_annotation(char** ann, const estats_log* log)
-{
-    estats_error* err = NULL;
-
-    ErrIf(log->mode != LOG_READ, ESTATS_ERR_INVAL);
-
-    Chk(Strndup(ann, log->note, ANNOTATION_LEN_MAX));
-
-Cleanup:
-    return err;
-}
 
 
-estats_error*
-estats_log_set_annotation(estats_log* log, const char* ann)
-{
-    estats_error* err = NULL;
-
-    ErrIf(log->mode != LOG_WRITE, ESTATS_ERR_INVAL);
-
-    Chk(Strndup(&log->note, ann, ANNOTATION_LEN_MAX));
-
-Cleanup:
-    return err;
-}
 
 
-estats_error*
-estats_log_eof(int* eof, const estats_log* log)
-{
-    estats_error* err = NULL;
 
-    ErrIf(eof == NULL || log == NULL, ESTATS_ERR_INVAL);
 
-    *eof = feof(log->fp);
 
-Cleanup:
-    return err;
-}
+

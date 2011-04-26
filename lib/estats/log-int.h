@@ -21,20 +21,45 @@
 #if !defined(ESTATS_LOG_INT_H)
 #define ESTATS_LOG_INT_H
 
-#include <sys/stat.h>
+#include <estats/estats-int.h>
 
-typedef enum LOG_MODE {
-    LOG_READ = 0,
-    LOG_WRITE = 1
-} LOG_MODE;
-
-struct estats_log {
-    FILE*                          fp; 
-    LOG_MODE                       mode;
-    int                            first_write; 
-    struct estats_agent*           agent;
-    struct estats_connection_spec  spec;
-    char*                          note;
+union ltv {
+    int32_t s32_val;
+    int64_t s64_val;
 };
 
+struct estats_log_timeval {
+    union ltv sec;
+    union ltv usec;
+};
+
+struct estats_log_data {
+    void* buf;
+    struct estats_list list;
+    struct estats_log_timeval timeval;
+};
+
+struct estats_log {
+    FILE*               fp;
+    int                 swap;
+    int                 tvsize;
+    int                 bufsize;
+    int                 nvars;
+    struct estats_list  var_list_head;
+    struct estats_list  data_list_head;
+    ESTATS_LOG_MODE     mode;
+};
+
+#include <endian.h>
+#include <byteswap.h>
+
+#if __BYTE_ORDER == __LITTLE_ENDIAN
+#define LOG_HOST_ORDER 0
+#else
+#define LOG_HOST_ORDER 1
+# endif
+
 #endif /* !defined(ESTATS_LOG_INT_H) */
+
+
+
