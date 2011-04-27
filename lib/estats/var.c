@@ -108,7 +108,7 @@ estats_var_next(estats_var** next, const estats_var* prev)
 }
 
 estats_var*
-estats_var_next_utility(const estats_var* prev)
+estats_var_return_next(const estats_var* prev)
 {
     estats_error* err = NULL;
     estats_var* next = NULL;

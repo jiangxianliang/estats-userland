@@ -27,12 +27,12 @@
 #define ESTATS_VARNAME_LEN_MAX 32
 #define ESTATS_VAR_FL_DEP    1
 #define ESTATS_VAR_FL_WARNED 2
-/*
+
 struct estats_list {
     struct estats_list* next;
     struct estats_list* prev;
 };
-*/
+
 struct estats_connection {
     struct estats_list               list;
     int                              cid;

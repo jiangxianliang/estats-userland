@@ -19,9 +19,10 @@ main(int argc, char *argv[])
     estats_error* err = NULL;
     estats_log* log = NULL;
     estats_var* var;
-    struct estats_list* data_list;
-    struct estats_list* pos;
-
+//    struct estats_list* data_list;
+//    struct estats_list* pos;
+    estats_log_data* hdata;
+    estats_log_data* ldata;
     argv0 = argv[0];
 
     if (argc != 2) {
@@ -33,12 +34,15 @@ main(int argc, char *argv[])
 
     Chk(estats_log_open(&log, "./log.example", "r"));
 
-    Chk(estats_log_data_read(&data_list, log));
+//    Chk(estats_log_data_read(&data_list, log));
 
     Chk(estats_log_find_var_from_name(&var, log, argv[1]));
 
-    ESTATS_LIST_FOREACH(pos, data_list) {
-        estats_log_data* ldata = LOG_DATA_ENTRY(pos);
+    Chk(estats_log_get_data_head(&hdata, log));
+
+//    ESTATS_LIST_FOREACH(pos, data_list) {
+    ESTATS_LOG_DATA_FOREACH(ldata, hdata) {
+//        estats_log_data* ldata = LOG_DATA_ENTRY(pos);
         estats_value* value = NULL;
         char* res;
 

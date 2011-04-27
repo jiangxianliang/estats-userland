@@ -39,9 +39,9 @@ estats_error* estats_group_find_var_from_name(estats_var** _var,
                                               const estats_group* _group,
                                               const char* _name);
 
-estats_group* estats_group_next_utility(const estats_group* prev);
+estats_group* estats_group_return_next(const estats_group* prev);
 
 #define ESTATS_GROUP_FOREACH(pos, head) \
-    for (pos = head; pos != NULL; pos = estats_group_next_utility(pos))
+    for (pos = head; pos != NULL; pos = estats_group_return_next(pos))
 
 #endif /* !defined(ESTATS_GROUP_H) */

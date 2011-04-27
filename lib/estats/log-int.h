@@ -34,10 +34,16 @@ struct estats_log_timeval {
 };
 
 struct estats_log_data {
-    void* buf;
+    void*  buf;
+    struct estats_log* log;
     struct estats_list list;
     struct estats_log_timeval timeval;
 };
+
+typedef enum ESTATS_LOG_MODE {
+    R_MODE,
+    W_MODE
+} ESTATS_LOG_MODE;
 
 struct estats_log {
     FILE*               fp;

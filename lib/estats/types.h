@@ -71,11 +71,6 @@ typedef enum ESTATS_VALUE_TYPE {
     ESTATS_VALUE_TYPE_OCTET   = 7,
 } ESTATS_VALUE_TYPE;
 
-typedef enum ESTATS_LOG_MODE {
-    R_MODE,
-    W_MODE
-} ESTATS_LOG_MODE;
-
 struct estats_connection_spec {
     struct estats_value *dst_port;
     struct estats_value *dst_addr;
@@ -83,19 +78,10 @@ struct estats_connection_spec {
     struct estats_value *src_addr;
 };
 
-struct estats_list {
-    struct estats_list* next;
-    struct estats_list* prev;
-};
-
-#define ESTATS_LIST_FOREACH(pos, head) \
-    for (pos = (head)->next; pos != (head); pos = pos->next)
-
 typedef struct estats_agent      estats_agent;
 typedef struct estats_connection estats_connection;
 typedef struct estats_error      estats_error;
 typedef struct estats_group      estats_group;
-//typedef struct estats_log        estats_log;
 typedef struct estats_snapshot   estats_snapshot;
 typedef struct estats_value      estats_value;
 typedef struct estats_var        estats_var;

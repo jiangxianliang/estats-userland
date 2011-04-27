@@ -80,6 +80,8 @@ _estats_log_data_new(estats_log_data** data, estats_log* log)
 
     Chk(Malloc((void**) &((*data)->buf), log->bufsize));
 
+    (*data)->log = log;
+
 Cleanup:
 
     return err;
@@ -93,11 +95,11 @@ _estats_log_data_free(estats_log_data** data)
 }
 
 estats_error*
-estats_log_data_read(struct estats_list** log_data_head, estats_log* log)
+_estats_log_data_read(estats_log* log)
 {
     estats_error* err = NULL;
 
-    ErrIf(log_data_head == NULL || log == NULL, ESTATS_ERR_INVAL);
+    ErrIf(log == NULL, ESTATS_ERR_INVAL);
     ErrIf(log->mode != R_MODE, ESTATS_ERR_ACCESS);
     ErrIf(log->fp == NULL, ESTATS_ERR_FILE);
 
@@ -120,12 +122,7 @@ estats_log_data_read(struct estats_list** log_data_head, estats_log* log)
         _estats_list_add_tail(&(ldata->list), &(log->data_list_head));
     }
 
-    *log_data_head = &(log->data_list_head);
-
 Cleanup:
-    if (err != NULL) {
-        *log_data_head = NULL;
-    }
 
     return err;
 }
@@ -195,11 +192,57 @@ Cleanup:
     
     return err;
 }
-
+/*
 estats_log_data*
 estats_log_data_from_list(struct estats_list* ps)
 {
     return ESTATS_LIST_ENTRY(ps, estats_log_data, list);
+}
+*/
+estats_error*
+estats_log_get_data_head(estats_log_data** data, estats_log* log)
+{
+    estats_error* err = NULL;
+    struct estats_list* head;
+
+    ErrIf(data == NULL || log == NULL, ESTATS_ERR_INVAL);
+
+    head = &(log->data_list_head);
+    *data = _estats_list_empty(head) ? NULL : ESTATS_LIST_ENTRY(head->next, estats_log_data, list);
+
+Cleanup:
+    return err;
+}
+
+estats_error*
+estats_log_data_next(estats_log_data** next, const estats_log_data* prev)
+{
+    estats_error* err = NULL;
+    struct estats_list* l;
+
+    ErrIf(next == NULL || prev == NULL, ESTATS_ERR_INVAL);
+
+    l = prev->list.next;
+    if (l == &(prev->log->data_list_head))
+        *next = NULL;
+    else
+        *next = ESTATS_LIST_ENTRY(l, estats_log_data, list);
+
+Cleanup:
+    return err;
+}
+
+estats_log_data*
+estats_log_data_return_next(const estats_log_data* prev)
+{
+    estats_error* err = NULL;
+    estats_log_data* next = NULL;
+
+    Chk(estats_log_data_next(&next, prev));
+
+Cleanup:
+    if (err) return NULL;
+    else return next;
 }
 
 static estats_error*
@@ -265,6 +308,8 @@ _estats_log_open_read(estats_log* log, const char* path)
     Chk(_estats_log_parse_header(log, header));
 
     log->mode = R_MODE;
+
+    Chk(_estats_log_data_read(log));
 
 Cleanup: 
     Fclose(&header);

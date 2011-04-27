@@ -40,7 +40,7 @@ Cleanup:
 }
 
 estats_connection*
-estats_connection_next_utility(const estats_connection* prev)
+estats_connection_return_next(const estats_connection* prev)
 {
     estats_error* err = NULL;
     estats_connection* next = NULL;
