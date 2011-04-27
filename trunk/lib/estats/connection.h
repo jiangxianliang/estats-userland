@@ -52,9 +52,9 @@ estats_error* estats_connection_spec_compare(int* _result,
 estats_error* estats_connection_spec_copy(struct estats_connection_spec* _s1,
                                     const struct estats_connection_spec* _s2);
 
-estats_connection* estats_connection_next_utility(const estats_connection* _prev);
+estats_connection* estats_connection_return_next(const estats_connection* _prev);
 
 #define ESTATS_CONNECTION_FOREACH(pos, head) \
-    for (pos = head; pos != NULL; pos = estats_connection_next_utility(pos))
+    for (pos = head; pos != NULL; pos = estats_connection_return_next(pos))
 
 #endif /* !defined(ESTATS_CONNECTION_H) */

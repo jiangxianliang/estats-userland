@@ -80,7 +80,7 @@ Cleanup:
 }
 
 estats_conninfo*
-estats_conninfo_next_utility(const estats_conninfo* prev)
+estats_conninfo_return_next(const estats_conninfo* prev)
 {
     estats_error* err = NULL;
     estats_conninfo* next = NULL;

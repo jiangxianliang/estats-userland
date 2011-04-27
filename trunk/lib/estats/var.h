@@ -31,9 +31,9 @@ estats_error* estats_var_get_type(ESTATS_TYPE* _type,
 estats_error* estats_var_get_size(size_t* _size,
                                   const estats_var* _var);
 
-estats_var* estats_var_next_utility(const estats_var* prev);
+estats_var* estats_var_return_next(const estats_var* prev);
 
 #define ESTATS_VAR_FOREACH(pos, head) \
-    for (pos = head; pos != NULL; pos = estats_var_next_utility(pos))
+    for (pos = head; pos != NULL; pos = estats_var_return_next(pos))
 
 #endif /* !defined(ESTATS_VAR_H) */

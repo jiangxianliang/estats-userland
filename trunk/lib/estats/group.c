@@ -40,7 +40,7 @@ Cleanup:
 }
 
 estats_group*
-estats_group_next_utility(const estats_group* prev)
+estats_group_return_next(const estats_group* prev)
 {
     estats_error* err = NULL;
     estats_group* next = NULL;

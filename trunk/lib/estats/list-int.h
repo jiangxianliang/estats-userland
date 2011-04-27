@@ -55,7 +55,7 @@ static inline int _estats_list_empty(struct estats_list* head)
 
 #define ESTATS_LIST_ENTRY(ptr, type, member) \
     ((type*)((char*)(ptr) - (unsigned long)(&((type*)0)->member)))
-//#define ESTATS_LIST_FOREACH(pos, head) \
+#define ESTATS_LIST_FOREACH(pos, head) \
     for (pos = (head)->next; pos != (head); pos = pos->next)
 #define ESTATS_LIST_FOREACH_PREV(pos, head) \
     for (pos = (head)->prev; pos != (head); pos = pos->prev)
