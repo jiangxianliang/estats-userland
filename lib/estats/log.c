@@ -192,13 +192,7 @@ Cleanup:
     
     return err;
 }
-/*
-estats_log_entry*
-estats_log_entry_from_list(struct estats_list* ps)
-{
-    return ESTATS_LIST_ENTRY(ps, estats_log_entry, list);
-}
-*/
+
 estats_error*
 estats_log_get_entry_head(estats_log_entry** entry, estats_log* log)
 {

@@ -45,7 +45,7 @@ main(int argc, char *argv[])
     for (arg=&argv[2]; *arg; arg++) {
         char* text = NULL;
 
-        Chk(estats_agent_find_var_and_group(&var, NULL, agent, *arg));
+        Chk(estats_agent_find_var_from_name(&var, agent, *arg));
         Chk(estats_connection_read_value(&value, conn, var));
         Chk(estats_value_as_string(&text, value));
     

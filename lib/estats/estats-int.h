@@ -54,6 +54,7 @@
 /* Estats internal headers */
 #include <estats/debug-int.h>
 #include <estats/error-int.h>
+#include <estats/group-int.h>
 #include <estats/libcwrap-int.h>
 #include <estats/list-int.h>
 #include <estats/log-int.h>
@@ -65,7 +66,6 @@
 #include <estats/agent.h>
 #include <estats/connection.h>
 #include <estats/error.h>
-#include <estats/group.h>
 #include <estats/log.h>
 #include <estats/snapshot.h>
 #include <estats/value.h>

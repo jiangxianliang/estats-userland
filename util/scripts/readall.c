@@ -4,20 +4,12 @@ int main(int argc, char *argv[])
 {
     estats_error* err = NULL;
     estats_agent* agent = NULL;
-    estats_group* grp_head;
-    estats_group* grp_pos;
     estats_connection* c_head;
     estats_connection* c_pos;
     const char* groupName;
     const char* varName;
     
     Chk(estats_agent_attach(&agent, ESTATS_AGENT_TYPE_LOCAL, NULL));
-
-    Chk(estats_agent_get_group_head(&grp_head, agent));
-    ESTATS_GROUP_FOREACH(grp_pos, grp_head) {
-
-        Chk(estats_group_get_name(&groupName, grp_pos));
-        fprintf(stdout, "Group \"%s\"\n", groupName);
 
         Chk(estats_agent_get_connection_head(&c_head, agent));
         ESTATS_CONNECTION_FOREACH(c_pos, c_head) {
@@ -30,8 +22,8 @@ int main(int argc, char *argv[])
             char* dstPort = NULL;
             int cid;
 
-            /* If no permission to access group, ignore and go to next connection */
-            if ((err = estats_connection_group_access(c_pos, grp_pos, R_OK)) != NULL) {
+            /* If no permission to access stats, ignore and go to next connection */
+            if ((err = estats_connection_read_access(c_pos, R_OK)) != NULL) {
                 estats_error_free(&err);
                 continue;
             }
@@ -46,7 +38,7 @@ int main(int argc, char *argv[])
 
             fprintf(stdout, "Connection %d (%s:%s %s:%s)\n", cid, srcAddr, srcPort, dstAddr, dstPort);
 
-            Chk(estats_group_get_var_head(&var_head, grp_pos));
+            Chk(estats_agent_get_var_head(&var_head, agent));
             ESTATS_VAR_FOREACH(var_pos, var_head) {
                 estats_value* value = NULL;
                 char* text = NULL;
@@ -66,16 +58,11 @@ int main(int argc, char *argv[])
             estats_value_free(&spec.dst_port);
             free(srcAddr); free(srcPort); free(dstAddr); free(dstPort);
         }
-    }
+
 
 Cleanup:
     estats_agent_detach(&agent);
-/*
-    if (srcAddr) free(srcAddr);
-    if (dstAddr) free(dstAddr);
-    if (srcPort) free(srcPort);
-    if (dstPort) free(dstPort);
-*/
+
     if (err != NULL) {
         PRINT_AND_FREE(err);
         return EXIT_FAILURE;

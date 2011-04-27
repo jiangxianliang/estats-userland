@@ -16,13 +16,12 @@ main(int argc, char *argv[])
     estats_error* err = NULL;
     estats_agent* agent = NULL;
     estats_connection* conn;
-    estats_group* group;
     estats_var* var;
     estats_snapshot* snapold = NULL;
     estats_snapshot* snapnew = NULL;
     estats_value* value = NULL;
-    int cid;
     char* text = NULL;
+    int cid;
 
     argv0 = argv[0];
 
@@ -35,10 +34,11 @@ main(int argc, char *argv[])
 
     Chk(estats_agent_attach(&agent, ESTATS_AGENT_TYPE_LOCAL, NULL));
     Chk(estats_agent_find_connection_from_cid(&conn, agent, cid)); 
-    Chk(estats_agent_find_var_and_group(&var, &group, agent, argv[2]));
 
-    Chk(estats_snapshot_alloc(&snapold, group, conn)); 
-    Chk(estats_snapshot_alloc(&snapnew, group, conn));
+    Chk(estats_agent_find_var_from_name(&var, agent, argv[2]));
+
+    Chk(estats_snapshot_alloc(&snapold, conn)); 
+    Chk(estats_snapshot_alloc(&snapnew, conn));
 
     Chk(estats_snap(snapold));
     Chk(estats_snap(snapnew));

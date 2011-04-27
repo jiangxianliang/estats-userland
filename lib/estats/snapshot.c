@@ -22,22 +22,24 @@
 
 
 estats_error*
-estats_snapshot_alloc(estats_snapshot** snap, estats_group* group, estats_connection* conn)
+estats_snapshot_alloc(estats_snapshot** snap, estats_connection* conn)
 {
     estats_error* err = NULL;
+    int size;
 
     ErrIf(snap == NULL, ESTATS_ERR_INVAL);
     *snap = NULL;
    
-    ErrIf(group == NULL || conn == NULL, ESTATS_ERR_INVAL); 
-    ErrIf(group->agent != conn->agent, ESTATS_ERR_INVAL);
+    ErrIf(conn == NULL, ESTATS_ERR_INVAL);
+
+    size = conn->agent->read->size;
 
     Chk(Malloc((void**) snap, sizeof(estats_snapshot)));
-    Chk(Malloc((void**) &((*snap)->data), group->size));
+    Chk(Malloc((void**) &((*snap)->data), size));
 
-    memset((*snap)->data, 0, group->size);
+    memset((*snap)->data, 0, size);
     
-    (*snap)->group = group;
+    (*snap)->group = conn->agent->read;
 //    (*snap)->connection = conn;
     (*snap)->cid = conn->cid;
     Chk(estats_connection_spec_copy(&(*snap)->spec, &conn->spec));

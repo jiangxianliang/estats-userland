@@ -19,7 +19,6 @@ main(int argc, char *argv[])
     estats_error* err = NULL;
     estats_agent* agent = NULL;
     estats_connection* conn;
-    estats_group* group;
     estats_var* var;
     estats_snapshot* snap = NULL;
     estats_log* log = NULL;
@@ -39,10 +38,10 @@ main(int argc, char *argv[])
 
     Chk(estats_agent_attach(&agent, ESTATS_AGENT_TYPE_LOCAL, NULL));
     Chk(estats_agent_find_connection_from_cid(&conn, agent, cid));
-    Chk(estats_agent_find_group_from_name(&group, agent, "read"));
 
     Chk(estats_log_open(&log, "./log.example", "w"));
-    Chk(estats_snapshot_alloc(&snap, group, conn)); 
+
+    Chk(estats_snapshot_alloc(&snap, conn)); 
     for (ii = 0; ii < 5; ii++) {
         Chk(estats_snap(snap));
 	Chk(estats_log_entry_write(log, snap));

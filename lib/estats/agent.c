@@ -89,6 +89,7 @@ _estats_agent_parse_header(estats_agent* agent, FILE* fp)
                 agent->spec = group;
                 group = NULL;
             } else {
+                if (strcmp(group->name, "read") == 0) { agent->read = group; }
                 _estats_list_add_tail(&(group->list), &(agent->group_list_head));
                 group = NULL;
             }
@@ -498,7 +499,53 @@ estats_agent_find_var_and_group(estats_var** var, estats_group** group,
     return err;
 }
 
+estats_error*
+estats_agent_find_var_from_name(estats_var** var, const estats_agent* agent, const char* name)
+{
+    estats_error* err = NULL;
+    struct estats_list* currItem;
+    estats_group* group;
     
+    ErrIf(var == NULL || agent == NULL || name == NULL, ESTATS_ERR_INVAL);
+
+    group = agent->read;
+
+    *var = NULL;
+    
+    ESTATS_LIST_FOREACH(currItem, &(group->var_list_head)) {
+        estats_var* currVar = ESTATS_LIST_ENTRY(currItem, estats_var, list);
+        if (strcmp(currVar->name, name) == 0) {
+            *var = currVar;
+            break;
+        }
+    }
+
+    Err2If(*var == NULL, ESTATS_ERR_NOVAR, name);
+    CHECK_VAR(*var);
+
+Cleanup:
+    return err;
+}
+    
+estats_error*
+estats_agent_get_var_head(estats_var** var, estats_agent* agent)
+{
+    estats_error* err = NULL;
+    struct estats_list* lp = NULL;
+
+    ErrIf(var == NULL || agent == NULL, ESTATS_ERR_INVAL);
+    ErrIf(agent->read == NULL, ESTATS_ERR_INVAL);
+
+    lp = (agent->read->var_list_head).next;
+    if (lp) { 
+    *var = ESTATS_LIST_ENTRY(lp, estats_var, list);
+    Chk(_estats_var_next_undeprecated(var, *var));
+    }
+    else *var = NULL;
+
+Cleanup:
+    return err;
+}
 static estats_error*
 _estats_agent_refresh_connections(estats_agent* agent)
 {
