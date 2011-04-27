@@ -33,10 +33,10 @@ struct estats_log_timeval {
     union ltv usec;
 };
 
-struct estats_log_data {
-    void*  buf;
-    struct estats_log* log;
+struct estats_log_entry {
+    void*  data;
     struct estats_list list;
+    struct estats_log* log;
     struct estats_log_timeval timeval;
 };
 
@@ -52,7 +52,7 @@ struct estats_log {
     int                 bufsize;
     int                 nvars;
     struct estats_list  var_list_head;
-    struct estats_list  data_list_head;
+    struct estats_list  entry_list_head;
     ESTATS_LOG_MODE     mode;
 };
 
@@ -66,6 +66,4 @@ struct estats_log {
 # endif
 
 #endif /* !defined(ESTATS_LOG_INT_H) */
-
-
 

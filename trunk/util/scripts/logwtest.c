@@ -45,7 +45,7 @@ main(int argc, char *argv[])
     Chk(estats_snapshot_alloc(&snap, group, conn)); 
     for (ii = 0; ii < 5; ii++) {
         Chk(estats_snap(snap));
-	Chk(estats_log_data_write(log, snap));
+	Chk(estats_log_entry_write(log, snap));
 	sleep(1);
     }
     estats_log_close(&log);
