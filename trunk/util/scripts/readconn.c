@@ -4,8 +4,6 @@ int main(int argc, char *argv[])
 {
     estats_error* err = NULL;
     estats_agent* agent = NULL;
-    estats_group* grp_head;
-    estats_group* grp_pos;
     estats_var* var_head;
     estats_var* var_pos;
     estats_connection* conn;
@@ -25,11 +23,7 @@ int main(int argc, char *argv[])
 
         Chk(estats_agent_find_connection_from_cid(&conn, agent, cid));
 
-        Chk(estats_agent_get_group_head(&grp_head, agent));
-
-        ESTATS_GROUP_FOREACH(grp_pos, grp_head) {
-
-            Chk(estats_group_get_var_head(&var_head, grp_pos));
+            Chk(estats_agent_get_var_head(&var_head, agent));
 
             ESTATS_VAR_FOREACH(var_pos, var_head) {
                 const char* varName;
@@ -45,7 +39,6 @@ int main(int argc, char *argv[])
                 free(text);
                 estats_value_free(&value);
             }
-        }
     }
 
  Cleanup:

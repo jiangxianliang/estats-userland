@@ -124,6 +124,22 @@ estats_connection_group_access(const estats_connection* conn,
     return err;
 }
 
+estats_error*
+estats_connection_read_access(const estats_connection* conn,
+                              int mode)
+{
+    estats_error* err = NULL;
+    char* filename = NULL;
+
+    ErrIf(conn == NULL, ESTATS_ERR_INVAL);
+    Chk(Asprintf(NULL, &filename, "%s/%d/read", ESTATS_ROOT_DIR, conn->cid));
+    Chk(Access(filename, mode));
+
+ Cleanup:
+    Free((void**) &filename);
+    return err;
+}
+
 
 estats_error*
 estats_connection_read_value(estats_value** value,

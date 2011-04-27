@@ -34,9 +34,8 @@ estats_error* estats_connection_get_addrtype(ESTATS_ADDRTYPE* _addrtype,
 estats_error* estats_connection_get_connection_spec(struct estats_connection_spec* _spec,
                                          const estats_connection* _conn);
 
-estats_error* estats_connection_group_access(const estats_connection* _conn,
-                                             const estats_group* _group,
-                                             int mode);
+estats_error* estats_connection_read_access(const estats_connection* _conn,
+                                            int mode);
 
 estats_error* estats_connection_read_value(estats_value** _value,
                                            const estats_connection* _conn,

@@ -66,6 +66,7 @@ struct estats_agent {
     struct estats_list        group_list_head;
     struct estats_list        connection_list_head;
     struct estats_group*      spec;
+    struct estats_group*      read;
 };
 
 struct estats_snapshot {

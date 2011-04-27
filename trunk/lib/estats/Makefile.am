@@ -5,7 +5,6 @@ estats_pub_h_sources = \
 	conninfo.h \
 	error.h \
 	estats.h \
-	group.h \
 	log.h \
 	snapshot.h \
 	types.h \
@@ -17,6 +16,7 @@ estats_pri_h_sources = \
 	debug-int.h \
 	error-int.h \
 	estats-int.h \
+	group-int.h \
 	libcwrap-int.h \
 	list-int.h \
 	log-int.h \
