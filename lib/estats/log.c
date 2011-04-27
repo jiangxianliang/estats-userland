@@ -72,15 +72,15 @@ Cleanup:
 
 
 static estats_error*
-_estats_log_data_new(estats_log_data** data, estats_log* log)
+_estats_log_entry_new(estats_log_entry** entry, estats_log* log)
 {
     estats_error* err = NULL;
 
-    Chk(Malloc((void**) data, sizeof(estats_log_data)));
+    Chk(Malloc((void**) entry, sizeof(estats_log_entry)));
 
-    Chk(Malloc((void**) &((*data)->buf), log->bufsize));
+    Chk(Malloc((void**) &((*entry)->data), log->bufsize));
 
-    (*data)->log = log;
+    (*entry)->log = log;
 
 Cleanup:
 
@@ -88,14 +88,14 @@ Cleanup:
 }
 
 static void*
-_estats_log_data_free(estats_log_data** data)
+_estats_log_entry_free(estats_log_entry** entry)
 {
-    Free(&((*data)->buf));
-    Free((void**) data);
+    Free(&((*entry)->data));
+    Free((void**) entry);
 }
 
 estats_error*
-_estats_log_data_read(estats_log* log)
+_estats_log_entry_read(estats_log* log)
 {
     estats_error* err = NULL;
 
@@ -104,22 +104,22 @@ _estats_log_data_read(estats_log* log)
     ErrIf(log->fp == NULL, ESTATS_ERR_FILE);
 
     while (1) {
-        estats_log_data* ldata = NULL;
+        estats_log_entry* entry = NULL;
 
-        Chk(_estats_log_data_new(&ldata, log));
+        Chk(_estats_log_entry_new(&entry, log));
 
-        if ((err = Fread(NULL, ldata->buf, log->bufsize, 1, log->fp)) != NULL) {
+        if ((err = Fread(NULL, entry->data, log->bufsize, 1, log->fp)) != NULL) {
     
             if (estats_error_get_number(err) == ESTATS_ERR_EOF) {
                 dbgprintf("   ... caught expected EOF at %s:%d in function %s\n", __FILE__, __LINE__, __FUNCTION__);
 
                 estats_error_free(&err);
             }
-            _estats_log_data_free(&ldata);
+            _estats_log_entry_free(&entry);
             break;
         }
 
-        _estats_list_add_tail(&(ldata->list), &(log->data_list_head));
+        _estats_list_add_tail(&(entry->list), &(log->entry_list_head));
     }
 
 Cleanup:
@@ -128,7 +128,7 @@ Cleanup:
 }
 
 estats_error*
-estats_log_data_write(estats_log* log, estats_snapshot* snap)
+estats_log_entry_write(estats_log* log, estats_snapshot* snap)
 {
     estats_error* err = NULL;
 
@@ -172,19 +172,19 @@ Cleanup:
 }
 
 estats_error*
-estats_log_data_read_value(estats_value** value,
-                           const estats_log_data* data,
+estats_log_entry_read_value(estats_value** value,
+                           const estats_log_entry* entry,
                            const estats_var* var)
 {
     estats_error* err = NULL;
     int size;
     char* buf = NULL;
     
-    ErrIf(value == NULL || data == NULL || var == NULL, ESTATS_ERR_INVAL);
+    ErrIf(value == NULL || entry == NULL || var == NULL, ESTATS_ERR_INVAL);
 
     Chk(_estats_var_size_from_type(&size, var->type));
     Chk(Malloc((void**) &buf, size));
-    memcpy(buf, (void *)((unsigned long)(data->buf) + var->offset), size);
+    memcpy(buf, (void *)((unsigned long)(entry->data) + var->offset), size);
     Chk(_estats_value_from_var_buf(value, buf, var->type));
 
 Cleanup:
@@ -193,29 +193,29 @@ Cleanup:
     return err;
 }
 /*
-estats_log_data*
-estats_log_data_from_list(struct estats_list* ps)
+estats_log_entry*
+estats_log_entry_from_list(struct estats_list* ps)
 {
-    return ESTATS_LIST_ENTRY(ps, estats_log_data, list);
+    return ESTATS_LIST_ENTRY(ps, estats_log_entry, list);
 }
 */
 estats_error*
-estats_log_get_data_head(estats_log_data** data, estats_log* log)
+estats_log_get_entry_head(estats_log_entry** entry, estats_log* log)
 {
     estats_error* err = NULL;
     struct estats_list* head;
 
-    ErrIf(data == NULL || log == NULL, ESTATS_ERR_INVAL);
+    ErrIf(entry == NULL || log == NULL, ESTATS_ERR_INVAL);
 
-    head = &(log->data_list_head);
-    *data = _estats_list_empty(head) ? NULL : ESTATS_LIST_ENTRY(head->next, estats_log_data, list);
+    head = &(log->entry_list_head);
+    *entry = _estats_list_empty(head) ? NULL : ESTATS_LIST_ENTRY(head->next, estats_log_entry, list);
 
 Cleanup:
     return err;
 }
 
 estats_error*
-estats_log_data_next(estats_log_data** next, const estats_log_data* prev)
+estats_log_entry_next(estats_log_entry** next, const estats_log_entry* prev)
 {
     estats_error* err = NULL;
     struct estats_list* l;
@@ -223,22 +223,22 @@ estats_log_data_next(estats_log_data** next, const estats_log_data* prev)
     ErrIf(next == NULL || prev == NULL, ESTATS_ERR_INVAL);
 
     l = prev->list.next;
-    if (l == &(prev->log->data_list_head))
+    if (l == &(prev->log->entry_list_head))
         *next = NULL;
     else
-        *next = ESTATS_LIST_ENTRY(l, estats_log_data, list);
+        *next = ESTATS_LIST_ENTRY(l, estats_log_entry, list);
 
 Cleanup:
     return err;
 }
 
-estats_log_data*
-estats_log_data_return_next(const estats_log_data* prev)
+estats_log_entry*
+estats_log_entry_return_next(const estats_log_entry* prev)
 {
     estats_error* err = NULL;
-    estats_log_data* next = NULL;
+    estats_log_entry* next = NULL;
 
-    Chk(estats_log_data_next(&next, prev));
+    Chk(estats_log_entry_next(&next, prev));
 
 Cleanup:
     if (err) return NULL;
@@ -256,7 +256,7 @@ _estats_log_new(estats_log** log)
     Chk(Malloc((void**) log, sizeof(estats_log)));
     (*log)->fp = NULL;
     _estats_list_init(&((*log)->var_list_head));
-    _estats_list_init(&((*log)->data_list_head));
+    _estats_list_init(&((*log)->entry_list_head));
 
 Cleanup:
 
@@ -309,7 +309,7 @@ _estats_log_open_read(estats_log* log, const char* path)
 
     log->mode = R_MODE;
 
-    Chk(_estats_log_data_read(log));
+    Chk(_estats_log_entry_read(log));
 
 Cleanup: 
     Fclose(&header);
@@ -449,10 +449,10 @@ _estats_log_free(estats_log** log)
 
     Fclose(&(*log)->fp);
 
-    ESTATS_LIST_FOREACH_SAFE(pos, tmp, &((*log)->data_list_head)) {
-        estats_log_data* data = ESTATS_LIST_ENTRY(pos, estats_log_data, list);
+    ESTATS_LIST_FOREACH_SAFE(pos, tmp, &((*log)->entry_list_head)) {
+        estats_log_entry* entry = ESTATS_LIST_ENTRY(pos, estats_log_entry, list);
         _estats_list_del(pos);
-        _estats_log_data_free(&data);
+        _estats_log_entry_free(&entry);
     }
 
     ESTATS_LIST_FOREACH_SAFE(pos, tmp, &((*log)->var_list_head)) {
