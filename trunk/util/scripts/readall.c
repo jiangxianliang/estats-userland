@@ -6,7 +6,6 @@ int main(int argc, char *argv[])
     estats_agent* agent = NULL;
     estats_connection* c_head;
     estats_connection* c_pos;
-    const char* groupName;
     const char* varName;
     
     Chk(estats_agent_attach(&agent, ESTATS_AGENT_TYPE_LOCAL, NULL));

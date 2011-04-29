@@ -216,7 +216,6 @@ _estats_conninfo_refresh(struct estats_conninfo** ecl, estats_agent* agent)
     estats_conninfo* ino_pos;
     estats_conninfo* pid_pos;
     estats_conninfo* newcl;
-    estats_conninfo* tst_pos;
     int dif;
     int tcp_entry, fd_entry;
 
@@ -457,7 +456,7 @@ _estats_conninfo_get_pid_list(struct estats_conninfo** head)
        	if ((pid = atoi(direntp->d_name)) != 0)
        	{
 	    sprintf(path, "%s/%d/%s/", "/proc", pid, "fd"); 
-	    if (fddir = opendir(path))  //else lacks permissions 
+	    if ((fddir = opendir(path)) != NULL)  //else lacks permissions 
 	    { 
 		while ((fddirentp = readdir(fddir)) != NULL) 
 		{ 

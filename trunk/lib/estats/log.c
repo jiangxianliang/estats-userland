@@ -87,14 +87,14 @@ Cleanup:
     return err;
 }
 
-static void*
+static void
 _estats_log_entry_free(estats_log_entry** entry)
 {
     Free(&((*entry)->data));
     Free((void**) entry);
 }
 
-estats_error*
+static estats_error*
 _estats_log_entry_read(estats_log* log)
 {
     estats_error* err = NULL;
@@ -203,8 +203,6 @@ estats_log_entry_read_value(estats_value** value,
     estats_error* err = NULL;
     int size;
     char* buf = NULL;
-    char* strresult = NULL;
-    uint32_t uintresult;
 
     ErrIf(value == NULL || entry == NULL || var == NULL, ESTATS_ERR_INVAL);
 
@@ -293,19 +291,10 @@ static estats_error*
 _estats_log_open_read(estats_log* log, const char* path)
 {
     estats_error* err = NULL;
-    estats_var* var;
-    estats_snapshot* snap = NULL;
-    estats_agent* agent;
     FILE* header = NULL;
-    
     uint16_t h_siz;
-   
     uint16_t sum;
-    fpos_t pos;
-    int c; 
-
-    unsigned char wtf;
-
+    int c;
     uint8_t end;
 
     ErrIf(log == NULL, ESTATS_ERR_INVAL);
@@ -411,7 +400,7 @@ _estats_log_calculate_checksum(estats_log* log, uint16_t* csum)
     fstat(fileno(log->fp), &st);
     size = st.st_size;
 
-    Chk(Calloc((void**) &buf, size+1, sizeof(uint8_t))); /* of course, a malloc would suffice, but let's be explicit */
+    Chk(Calloc((void**) &buf, size+1, sizeof(uint8_t)));
 
     Chk(Fread(NULL, buf, size, 1, log->fp));
 
