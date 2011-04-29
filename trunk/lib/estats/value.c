@@ -136,10 +136,10 @@ _estats_value_copy(estats_value** copyVal,
         newVal->u.u16_val = origVal->u.u16_val;
         break;
     case ESTATS_VALUE_TYPE_INT32:
-        newVal->u.s32_val = origVal->u.u64_val;
+        newVal->u.s32_val = origVal->u.s32_val;
         break;
     case ESTATS_VALUE_TYPE_UINT32:
-        newVal->u.u32_val = origVal->u.u64_val;
+        newVal->u.u32_val = origVal->u.u32_val;
         break;
     case ESTATS_VALUE_TYPE_UINT64:
         newVal->u.u64_val = origVal->u.u64_val;

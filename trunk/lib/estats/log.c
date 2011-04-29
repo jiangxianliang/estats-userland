@@ -171,6 +171,30 @@ Cleanup:
     return err;
 }
 
+static void
+_estats_swap_buf(char* buf, const estats_var* var)
+{
+    if (var == NULL) return;
+
+    switch (var->type) {
+    case ESTATS_TYPE_INTEGER:
+    case ESTATS_TYPE_INTEGER32:
+    case ESTATS_TYPE_COUNTER32:
+    case ESTATS_TYPE_GAUGE32:
+    case ESTATS_TYPE_UNSIGNED32:
+    case ESTATS_TYPE_TIME_TICKS:
+        *(uint32_t*)buf = bswap_32(*(uint32_t*)buf);
+        break;
+    case ESTATS_TYPE_COUNTER64:
+        *(uint64_t*)buf = bswap_64(*(uint64_t*)buf);
+        break;
+    default: // all other types already handled
+        break;
+    }
+
+    return;
+}
+
 estats_error*
 estats_log_entry_read_value(estats_value** value,
                            const estats_log_entry* entry,
@@ -179,17 +203,22 @@ estats_log_entry_read_value(estats_value** value,
     estats_error* err = NULL;
     int size;
     char* buf = NULL;
-    
+    char* strresult = NULL;
+    uint32_t uintresult;
+
     ErrIf(value == NULL || entry == NULL || var == NULL, ESTATS_ERR_INVAL);
 
     Chk(_estats_var_size_from_type(&size, var->type));
     Chk(Malloc((void**) &buf, size));
-    memcpy(buf, (void *)((unsigned long)(entry->data) + var->offset), size);
+    memcpy(buf, (void *)((unsigned long int)(entry->data) + var->offset), size);
+
+    if (entry->log->swap) _estats_swap_buf(buf, var);
+
     Chk(_estats_value_from_var_buf(value, buf, var->type));
 
 Cleanup:
     Free((void**) &buf);
-    
+
     return err;
 }
 
@@ -249,6 +278,7 @@ _estats_log_new(estats_log** log)
 
     Chk(Malloc((void**) log, sizeof(estats_log)));
     (*log)->fp = NULL;
+    (*log)->swap = 0;
     _estats_list_init(&((*log)->var_list_head));
     _estats_list_init(&((*log)->entry_list_head));
 
@@ -288,7 +318,10 @@ _estats_log_open_read(estats_log* log, const char* path)
     Chk(Fread(NULL, &end, 1, 1, log->fp));
 
     Chk(Fread(NULL, &h_siz, 2, 1, log->fp));
-    if (end != LOG_HOST_ORDER) h_siz = bswap_16(h_siz);
+    if (end != LOG_HOST_ORDER) {
+        log->swap = 1;
+        h_siz = bswap_16(h_siz);
+    }
 
     Chk(Fopen(&header, "./log_header", "w+"));
 
