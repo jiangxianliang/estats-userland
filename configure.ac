@@ -112,7 +112,7 @@ else
 fi
 
 if test "x$enable_warnings" = "xyes"; then
-    for i in -Wall -Wtraditional -Wpointer-arith -Wstrict-prototypes -Wmissing-prototypes; do
+    for i in -Wall -Wpointer-arith -Wstrict-prototypes -Wmissing-prototypes -Wconversion -Wextra; do
         if test -z "`echo $CFLAGS | grep "$i" 2> /dev/null`"; then
             CFLAGS="$CFLAGS $i"
         fi

@@ -23,21 +23,11 @@
 
 #include <estats/estats-int.h>
 
-union ltv {
-    int32_t s32_val;
-    int64_t s64_val;
-};
-
-struct estats_log_timeval {
-    union ltv sec;
-    union ltv usec;
-};
-
 struct estats_log_entry {
     void*  data;
     struct estats_list list;
     struct estats_log* log;
-    struct estats_log_timeval timeval;
+//    struct estats_log_timeval timeval;
 };
 
 typedef enum ESTATS_LOG_MODE {
@@ -48,7 +38,6 @@ typedef enum ESTATS_LOG_MODE {
 struct estats_log {
     FILE*               fp;
     int                 swap;
-    int                 tvsize;
     int                 bufsize;
     int                 nvars;
     struct estats_list  var_list_head;
