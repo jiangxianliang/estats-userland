@@ -21,12 +21,9 @@
 
 static estats_error* _estats_agent_refresh_connections(estats_agent *agent);
 static estats_error* _estats_agent_attach_local(estats_agent** agent);
-static estats_error* _estats_agent_attach_log(estats_agent** agent, FILE *header);
-static void          _estats_agent_detach_local(estats_agent** agent);
-static void          _estats_agent_detach_log(estats_agent** agent);
 
 
-estats_error*
+static estats_error*
 _estats_agent_parse_header(estats_agent* agent, FILE* fp)
 {
     estats_error* err = NULL;
@@ -173,9 +170,6 @@ estats_agent_attach(estats_agent** agent, const ESTATS_AGENT_TYPE type, const vo
     case ESTATS_AGENT_TYPE_LOCAL:
        	Chk(_estats_agent_attach_local(agent));
        	break;
-    case ESTATS_AGENT_TYPE_LOG:
-	Chk(_estats_agent_attach_log(agent, (FILE*) data));
-	break;
     default:
 	Err(ESTATS_ERR_AGENT_TYPE);
         break; /* not reached */
@@ -235,17 +229,6 @@ estats_agent_detach(estats_agent** agent)
         estats_value_free(&currConn->spec.src_addr);
         free(currConn);
     }
-    
-    switch ((*agent)->type) {
-    case ESTATS_AGENT_TYPE_LOCAL:
-        _estats_agent_detach_local(agent);
-        break;
-    case ESTATS_AGENT_TYPE_LOG:
-        _estats_agent_detach_log(agent);
-        break;
-    default:
-        break;
-    }
 
     free(*agent);
     *agent = NULL;
@@ -266,22 +249,6 @@ estats_agent_get_connection_head(estats_connection** conn, estats_agent* agent)
 Cleanup:
     return err;
 }
-
-
-estats_error*
-estats_agent_get_group_head(estats_group** group, estats_agent* agent)
-{
-    estats_error* err = NULL;
-    struct estats_list* head;
-
-    ErrIf(group == NULL || agent == NULL, ESTATS_ERR_INVAL);
-    head = &(agent->group_list_head);
-    *group = _estats_list_empty(head) ? NULL : ESTATS_LIST_ENTRY(head->next, estats_group, list);
-
-Cleanup:
-    return err;
-}
-
 
 estats_error*
 estats_agent_get_type(ESTATS_AGENT_TYPE* type, const estats_agent* agent)
@@ -379,7 +346,6 @@ estats_agent_find_connection_from_socket(estats_connection** conn,
     socklen_t namelen; /* may not be POSIX */
     struct estats_connection_spec spec; /* connection tuple */
 
-    /* XXX TODO XXX: Should we only allow local agents? */
     ErrIf(conn == NULL || agent == NULL, ESTATS_ERR_INVAL);
    
     /* refresh_conections is not necessary */
@@ -430,72 +396,6 @@ Cleanup:
     Free((void**) &spec.dst_addr);
     Free((void**) &spec.dst_port); 
 
-    return err;
-}
-
-
-estats_error*
-estats_agent_find_group_from_name(estats_group** group,
-                                  const estats_agent* agent,
-                                  const char* groupName)
-{
-    estats_error* err = NULL;
-    struct estats_list* currItem;
-    
-    ErrIf(group == NULL || agent == NULL || groupName == NULL, ESTATS_ERR_INVAL);
-
-    *group = NULL;
-
-    ESTATS_LIST_FOREACH(currItem, &(agent->group_list_head)) {
-        estats_group* currGroup = ESTATS_LIST_ENTRY(currItem, estats_group, list);
-        if (strcmp(currGroup->name, groupName) == 0) {
-            *group = currGroup;
-            break;
-        }
-    }
-    
-    ErrIf(*group == NULL, ESTATS_ERR_NOGROUP);
-
- Cleanup:
-    return err;
-}
-
-
-estats_error*
-estats_agent_find_var_and_group(estats_var** var, estats_group** group,
-                                estats_agent* agent, const char* varname)
-{
-    estats_error* err = NULL;
-    struct estats_list* head;
-    struct estats_list* currItem;
-    estats_var* v = NULL;
-    estats_group* g = NULL;
-    
-    ErrIf(var == NULL || agent == NULL || varname == NULL, ESTATS_ERR_INVAL);
-    
-    head = &(agent->group_list_head);
-    ESTATS_LIST_FOREACH(currItem, head) {
-        g = ESTATS_LIST_ENTRY(currItem, estats_group, list);
-
-        if ((err = estats_group_find_var_from_name(&v, g, varname)) == NULL) {
-            dbgprintf("Found variable \"%s\" in group \"%s\"\n", varname, g->name);
-            CHECK_VAR(v);
-            break;
-        } else {
-            dbgprintf("Ignoring variable \"%s\" not found, checking next group\n", varname);
-            estats_error_free(&err);
-            v = NULL;
-            g = NULL;
-        }
-    }
-
-    ErrIf(v == NULL || g == NULL, ESTATS_ERR_NOVAR);
-
-    *var = v;
-    if (group != NULL)
-        *group = g;
-
- Cleanup:
     return err;
 }
 
@@ -579,7 +479,7 @@ _estats_agent_refresh_connections(estats_agent* agent)
         int cid;
         const char* addr_name;
         const char* port_name;
-        int16_t* dst;
+        //int16_t* dst;
         
         cid = atoi(ent->d_name);
         if (cid == 0 && ent->d_name[0] != '0')
@@ -648,38 +548,8 @@ _estats_agent_attach_local(estats_agent** agent)
 
  Cleanup:
     Fclose(&header);
-    
-    if (err != NULL) {
-        _estats_agent_detach_local(agent);
-    }
-    
+
     return err;
 }
 
 
-static estats_error*
-_estats_agent_attach_log(estats_agent** agent, FILE* header)
-{
-    estats_error* err = NULL;
-
-//    Chk(Malloc((void**) agent, sizeof(estats_agent)));
-    (*agent)->type = ESTATS_AGENT_TYPE_LOG;
-//    _estats_list_init(&((*agent)->group_list_head));
-//    _estats_list_init(&((*agent)->connection_list_head));
-    Chk(_estats_agent_parse_header(*agent, header));
-
-Cleanup:
-    return err;
-}
-
-
-static void
-_estats_agent_detach_local(estats_agent** agent)
-{
-}
-
-
-static void
-_estats_agent_detach_log(estats_agent** agent)
-{
-}

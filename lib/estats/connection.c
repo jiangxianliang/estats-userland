@@ -106,7 +106,7 @@ Cleanup:
     return err;
 }
 
-
+/*
 estats_error*
 estats_connection_group_access(const estats_connection* conn,
                                const estats_group* group,
@@ -123,7 +123,7 @@ estats_connection_group_access(const estats_connection* conn,
     Free((void**) &filename);
     return err;
 }
-
+*/
 estats_error*
 estats_connection_read_access(const estats_connection* conn,
                               int mode)
@@ -228,7 +228,7 @@ estats_connection_spec_compare(int* result,
 
     if (type1 != type2) {
 	*result = 1;
-	return;
+	goto Cleanup;
     }
 
     Chk(estats_value_compare(&sa, s1->src_addr, s2->src_addr));

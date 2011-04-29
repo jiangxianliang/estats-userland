@@ -19,7 +19,6 @@ main(int argc, char *argv[])
     estats_error* err = NULL;
     estats_agent* agent = NULL;
     estats_connection* conn;
-    estats_var* var;
     estats_snapshot* snap = NULL;
     estats_log* log = NULL;
     int cid;

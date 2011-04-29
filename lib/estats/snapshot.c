@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2011 The Board of Trustees of the University of Illinois,
  *                    Carnegie Mellon University.
@@ -40,7 +39,6 @@ estats_snapshot_alloc(estats_snapshot** snap, estats_connection* conn)
     memset((*snap)->data, 0, size);
     
     (*snap)->group = conn->agent->read;
-//    (*snap)->connection = conn;
     (*snap)->cid = conn->cid;
     Chk(estats_connection_spec_copy(&(*snap)->spec, &conn->spec));
    
@@ -61,32 +59,6 @@ estats_snapshot_free(estats_snapshot** snap)
 
     Free((void**) &((*snap)->data));
     Free((void**) snap);
-}
-
-
-estats_error*
-estats_snapshot_get_group(estats_group** group, const estats_snapshot* snap)
-{
-    estats_error* err = NULL;
-
-    ErrIf(group == NULL || snap == NULL, ESTATS_ERR_INVAL);
-    *group = snap->group;
-
-Cleanup:
-    return err;
-}
-
-
-estats_error*
-estats_snapshot_get_group_name(const char** name, const estats_snapshot* snap)
-{
-    estats_error* err = NULL;
-
-    ErrIf(name == NULL || snap == NULL, ESTATS_ERR_INVAL);
-    *name = snap->group->name;
-
-Cleanup:
-    return err;
 }
 
 

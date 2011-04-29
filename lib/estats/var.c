@@ -79,8 +79,6 @@ _estats_var_next_undeprecated(estats_var** next, const estats_var* prev)
 
     ErrIf(next == NULL || prev == NULL, ESTATS_ERR_INVAL);
 
-//    *next = NULL;
-
     head = &(prev->group->var_list_head);
     iter = &(prev->list);
 
