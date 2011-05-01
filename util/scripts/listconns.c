@@ -31,10 +31,6 @@ main(int argc, char *argv[])
 
         printf("%-8d %-8d %-8d %-10s %-20s %-8s %-20s %-8s\n", cid, pid, uid, cmdline, spec_asc.src_addr, spec_asc.src_port, spec_asc.dst_addr, spec_asc.dst_port);
 
-        free(spec_asc.dst_addr);
-        free(spec_asc.dst_port);
-        free(spec_asc.src_addr);
-        free(spec_asc.src_port);
     }
 
 Cleanup:

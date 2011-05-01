@@ -121,29 +121,23 @@ estats_connection_spec_addr_as_string(char** str, const char* addr)
 estats_error* estats_connection_spec_as_strings(struct spec_ascii* spec_asc, struct estats_connection_spec* spec)
 {
     estats_error* err = NULL;
-    estats_value* val = NULL;
 
-    spec_asc->dst_port = NULL;
-    spec_asc->src_port = NULL;
+    Chk(Sprintf(NULL, spec_asc->dst_port, "%u", spec->dst_port));
+    Chk(Sprintf(NULL, spec_asc->src_port, "%u", spec->src_port));
 
-    Chk(_estats_value_from_var_buf(&val, (void*) &spec->dst_addr, ESTATS_TYPE_INET_ADDRESS));
-    Chk(estats_value_as_string(&spec_asc->dst_addr, val));
-    estats_value_free(&val);
+    if (spec->dst_addr[16] == ESTATS_ADDRTYPE_IPV4)
+        Chk(Inet_ntop(AF_INET, (void*) (spec->dst_addr), spec_asc->dst_addr, INET_ADDRSTRLEN));
+    else if (spec->dst_addr[16] == ESTATS_ADDRTYPE_IPV6)
+        Chk(Inet_ntop(AF_INET6, (void*) (spec->dst_addr), spec_asc->dst_addr, INET6_ADDRSTRLEN));
+    else Err(ESTATS_ERR_UNKNOWN_TYPE);
 
-    Chk(Asprintf(NULL, &spec_asc->dst_port, "%u", spec->dst_port));
-
-    Chk(_estats_value_from_var_buf(&val, (void*) &spec->src_addr, ESTATS_TYPE_INET_ADDRESS));
-    Chk(estats_value_as_string(&spec_asc->src_addr, val));
-    estats_value_free(&val);
-
-    Chk(Asprintf(NULL, &spec_asc->src_port, "%u", spec->src_port));
+    if (spec->src_addr[16] == ESTATS_ADDRTYPE_IPV4)
+        Chk(Inet_ntop(AF_INET, (void*) (spec->src_addr), spec_asc->src_addr, INET_ADDRSTRLEN));
+    else if (spec->dst_addr[16] == ESTATS_ADDRTYPE_IPV6)
+        Chk(Inet_ntop(AF_INET6, (void*) (spec->src_addr), spec_asc->src_addr, INET6_ADDRSTRLEN));
+    else Err(ESTATS_ERR_UNKNOWN_TYPE);
 
  Cleanup:
-    if (err != NULL) {
-        estats_value_free(&val);
-        Free((void**) &spec_asc->dst_port);
-        Free((void**) &spec_asc->src_port);
-    }
     return err;
 }
 

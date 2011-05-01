@@ -80,10 +80,10 @@ struct estats_connection_spec {
 };
 
 struct spec_ascii {
-    char* dst_port;
-    char* dst_addr;
-    char* src_port;
-    char* src_addr;
+    char dst_port[6];
+    char dst_addr[46];
+    char src_port[6];
+    char src_addr[46];
 };
 
 typedef struct estats_agent      estats_agent;

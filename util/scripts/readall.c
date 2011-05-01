@@ -43,11 +43,6 @@ int main(int argc, char *argv[])
                 free(text);
                 estats_value_free(&value);
             }
-
-            free(spec_asc.dst_addr);
-            free(spec_asc.dst_port);
-            free(spec_asc.src_addr);
-            free(spec_asc.src_port);
         }
 
 
