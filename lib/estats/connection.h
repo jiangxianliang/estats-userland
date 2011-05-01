@@ -34,6 +34,10 @@ estats_error* estats_connection_get_addrtype(ESTATS_ADDRTYPE* _addrtype,
 estats_error* estats_connection_get_connection_spec(struct estats_connection_spec* _spec,
                                          const estats_connection* _conn);
 
+estats_error* estats_connection_spec_addr_as_string(char** _str, const char* _addr);
+
+estats_error* estats_connection_spec_as_strings(struct spec_ascii* _sa, struct estats_connection_spec* _spec);
+
 estats_error* estats_connection_read_access(const estats_connection* _conn,
                                             int mode);
 
@@ -47,9 +51,6 @@ estats_error* estats_connection_write_value(const estats_value* _value,
 estats_error* estats_connection_spec_compare(int* _result,
                  const struct estats_connection_spec* _s1,
                  const struct estats_connection_spec* _s2);
-
-estats_error* estats_connection_spec_copy(struct estats_connection_spec* _s1,
-                                    const struct estats_connection_spec* _s2);
 
 estats_connection* estats_connection_return_next(const estats_connection* _prev);
 

@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2011 The Board of Trustees of the University of Illinois,
  *                    Carnegie Mellon University.
@@ -25,10 +24,10 @@ static estats_error* _estats_conninfo_refresh(estats_conninfo** _conninfo, estat
 static estats_error* _estats_conninfo_get_tcp_list(struct estats_conninfo** tcp_list, estats_agent* agent);
 static estats_error* _estats_conninfo_get_ino_list(struct estats_conninfo** ino_list);
 static estats_error* _estats_conninfo_get_pid_list(struct estats_conninfo** pid_list);
-static estats_error* _estats_conninfo_spec_compare(int* res, const estats_conninfo* st1, const estats_conninfo* st2);
 static estats_error* _estats_conninfo_new_node(estats_conninfo** _conninfo);
 static void          _estats_conninfo_free_node(estats_conninfo** conninfo);
 static estats_error* _estats_conninfo_add_tail(struct estats_conninfo** head, struct estats_conninfo* ci);
+
 
 estats_error*
 estats_get_conninfo_head(estats_conninfo** head, estats_agent* agent)
@@ -43,7 +42,7 @@ Cleanup:
     return err;
 }
 
-estats_error*
+static estats_error*
 _estats_conninfo_new_node(estats_conninfo** ci)
 {
     estats_error* err = NULL; 
@@ -52,15 +51,7 @@ _estats_conninfo_new_node(estats_conninfo** ci)
     *ci = NULL;
 
     Chk(Malloc((void**) ci, sizeof(estats_conninfo)));
-
-    (*ci)->spec.dst_port = NULL;
-    (*ci)->spec.dst_addr = NULL;
-    (*ci)->spec.src_port = NULL;
-    (*ci)->spec.src_addr = NULL;
-    strlcpy((*ci)->cmdline, "\0", 1);
-    (*ci)->pid = 0;
-    (*ci)->uid = 0;
-    (*ci)->next = NULL;
+    memset((void*) *ci, 0, sizeof(estats_conninfo));
 
 Cleanup:
     return err;
@@ -112,11 +103,6 @@ _estats_conninfo_free_node(estats_conninfo** conninfo)
 {
     if (conninfo == NULL || *conninfo == NULL)
 	return;
-
-    estats_value_free(&((*conninfo)->spec.src_addr));
-    estats_value_free(&((*conninfo)->spec.src_port));
-    estats_value_free(&((*conninfo)->spec.dst_addr));
-    estats_value_free(&((*conninfo)->spec.dst_port));
 
     Free((void**) conninfo);
 }
@@ -174,25 +160,6 @@ Cleanup:
 
 
 estats_error*
-estats_conninfo_copy_spec(struct estats_connection_spec *spec, const estats_conninfo* st)
-{
-    estats_error* err = NULL;
-    const struct estats_connection_spec* sp;
-
-    ErrIf(spec == NULL || st == NULL, ESTATS_ERR_INVAL);
-    ErrIf((sp = &st->spec) == NULL, ESTATS_ERR_INVAL);
-
-    Chk(_estats_value_copy(&spec->src_addr, sp->src_addr));
-    Chk(_estats_value_copy(&spec->src_port, sp->src_port));
-    Chk(_estats_value_copy(&spec->dst_addr, sp->dst_addr));
-    Chk(_estats_value_copy(&spec->dst_port, sp->dst_port));
-
-Cleanup:
-    return err;
-}
-
-
-estats_error*
 estats_conninfo_get_cmdline(char** str, const estats_conninfo* conninfo)
 {
     estats_error* err = NULL;
@@ -236,7 +203,7 @@ _estats_conninfo_refresh(struct estats_conninfo** ecl, estats_agent* agent)
 
         ESTATS_CONNINFO_FOREACH(ino_pos, ino_head) {
 
-	    Chk(_estats_conninfo_spec_compare(&dif, ino_pos, tcp_pos));
+	    Chk(estats_connection_spec_compare(&dif, &ino_pos->spec, &tcp_pos->spec));
 
 	    if (!dif) {
 	       	tcp_entry = 1;
@@ -259,7 +226,7 @@ _estats_conninfo_refresh(struct estats_conninfo** ecl, estats_agent* agent)
 
 			newcl->addrtype = tcp_pos->addrtype; 
 
-			Chk(estats_conninfo_copy_spec(&newcl->spec, tcp_pos));
+                        newcl->spec = tcp_pos->spec; // struct copy
 
                         Chk(_estats_conninfo_add_tail(ecl, newcl));
 		    }
@@ -274,7 +241,8 @@ _estats_conninfo_refresh(struct estats_conninfo** ecl, estats_agent* agent)
 
 			newcl->cid = tcp_pos->cid;
 			newcl->addrtype = tcp_pos->addrtype; 
-			Chk(estats_conninfo_copy_spec(&newcl->spec, tcp_pos));
+
+                        newcl->spec = tcp_pos->spec; // struct copy
 
                         strlcpy(newcl->cmdline, "\0", 1);
                         Chk(_estats_conninfo_add_tail(ecl, newcl));
@@ -288,7 +256,8 @@ _estats_conninfo_refresh(struct estats_conninfo** ecl, estats_agent* agent)
 
 	    newcl->cid = tcp_pos->cid; 
 	    newcl->addrtype = tcp_pos->addrtype; 
-	    Chk(estats_conninfo_copy_spec(&newcl->spec, tcp_pos));
+
+            newcl->spec = tcp_pos->spec; // struct copy
 
             strlcpy(newcl->cmdline, "\0", 1);
 
@@ -364,18 +333,13 @@ _estats_conninfo_get_ino_list(struct estats_conninfo** head)
 
 	    if ((scan = sscanf(buf,
 			    "%*u: %x:%hx %x:%hx %x %*x:%*x %*x:%*x %*x %u %*u %lu",
-			    (uint32_t *) &(srcAddr),
-			    (uint16_t *) &(srcPort),
-			    (uint32_t *) &(dstAddr),
-			    (uint16_t *) &(dstPort),
+			    (uint32_t *) &(conninfo->spec.src_addr),
+			    (uint16_t *) &(conninfo->spec.src_port),
+			    (uint32_t *) &(conninfo->spec.dst_addr),
+			    (uint16_t *) &(conninfo->spec.dst_port),
 			    (int *) &(conninfo->state),
 			    (uid_t *) &(conninfo->uid),
 			    (ino_t *) &(conninfo->ino))) == 7) { 
-
-		Chk(estats_value_new(&conninfo->spec.src_addr, &srcAddr, ESTATS_VALUE_TYPE_IP4ADDR));
-		Chk(estats_value_new(&conninfo->spec.src_port, &srcPort, ESTATS_VALUE_TYPE_UINT16));
-		Chk(estats_value_new(&conninfo->spec.dst_addr, &dstAddr, ESTATS_VALUE_TYPE_IP4ADDR));
-		Chk(estats_value_new(&conninfo->spec.dst_port, &dstPort, ESTATS_VALUE_TYPE_UINT16));
 
 		conninfo->addrtype = ESTATS_ADDRTYPE_IPV4;
 
@@ -399,24 +363,22 @@ _estats_conninfo_get_ino_list(struct estats_conninfo** head)
 	    Chk(_estats_conninfo_new_node(&conninfo));
 
 	    if ((scan = sscanf(buf,
-			    "%*u: %64[0-9A-Fa-f]:%hx %64[0-9A-Fa-f]:%hx %x %*x:%*x %*x:%*x %*x %u %*u %u",
+			    "%*u: %64[0-9A-Fa-f]:%hx %64[0-9A-Fa-f]:%hx %x %*x:%*x %*x:%*x %*x %u %*u %u", 
 			    (char *) &srcAddr,
-			    (uint16_t *) &srcPort,
+			    (uint16_t *) &(conninfo->spec.src_port),
 			    (char *) &dstAddr,
-			    (uint16_t *) &dstPort,
+			    (uint16_t *) &(conninfo->spec.dst_port),
 			    (int *) &(conninfo->state),
 			    (uid_t *) &(conninfo->uid),
 			    (pid_t *) &(conninfo->ino))) == 7) { 
 
 		sscanf(srcAddr, "%8x%8x%8x%8x", &in6.s6_addr32[0], &in6.s6_addr32[1], &in6.s6_addr32[2], &in6.s6_addr32[3]); 
 
-		estats_value_new(&conninfo->spec.src_addr, &in6.s6_addr, ESTATS_VALUE_TYPE_IP6ADDR);
-		estats_value_new(&conninfo->spec.src_port, &srcPort, ESTATS_VALUE_TYPE_UINT16);
+                memcpy(&(conninfo->spec.src_addr), &in6.s6_addr, 16);
 
 		sscanf(dstAddr, "%8x%8x%8x%8x", &in6.s6_addr32[0], &in6.s6_addr32[1], &in6.s6_addr32[2], &in6.s6_addr32[3]);
 
-		estats_value_new(&conninfo->spec.dst_addr, &in6.s6_addr, ESTATS_VALUE_TYPE_IP6ADDR);
-		estats_value_new(&conninfo->spec.dst_port, &dstPort, ESTATS_VALUE_TYPE_UINT16);
+                memcpy(&(conninfo->spec.dst_addr), &in6.s6_addr, 16);
 
 		conninfo->addrtype = ESTATS_ADDRTYPE_IPV6;
 
@@ -474,7 +436,7 @@ _estats_conninfo_get_pid_list(struct estats_conninfo** head)
        	
 	                Chk(_estats_conninfo_new_node(&ecl));
 
-			if (sscanf(buf, "Name: %16s\n", &ecl->cmdline) != 1) {
+			if (sscanf(buf, "Name: %16s\n", ecl->cmdline) != 1) {
 			    Free((void**) &ecl);
 			    goto FileCleanup;
 		       	}
@@ -506,34 +468,6 @@ _estats_conninfo_add_tail(struct estats_conninfo** head, struct estats_conninfo*
 
     ci->next = *head;
     *head = ci;
-
-Cleanup:
-    return err;
-}
-
-static estats_error*
-_estats_conninfo_spec_compare(int* result, const estats_conninfo* st1, const estats_conninfo* st2)
-{
-    estats_error* err = NULL;
-    const struct estats_connection_spec* sp1;
-    const struct estats_connection_spec* sp2;
-    int sa, sp, da, dp;
-
-    ErrIf(result == NULL || st1 == NULL || st2 == NULL, ESTATS_ERR_INVAL);
-    ErrIf((sp1 = &st1->spec) == NULL || (sp2 = &st2->spec) == NULL, ESTATS_ERR_INVAL);
-
-    if (st1->addrtype != st2->addrtype) {
-	*result = 1;
-	goto Cleanup;
-    }
-
-    Chk(estats_value_compare(&sa, sp1->src_addr, sp2->src_addr));
-    Chk(estats_value_compare(&sp, sp1->src_port, sp2->src_port));
-    Chk(estats_value_compare(&da, sp1->dst_addr, sp2->dst_addr));
-    Chk(estats_value_compare(&dp, sp1->dst_port, sp2->dst_port));
-
-    if (!sa && !sp && !da && !dp) *result = 0;
-    else *result = 1;
 
 Cleanup:
     return err;

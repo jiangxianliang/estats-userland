@@ -97,33 +97,57 @@ estats_connection_get_connection_spec(struct estats_connection_spec *spec, const
 
     ErrIf(spec == NULL || conn == NULL, ESTATS_ERR_INVAL);
 
-    Chk(_estats_value_copy(&spec->dst_port, conn->spec.dst_port));
-    Chk(_estats_value_copy(&spec->dst_addr, conn->spec.dst_addr));
-    Chk(_estats_value_copy(&spec->src_port, conn->spec.src_port));
-    Chk(_estats_value_copy(&spec->src_addr, conn->spec.src_addr));
+    *spec = conn->spec; // struct copy
 
 Cleanup:
     return err;
 }
 
-/*
 estats_error*
-estats_connection_group_access(const estats_connection* conn,
-                               const estats_group* group,
-                               int mode)
+estats_connection_spec_addr_as_string(char** str, const char* addr)
 {
     estats_error* err = NULL;
-    char* filename = NULL;
+    estats_value* val = NULL;
 
-    ErrIf(conn == NULL || group == NULL, ESTATS_ERR_INVAL);
-    Chk(Asprintf(NULL, &filename, "%s/%d/%s", ESTATS_ROOT_DIR, conn->cid, group->name));
-    Chk(Access(filename, mode));
+    Chk(_estats_value_from_var_buf(&val, (void*) addr, ESTATS_TYPE_INET_ADDRESS));
+    Chk(estats_value_as_string(str, val));
 
  Cleanup:
-    Free((void**) &filename);
+    estats_value_free(&val);
     return err;
 }
-*/
+
+
+estats_error* estats_connection_spec_as_strings(struct spec_ascii* spec_asc, struct estats_connection_spec* spec)
+{
+    estats_error* err = NULL;
+    estats_value* val = NULL;
+
+    spec_asc->dst_port = NULL;
+    spec_asc->src_port = NULL;
+
+    Chk(_estats_value_from_var_buf(&val, (void*) &spec->dst_addr, ESTATS_TYPE_INET_ADDRESS));
+    Chk(estats_value_as_string(&spec_asc->dst_addr, val));
+    estats_value_free(&val);
+
+    Chk(Asprintf(NULL, &spec_asc->dst_port, "%u", spec->dst_port));
+
+    Chk(_estats_value_from_var_buf(&val, (void*) &spec->src_addr, ESTATS_TYPE_INET_ADDRESS));
+    Chk(estats_value_as_string(&spec_asc->src_addr, val));
+    estats_value_free(&val);
+
+    Chk(Asprintf(NULL, &spec_asc->src_port, "%u", spec->src_port));
+
+ Cleanup:
+    if (err != NULL) {
+        estats_value_free(&val);
+        Free((void**) &spec_asc->dst_port);
+        Free((void**) &spec_asc->src_port);
+    }
+    return err;
+}
+
+
 estats_error*
 estats_connection_read_access(const estats_connection* conn,
                               int mode)
@@ -211,64 +235,27 @@ estats_connection_write_value(const estats_value* value,
 
 
 estats_error*
-estats_connection_spec_compare(int* result,
+estats_connection_spec_compare(int* res,
                                const struct estats_connection_spec *s1,
                                const struct estats_connection_spec *s2)
 {
     estats_error* err = NULL;
-    int sa, sp, da, dp;
-
-    ESTATS_VALUE_TYPE type1;
-    ESTATS_VALUE_TYPE type2;
 
     ErrIf(s1 == NULL || s2 == NULL, ESTATS_ERR_INVAL);
 
-    Chk(estats_value_get_type(&type1, s1->src_addr));
-    Chk(estats_value_get_type(&type2, s2->src_addr));
+    *res = 1;
 
-    if (type1 != type2) {
-	*result = 1;
-	goto Cleanup;
+    if ( (s1->dst_port == s2->dst_port) &&
+         strcmp(s1->dst_addr, s2->dst_addr) == 0 &&
+         (s1->src_port == s2->src_port) &&
+         strcmp(s1->src_addr, s2->src_addr) == 0 ) {
+
+        *res = 0;
     }
 
-    Chk(estats_value_compare(&sa, s1->src_addr, s2->src_addr));
-    Chk(estats_value_compare(&sp, s1->src_port, s2->src_port));
-    Chk(estats_value_compare(&da, s1->dst_addr, s2->dst_addr));
-    Chk(estats_value_compare(&dp, s1->dst_port, s2->dst_port));
-
-    if (!sa && !sp && !da && !dp) *result = 0;
-    else *result = 1;
-
 Cleanup:
-
     return err;
 }
-
-
-estats_error*
-estats_connection_spec_copy(struct estats_connection_spec* s1,
-                      const struct estats_connection_spec* s2)
-{
-    estats_error* err = NULL;
-
-    ErrIf(s1 == NULL || s2 == NULL, ESTATS_ERR_INVAL);
-
-    Chk(_estats_value_copy(&s1->src_addr, s2->src_addr));
-    Chk(_estats_value_copy(&s1->src_port, s2->src_port));
-    Chk(_estats_value_copy(&s1->dst_addr, s2->dst_addr));
-    Chk(_estats_value_copy(&s1->dst_port, s2->dst_port));
-
-Cleanup:
-
-    return err;
-}
-
-
-
-
-
-
-
 
 
 

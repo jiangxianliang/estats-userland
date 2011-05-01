@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2011 The Board of Trustees of the University of Illinois,
  *                    Carnegie Mellon University.
@@ -318,6 +317,37 @@ Cleanup:
     return err;
 }
 
+
+estats_error*
+Sprintf(int* ret, char* str, const char* fmt, ...)
+{
+    estats_error* err = NULL;
+    va_list ap;
+
+    va_start(ap,fmt);
+    Chk(Vsprintf(ret, str, fmt, ap));
+    va_end(ap);
+
+Cleanup:
+    return err;
+}
+
+
+estats_error*
+Snprintf(int* ret, char* str, size_t size, const char* fmt, ...)
+{
+    estats_error* err = NULL;
+    va_list ap;
+
+    va_start(ap,fmt);
+    Chk(Vsnprintf(ret, str, size, fmt, ap));
+    va_end(ap);
+
+Cleanup:
+    return err;
+}
+
+
 estats_error*
 Sscanf(int* ret, const char* str, const char* fmt, ...)
 {
@@ -424,7 +454,7 @@ Vasprintf(int* ret, char** strp, const char* fmt, va_list ap)
     if (ret != NULL)
         *ret = v;
 
-Cleanup:
+ Cleanup:
     return err;
 }
 
@@ -436,7 +466,7 @@ Vfprintf(int* ret, FILE* fp, const char* fmt, va_list ap)
     int v;
 
     ErrIf(fp == NULL || fmt == NULL, ESTATS_ERR_INVAL);
-    if ((v = vfprintf(fp, fmt, ap)) == 0) /* TODO: is this correct? */
+    if ((v = vfprintf(fp, fmt, ap)) <= 0)
         Err(ESTATS_ERR_LIBC);
     if (ret != NULL)
         *ret = v;
@@ -454,7 +484,41 @@ Vfscanf(int* ret, FILE* fp, const char* fmt, va_list ap)
 
     ErrIf(fp == NULL || fmt == NULL, ESTATS_ERR_INVAL);
     if ((v = vfscanf(fp, fmt, ap)) == EOF)
-        Err(ESTATS_ERR_LIBC); /* TODO: Consider returning EOF error? */
+        Err(ESTATS_ERR_LIBC);
+    if (ret != NULL)
+        *ret = v;
+
+ Cleanup:
+    return err;
+}
+
+
+estats_error*
+Vsnprintf(int* ret, char* str, size_t size, const char* fmt, va_list ap)
+{
+    estats_error* err = NULL;
+    int v;
+
+    ErrIf(str == NULL || size == 0 || fmt == NULL, ESTATS_ERR_INVAL);
+    if ((v = vsnprintf(str, size, fmt, ap)) <= 0)
+        Err(ESTATS_ERR_LIBC);
+    if (ret != NULL)
+        *ret = v;
+
+ Cleanup:
+    return err;
+}
+
+
+estats_error*
+Vsprintf(int* ret, char* str, const char* fmt, va_list ap)
+{
+    estats_error* err = NULL;
+    int v;
+
+    ErrIf(str == NULL || fmt == NULL, ESTATS_ERR_INVAL);
+    if ((v = vsprintf(str, fmt, ap)) <= 0)
+        Err(ESTATS_ERR_LIBC);
     if (ret != NULL)
         *ret = v;
 
@@ -471,7 +535,7 @@ Vsscanf(int* ret, const char* str, const char* fmt, va_list ap)
 
     ErrIf(str == NULL || fmt == NULL, ESTATS_ERR_INVAL);
     if ((v = vsscanf(str, fmt, ap)) == EOF)
-        Err(ESTATS_ERR_LIBC); /* TODO: Consider returning EOF error? */
+        Err(ESTATS_ERR_LIBC);
     if (ret != NULL)
         *ret = v;
 
