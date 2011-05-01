@@ -233,18 +233,6 @@ estats_agent_get_connection_head(estats_connection** conn, estats_agent* agent)
     head = &(agent->connection_list_head);
     *conn = _estats_list_empty(head) ? NULL : ESTATS_LIST_ENTRY(head->next, estats_connection, list);
 
-Cleanup:
-    return err;
-}
-
-estats_error*
-estats_agent_get_type(ESTATS_AGENT_TYPE* type, const estats_agent* agent)
-{
-    estats_error* err = NULL;
-
-    ErrIf(type == NULL || agent == NULL, ESTATS_ERR_INVAL);
-    *type = agent->type;
- 
  Cleanup:
     return err;
 }
@@ -407,7 +395,7 @@ Cleanup:
 }
     
 estats_error*
-estats_agent_get_var_head(estats_var** var, estats_agent* agent)
+estats_agent_get_var_head(estats_var** var, const estats_agent* agent)
 {
     estats_error* err = NULL;
     struct estats_list* lp = NULL;

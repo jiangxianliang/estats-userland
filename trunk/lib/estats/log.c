@@ -188,6 +188,9 @@ _estats_swap_buf(char* buf, const estats_var* var)
     case ESTATS_TYPE_COUNTER64:
         *(uint64_t*)buf = bswap_64(*(uint64_t*)buf);
         break;
+    case ESTATS_TYPE_INET_PORT_NUMBER:
+        *(uint16_t*)buf = bswap_16(*(uint16_t*)buf);
+        break;
     default: // all other types already handled
         break;
     }

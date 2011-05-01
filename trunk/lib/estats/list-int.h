@@ -1,4 +1,4 @@
-#if !defined(ESTATS_LIST_INT_H)
+#ifndef ESTATS_LIST_INT_H
 #define ESTATS_LIST_INT_H
 
 /*
@@ -62,4 +62,4 @@ static inline int _estats_list_empty(struct estats_list* head)
 #define ESTATS_LIST_FOREACH_SAFE(pos, tmp, head) \
     for (pos = (head)->next, tmp = pos->next; pos != (head); pos = tmp, tmp = pos->next)
 
-#endif /* !defined(ESTATS_LIST_INT_H) */
+#endif /* ESTATS_LIST_INT_H */

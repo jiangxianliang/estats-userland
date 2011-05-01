@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2011 The Board of Trustees of the University of Illinois,
  *                    Carnegie Mellon University.
@@ -18,10 +17,9 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA
  *
  */
-#if !defined(ESTATS_H)
+#ifndef ESTATS_H
 #define ESTATS_H
 
-/* TODO: How to handle systems without the following headers? */
 #include <sys/types.h>  /* For size_t */
 #include <netinet/in.h> /* For struct in_addr, in6_addr */
 #include <inttypes.h>   /* For uint8_t and friends, C99 standard header */
@@ -39,4 +37,4 @@
 #include <estats/value.h>
 #include <estats/var.h>
 
-#endif /* !defined(ESTATS_H) */
+#endif /* ESTATS_H */

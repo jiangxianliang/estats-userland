@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2011 The Board of Trustees of the University of Illinois,
  *                    Carnegie Mellon University.
@@ -18,7 +17,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA
  *
  */
-#if !defined(ESTATS_VALUE_INT_H)
+#ifndef ESTATS_VALUE_INT_H
 #define ESTATS_VALUE_INT_H
 
 estats_error* _estats_value_from_var_buf(estats_value** _value,
@@ -31,4 +30,4 @@ estats_error* _estats_value_to_var_buf(void** _buf,
 estats_error* _estats_value_copy(estats_value** copyVal,
 	                         const estats_value* origVal);
 
-#endif /* !defined(ESTATS_VALUE_INT_H) */
+#endif /* ESTATS_VALUE_INT_H */

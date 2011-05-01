@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2011 The Board of Trustees of the University of Illinois,
  *                    Carnegie Mellon University.
@@ -18,7 +17,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA
  *
  */
-#if !defined(ESTATS_TYPES_INT_H)
+#ifndef ESTATS_TYPES_INT_H
 #define ESTATS_TYPES_INT_H
 
 #define ESTATS_VERSTR_LEN_MAX 64
@@ -60,6 +59,8 @@ struct estats_group {
     struct estats_list   var_list_head;
 };
 
+typedef struct estats_group estats_group;
+
 struct estats_agent {
     ESTATS_AGENT_TYPE         type;
     char                      version[ESTATS_VERSTR_LEN_MAX];
@@ -99,4 +100,4 @@ struct estats_value {
     } u;
 };
 
-#endif /* !defined(ESTATS_TYPES_INT_H) */
+#endif /* ESTATS_TYPES_INT_H */

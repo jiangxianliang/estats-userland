@@ -17,7 +17,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA
  *
  */
-#if !defined(ESTATS_CONNINFO_H)
+#ifndef ESTATS_CONNINFO_H
 #define ESTATS_CONNINFO_H
 
 #define ESTATS_CMDLINE_LEN_MAX 32
@@ -34,9 +34,13 @@ typedef struct estats_conninfo {
     struct estats_conninfo        *next;
 } estats_conninfo;
 
-estats_error* estats_get_conninfo_head(estats_conninfo** _head, estats_agent* _agent);
+estats_error* estats_get_conninfo_head( estats_conninfo **,
+                                        estats_agent *);
 
 estats_error* estats_conninfo_next(estats_conninfo** _next, const estats_conninfo* _prev);
+
+#define ESTATS_CONNINFO_FOREACH(pos, head) \
+    for (pos = head; pos != NULL; pos = estats_conninfo_return_next(pos))
 
 estats_conninfo* estats_conninfo_return_next(const estats_conninfo* _prev);
 
@@ -57,7 +61,4 @@ estats_error* estats_conninfo_get_state(int* _state,
 estats_error* estats_conninfo_get_cmdline(char** _cmdline,
                                       const estats_conninfo* _conninfo);
 
-#define ESTATS_CONNINFO_FOREACH(pos, head) \
-    for (pos = head; pos != NULL; pos = estats_conninfo_return_next(pos))
-
-#endif /* !defined(ESTATS_CONNINFO_H) */
+#endif /* ESTATS_CONNINFO_H */
