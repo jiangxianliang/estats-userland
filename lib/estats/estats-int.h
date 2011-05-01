@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2011 The Board of Trustees of the University of Illinois,
  *                    Carnegie Mellon University.
@@ -18,7 +17,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA
  *
  */
-#if !defined(ESTATS_INT_H)
+#ifndef ESTATS_INT_H
 #define ESTATS_INT_H
 
 /* System headers (use config.h's results to determine whether or not to
@@ -71,4 +70,4 @@
 #include <estats/value.h>
 #include <estats/var.h>
 
-#endif /* !defined(ESTATS_INT_H) */
+#endif /* ESTATS_INT_H */

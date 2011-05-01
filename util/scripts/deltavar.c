@@ -40,8 +40,8 @@ main(int argc, char *argv[])
     Chk(estats_snapshot_alloc(&snapold, conn)); 
     Chk(estats_snapshot_alloc(&snapnew, conn));
 
-    Chk(estats_snap(snapold));
-    Chk(estats_snap(snapnew));
+    Chk(estats_get_snapshot(snapold));
+    Chk(estats_get_snapshot(snapnew));
 
     Chk(estats_snapshot_read_value(&value, snapold, var));
     Chk(estats_value_as_string(&text, value));
@@ -55,7 +55,7 @@ main(int argc, char *argv[])
         sleep(1);
 
         SWAP(snapnew, snapold);
-        Chk(estats_snap(snapnew));
+        Chk(estats_get_snapshot(snapnew));
         Chk(estats_snapshot_delta(&value, snapnew, snapold, var));
         Chk(estats_value_as_string(&text, value));
 

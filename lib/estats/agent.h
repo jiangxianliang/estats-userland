@@ -17,37 +17,35 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA
  *
  */
-#if !defined(ESTATS_AGENT_H)
+#ifndef ESTATS_AGENT_H
 #define ESTATS_AGENT_H
 
-estats_error* estats_agent_attach(estats_agent** _agent,
-                                  const ESTATS_AGENT_TYPE _type,
-                                  const void* _data);
-void          estats_agent_detach(estats_agent** _agent);
+estats_error* estats_agent_attach( estats_agent **,
+                             const ESTATS_AGENT_TYPE,
+                             const void * /* data */);
+                                
+void          estats_agent_detach( estats_agent **);
 
-estats_error* estats_agent_get_connection_head(estats_connection** _conn,
-                                               estats_agent* _agent);
+estats_error* estats_agent_find_connection_from_cid( estats_connection **,
+                                                     estats_agent *,
+                                                     int /* cid */);
 
-estats_error* estats_agent_get_type(ESTATS_AGENT_TYPE* _type,
-                                    const estats_agent* _agent);
-estats_error* estats_agent_get_version(const char** _version,
-                                       const estats_agent* _agent);
+estats_error* estats_agent_find_connection_from_spec( estats_connection **,
+                                                      estats_agent *,
+                                         const struct estats_connection_spec *);
 
-estats_error* estats_agent_find_connection_from_cid(estats_connection** _conn,
-                                                    estats_agent* _agent,
-                                                    int _cid);
-estats_error* estats_agent_find_connection_from_spec(estats_connection** _conn,
-                                                     estats_agent* _agent,
-                                                     const struct estats_connection_spec* _spec);
+estats_error* estats_agent_find_connection_from_socket( estats_connection **,
+                                                        estats_agent *,
+                                                        int /* fd */);
 
-estats_error* estats_agent_find_connection_from_socket(estats_connection** _conn,
-                                                       estats_agent* _agent,
-                                                       int _sockfd);
+estats_error* estats_agent_get_connection_head( estats_connection **,
+                                                estats_agent *);
 
-estats_error* estats_agent_find_var_from_name(estats_var** var,
-                                              const estats_agent* agent,
-                                              const char* name);
+estats_error* estats_agent_get_var_head( estats_var **,
+                                   const estats_agent *);
 
-estats_error* estats_agent_get_var_head(estats_var** var, estats_agent* agent);
+estats_error* estats_agent_find_var_from_name( estats_var **,
+                                         const estats_agent *,
+                                         const char * /* name */);
 
-#endif /* !defined(ESTATS_AGENT_H) */
+#endif /* ESTATS_AGENT_H */

@@ -1,4 +1,23 @@
-#if !defined(ESTATS_TYPES_H)
+/*
+ * Copyright (c) 2011 The Board of Trustees of the University of Illinois,
+ *                    Carnegie Mellon University.
+ *
+ * This library is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation; either version 2.1 of the License, or (at your
+ * option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation,
+ * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA
+ *
+ */
+#ifndef ESTATS_TYPES_H
 #define ESTATS_TYPES_H
 
 #if !defined(NULL)
@@ -14,7 +33,6 @@ typedef enum ESTATS_ADDRTYPE {
 
 typedef enum ESTATS_AGENT_TYPE {
     ESTATS_AGENT_TYPE_LOCAL = 0,
-    ESTATS_AGENT_TYPE_LOG   = 1,
 } ESTATS_AGENT_TYPE;
 
 typedef enum ESTATS_ERROR {
@@ -89,9 +107,8 @@ struct spec_ascii {
 typedef struct estats_agent      estats_agent;
 typedef struct estats_connection estats_connection;
 typedef struct estats_error      estats_error;
-typedef struct estats_group      estats_group;
 typedef struct estats_snapshot   estats_snapshot;
 typedef struct estats_value      estats_value;
 typedef struct estats_var        estats_var;
 
-#endif /* !defined(ESTATS_TYPES_H) */
+#endif /* ESTATS_TYPES_H */

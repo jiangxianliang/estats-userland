@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2011 The Board of Trustees of the University of Illinois,
  *                    Carnegie Mellon University.
@@ -18,7 +17,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA
  *
  */
-#if !defined(ESTATS_LOG_H)
+#ifndef ESTATS_LOG_H
 #define ESTATS_LOG_H
 
 typedef struct estats_log estats_log;
@@ -44,4 +43,4 @@ estats_log_entry* estats_log_entry_return_next(const estats_log_entry* _prev);
 #define ESTATS_LOG_DATA_FOREACH(pos, head) \
     for (pos = head; pos != NULL; pos = estats_log_entry_return_next(pos))
 
-#endif /* !defined(ESTATS_LOG_H) */
+#endif /* ESTATS_LOG_H */

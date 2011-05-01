@@ -42,7 +42,7 @@ main(int argc, char *argv[])
 
     Chk(estats_snapshot_alloc(&snap, conn)); 
     for (ii = 0; ii < 5; ii++) {
-        Chk(estats_snap(snap));
+        Chk(estats_get_snapshot(snap));
 	Chk(estats_log_entry_write(log, snap));
 	sleep(1);
     }

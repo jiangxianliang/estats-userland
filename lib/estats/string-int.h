@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2011 The Board of Trustees of the University of Illinois,
  *                    Carnegie Mellon University.
@@ -18,9 +17,9 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA
  *
  */
-#if !defined(ESTATS_STRING_INT_H)
+#ifndef ESTATS_STRING_INT_H
 #define ESTATS_STRING_INT_H
 
 int strisspace(const char* _str);
 
-#endif /* !defined(ESTATS_STRING_INT_H) */
+#endif /* ESTATS_STRING_INT_H */

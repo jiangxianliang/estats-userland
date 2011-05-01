@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2011 The Board of Trustees of the University of Illinois,
  *                    Carnegie Mellon University.
@@ -18,7 +17,7 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA
  *
  */
-#if !defined(ESTATS_DEBUG_INT_H)
+#ifndef ESTATS_DEBUG_INT_H
 #define ESTATS_DEBUG_INT_H
 
 #if !defined(IFDEBUG)
@@ -41,4 +40,4 @@
 
 void dbgprintf_no_prefix(const char* _fmt, ...);
 
-#endif /* !defined(ESTATS_DEBUG_INT_H) */
+#endif /* ESTATS_DEBUG_INT_H */

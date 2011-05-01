@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2011 The Board of Trustees of the University of Illinois,
  *                    Carnegie Mellon University.
@@ -18,22 +17,24 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA
  *
  */
-#if !defined(ESTATS_VAR_H)
+#ifndef ESTATS_VAR_H
 #define ESTATS_VAR_H
 
-estats_error* estats_var_next(estats_var** _next,
-                              const estats_var* _prev);
+estats_error* estats_var_next( estats_var ** /* next */,
+                         const estats_var *);
 
-estats_error* estats_var_get_name(const char** _name,
-                                  const estats_var* _var);
-estats_error* estats_var_get_type(ESTATS_TYPE* _type,
-                                  const estats_var* _var);
-estats_error* estats_var_get_size(size_t* _size,
-                                  const estats_var* _var);
-
-estats_var* estats_var_return_next(const estats_var* prev);
+estats_var* estats_var_return_next( const estats_var *);
 
 #define ESTATS_VAR_FOREACH(pos, head) \
     for (pos = head; pos != NULL; pos = estats_var_return_next(pos))
 
-#endif /* !defined(ESTATS_VAR_H) */
+estats_error* estats_var_get_name( const char **,
+                                   const estats_var *);
+
+estats_error* estats_var_get_type( ESTATS_TYPE *,
+                             const estats_var *);
+
+estats_error* estats_var_get_size( size_t *,
+                             const estats_var *);
+
+#endif /* ESTATS_VAR_H */

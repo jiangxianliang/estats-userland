@@ -63,7 +63,7 @@ estats_snapshot_free(estats_snapshot** snap)
 
 
 estats_error*
-estats_snap(estats_snapshot* snap)
+estats_get_snapshot(estats_snapshot* snap)
 {
     estats_error* err = NULL;
     FILE *fp = NULL;

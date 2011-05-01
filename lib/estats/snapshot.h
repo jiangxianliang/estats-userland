@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2011 The Board of Trustees of the University of Illinois,
  *                    Carnegie Mellon University.
@@ -18,22 +17,23 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA
  *
  */
-#if !defined(ESTATS_SNAPSHOT_H)
+#ifndef ESTATS_SNAPSHOT_H
 #define ESTATS_SNAPSHOT_H
 
-estats_error* estats_snapshot_alloc(estats_snapshot** _snap,
-                                    estats_connection* _conn);
+estats_error* estats_snapshot_alloc( estats_snapshot **,
+                                     estats_connection *);
 
-void          estats_snapshot_free(estats_snapshot** _snap);
+void          estats_snapshot_free( estats_snapshot **);
 
-estats_error* estats_snap(estats_snapshot* _snap);
+estats_error* estats_get_snapshot( estats_snapshot *);
 
-estats_error* estats_snapshot_read_value(estats_value** _value,
-                                         const estats_snapshot* _snap,
-                                         const estats_var* _var);
-estats_error* estats_snapshot_delta(estats_value** _value,
-                                    const estats_snapshot* _s1,
-                                    const estats_snapshot* _s2,
-                                    const estats_var* _var);
+estats_error* estats_snapshot_read_value( estats_value **,
+                                    const estats_snapshot *,
+                                    const estats_var *);
 
-#endif /* !defined(ESTATS_SNAPSHOT_H) */
+estats_error* estats_snapshot_delta( estats_value **,
+                               const estats_snapshot *,
+                               const estats_snapshot *,
+                               const estats_var *);
+
+#endif /* ESTATS_SNAPSHOT_H */
