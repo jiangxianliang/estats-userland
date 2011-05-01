@@ -71,11 +71,19 @@ typedef enum ESTATS_VALUE_TYPE {
     ESTATS_VALUE_TYPE_OCTET   = 7,
 } ESTATS_VALUE_TYPE;
 
+
 struct estats_connection_spec {
-    struct estats_value *dst_port;
-    struct estats_value *dst_addr;
-    struct estats_value *src_port;
-    struct estats_value *src_addr;
+    uint16_t dst_port;
+    char dst_addr[17];
+    uint16_t src_port;
+    char src_addr[17];
+};
+
+struct spec_ascii {
+    char* dst_port;
+    char* dst_addr;
+    char* src_port;
+    char* src_addr;
 };
 
 typedef struct estats_agent      estats_agent;

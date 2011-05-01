@@ -8,8 +8,8 @@ main(int argc, char *argv[])
     estats_conninfo* ci_head = NULL;
     estats_conninfo* ci_pos;
 
-    printf("%-12s %-20s %-40s %-8s %-40s %-8s\n", "CID", "Cmdline", "SrcAddr", "SrcPort", "DstAddr", "DstPort");
-    printf("------------ -------------------- ---------------------------------------- -------- ---------------------------------------- --------\n");
+    printf("%-8s %-8s %-8s %-10s %-20s %-8s %-20s %-8s\n", "CID", "PID", "UID", "Cmdline", "SrcAddr", "SrcPort", "DstAddr", "DstPort");
+    printf("-------- -------- -------- ---------- -------------------- -------- -------------------- --------\n");
 
     Chk(estats_agent_attach(&agent, ESTATS_AGENT_TYPE_LOCAL, NULL));
 
@@ -18,29 +18,23 @@ main(int argc, char *argv[])
     ESTATS_CONNINFO_FOREACH(ci_pos, ci_head) {
         int cid, pid, uid;
         char cmdline[20];
-	char* srcAddr = NULL;
-       	char* dstAddr = NULL;
-       	char* srcPort = NULL;
-       	char* dstPort = NULL;
+        struct spec_ascii spec_asc;
 
         cid = ci_pos->cid;
         pid = ci_pos->pid;
         uid = ci_pos->uid;
         
-        strncpy(&cmdline, ci_pos->cmdline, 20);
-        cmdline[19] = '\0';
+        strncpy(cmdline, ci_pos->cmdline, 10);
+        cmdline[10] = '\0';
 
-	Chk(estats_value_as_string(&srcAddr, (ci_pos->spec).src_addr));
-       	Chk(estats_value_as_string(&srcPort, (ci_pos->spec).src_port));
-       	Chk(estats_value_as_string(&dstAddr, (ci_pos->spec).dst_addr));
-       	Chk(estats_value_as_string(&dstPort, (ci_pos->spec).dst_port));
+        Chk(estats_connection_spec_as_strings(&spec_asc, &ci_pos->spec));
 
-        printf("%-12d %-12d %-12d %-20s %-40s %-8s %-40s %-8s\n", cid, pid, uid, cmdline, srcAddr, srcPort, dstAddr, dstPort);
+        printf("%-8d %-8d %-8d %-10s %-20s %-8s %-20s %-8s\n", cid, pid, uid, cmdline, spec_asc.src_addr, spec_asc.src_port, spec_asc.dst_addr, spec_asc.dst_port);
 
-        free(srcAddr);
-        free(dstAddr);
-        free(srcPort);
-        free(dstPort);
+        free(spec_asc.dst_addr);
+        free(spec_asc.dst_port);
+        free(spec_asc.src_addr);
+        free(spec_asc.src_port);
     }
 
 Cleanup:

@@ -42,6 +42,8 @@ estats_error* Inet_pton(int _af, const char* _str, void* _dst);
 estats_error* Malloc(void** _ptr, size_t _size);
 estats_error* Opendir(DIR** _dir, const char* _name);
 estats_error* Remove(const char* _pathname);
+estats_error* Snprintf(int* _ret, char* _str, size_t _siz, const char* _fmt, ...);
+estats_error* Sprintf(int* _ret, char* _str, const char* _fmt, ...);
 estats_error* Sscanf(int* _ret, const char* _str, const char* _fmt, ...);
 estats_error* Strdup(char** _ret, const char* _s);
 estats_error* Strndup(char** _ret, const char* _s, size_t _n);
@@ -51,6 +53,8 @@ estats_error* Strtoull(unsigned long long int* _ret, const char* _nptr, char** _
 estats_error* Vasprintf(int* _ret, char** _strp, const char* _fmt, va_list _ap);
 estats_error* Vfprintf(int* _ret, FILE* _fp, const char* _fmt, va_list _ap);
 estats_error* Vfscanf(int* _ret, FILE* _stream, const char* _fmt, va_list _ap);
+estats_error* Vsnprintf(int* _ret, char* _str, size_t _siz, const char* _fmt, va_list _ap);
+estats_error* Vsprintf(int* _ret, char* _str, const char* _fmt, va_list _ap);
 estats_error* Vsscanf(int* _ret, const char* _str, const char* _fmt, va_list _ap);
 
 #endif /* !defined(ESTATS_LIBCWRAP_INT_H) */

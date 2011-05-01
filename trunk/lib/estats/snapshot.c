@@ -28,7 +28,7 @@ estats_snapshot_alloc(estats_snapshot** snap, estats_connection* conn)
 
     ErrIf(snap == NULL, ESTATS_ERR_INVAL);
     *snap = NULL;
-   
+
     ErrIf(conn == NULL, ESTATS_ERR_INVAL);
 
     size = conn->agent->read->size;
@@ -37,11 +37,11 @@ estats_snapshot_alloc(estats_snapshot** snap, estats_connection* conn)
     Chk(Malloc((void**) &((*snap)->data), size));
 
     memset((*snap)->data, 0, size);
-    
+
     (*snap)->group = conn->agent->read;
     (*snap)->cid = conn->cid;
-    Chk(estats_connection_spec_copy(&(*snap)->spec, &conn->spec));
-   
+    (*snap)->spec = conn->spec; // struct copy
+
 Cleanup:
     if (err != NULL) {
         estats_snapshot_free(snap);

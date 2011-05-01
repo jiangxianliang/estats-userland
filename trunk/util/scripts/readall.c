@@ -15,12 +15,8 @@ int main(int argc, char *argv[])
             estats_var* var_head;
             estats_var* var_pos;
             struct estats_connection_spec spec; 
-            char* srcAddr = NULL;
-            char* dstAddr = NULL;
-            char* srcPort = NULL;
-            char* dstPort = NULL;
             int cid;
-
+            struct spec_ascii spec_asc;
             /* If no permission to access stats, ignore and go to next connection */
             if ((err = estats_connection_read_access(c_pos, R_OK)) != NULL) {
                 estats_error_free(&err);
@@ -29,13 +25,9 @@ int main(int argc, char *argv[])
 
             Chk(estats_connection_get_cid(&cid, c_pos));
             Chk(estats_connection_get_connection_spec(&spec, c_pos));
+            Chk(estats_connection_spec_as_strings(&spec_asc, &spec));
 
-            Chk(estats_value_as_string(&srcAddr, spec.src_addr));
-            Chk(estats_value_as_string(&srcPort, spec.src_port));
-            Chk(estats_value_as_string(&dstAddr, spec.dst_addr));
-            Chk(estats_value_as_string(&dstPort, spec.dst_port));
-
-            fprintf(stdout, "Connection %d (%s:%s %s:%s)\n", cid, srcAddr, srcPort, dstAddr, dstPort);
+            fprintf(stdout, "Connection %d (%s_%s %s_%s)\n", cid, spec_asc.src_addr, spec_asc.src_port, spec_asc.dst_addr, spec_asc.dst_port);
 
             Chk(estats_agent_get_var_head(&var_head, agent));
             ESTATS_VAR_FOREACH(var_pos, var_head) {
@@ -51,11 +43,11 @@ int main(int argc, char *argv[])
                 free(text);
                 estats_value_free(&value);
             }
-            estats_value_free(&spec.src_addr);
-            estats_value_free(&spec.src_port);
-            estats_value_free(&spec.dst_addr);
-            estats_value_free(&spec.dst_port);
-            free(srcAddr); free(srcPort); free(dstAddr); free(dstPort);
+
+            free(spec_asc.dst_addr);
+            free(spec_asc.dst_port);
+            free(spec_asc.src_addr);
+            free(spec_asc.src_port);
         }
 
 
