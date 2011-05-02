@@ -77,6 +77,7 @@ _estats_log_entry_new(estats_log_entry** entry, estats_log* log)
     estats_error* err = NULL;
 
     Chk(Malloc((void**) entry, sizeof(estats_log_entry)));
+    memset((void*) *entry, 0, sizeof(estats_log_entry));
 
     Chk(Malloc((void**) &((*entry)->data), log->bufsize));
 
@@ -204,12 +205,11 @@ estats_log_entry_read_value(estats_value** value,
                            const estats_var* var)
 {
     estats_error* err = NULL;
-    int size;
     char* buf = NULL;
+    size_t size = var->len;
 
     ErrIf(value == NULL || entry == NULL || var == NULL, ESTATS_ERR_INVAL);
 
-    Chk(_estats_var_size_from_type(&size, var->type));
     Chk(Malloc((void**) &buf, size));
     memcpy(buf, (void *)((unsigned long int)(entry->data) + var->offset), size);
 
@@ -278,13 +278,12 @@ _estats_log_new(estats_log** log)
     *log = NULL;
 
     Chk(Malloc((void**) log, sizeof(estats_log)));
-    (*log)->fp = NULL;
-    (*log)->swap = 0;
+    memset((void*) *log, 0, sizeof(estats_log));
+
     _estats_list_init(&((*log)->var_list_head));
     _estats_list_init(&((*log)->entry_list_head));
 
 Cleanup:
-
     return err;
 }
 
@@ -530,7 +529,6 @@ _estats_log_parse_header(estats_log* log, FILE* fp)
         } else {
             int nRead;
             int fsize;
-            int varsize;
 
             if (strcmp(group_name, "read") != 0) continue;
 
@@ -539,15 +537,10 @@ _estats_log_parse_header(estats_log* log, FILE* fp)
             
             /* Add a new variable */
             Chk(Malloc((void**) &var, sizeof(estats_var)));
+            memset((void*) var, 0, sizeof(estats_var));
 
-            if (!have_len) {
-                Chk(Sscanf(&nRead, linebuf, "%s%d%d", var->name, &var->offset, &var->type));
-                ErrIf(nRead != 3, ESTATS_ERR_HEADER);
-                var->len = -1;
-            } else {
-                Chk(Sscanf(&nRead, linebuf, "%s%d%d%d", var->name, &var->offset, &var->type, &var->len));
-                ErrIf(nRead != 4, ESTATS_ERR_HEADER);
-            }
+            Chk(Sscanf(&nRead, linebuf, "%s%d%d%d", var->name, &var->offset, &var->type, &var->len));
+            ErrIf(nRead != 4, ESTATS_ERR_HEADER);
 
             /* Deprecated variable check */
             var->flags = 0;
@@ -563,21 +556,9 @@ _estats_log_parse_header(estats_log* log, FILE* fp)
             dbgprintf_no_prefix("var: %s offset=%d type=%d len=%d\n", var->name, var->offset, var->type, var->len);
 #endif /* defined(DEBUG) */
 
-            if ((err = _estats_var_size_from_type(&varsize, var->type)) != NULL) {
-                estats_error_free(&err);
-                varsize = 0;
-            }
-            
             /* increment group (== file) size if necessary */ 
-            fsize = var->offset + varsize;
+            fsize = var->offset + var->len;
             log->bufsize = ((log->bufsize < fsize) ? fsize : log->bufsize); 
-
-            /* if size_from_type 0 (i.e., type unrecognized),
-               forgo adding the variable */
-            if (varsize == 0) {
-                Free((void**) &var);
-                continue;
-            }
 
             log->nvars++;
             _estats_list_add_tail(&(var->list), &(log->var_list_head));
@@ -592,19 +573,5 @@ Cleanup:
 
     return err;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

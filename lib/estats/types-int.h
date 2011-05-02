@@ -22,7 +22,6 @@
 
 #define ESTATS_VERSTR_LEN_MAX 64
 #define ESTATS_GROUPNAME_LEN_MAX 32
-#define ESTATS_VALUE_LEN_MAX 255 /* IPv6 addr should use <=40 */
 #define ESTATS_VARNAME_LEN_MAX 32
 #define ESTATS_VAR_FL_DEP    1
 #define ESTATS_VAR_FL_WARNED 2
@@ -59,12 +58,9 @@ struct estats_group {
     struct estats_list   var_list_head;
 };
 
-typedef struct estats_group estats_group;
-
 struct estats_agent {
     ESTATS_AGENT_TYPE         type;
     char                      version[ESTATS_VERSTR_LEN_MAX];
-    struct estats_list        group_list_head;
     struct estats_list        connection_list_head;
     struct estats_group*      spec;
     struct estats_group*      read;
@@ -99,5 +95,7 @@ struct estats_value {
         struct in6_addr ip6addr_val;
     } u;
 };
+
+typedef struct estats_group estats_group;
 
 #endif /* ESTATS_TYPES_INT_H */

@@ -91,15 +91,14 @@ estats_snapshot_read_value(estats_value** value,
                            const estats_var* var)
 {
     estats_error* err = NULL;
-    int size;
     char* buf = NULL;
     
     ErrIf(value == NULL || snap == NULL || var == NULL, ESTATS_ERR_INVAL);
     ErrIf(var->group != snap->group, ESTATS_ERR_INVAL);
 
-    Chk(_estats_var_size_from_type(&size, var->type));
-    Chk(Malloc((void**) &buf, size));
-    memcpy(buf, (void *)((unsigned long)(snap->data) + var->offset), size);
+    Chk(Malloc((void**) &buf, var->len));
+    memcpy(buf, (void *)((unsigned long)(snap->data) + var->offset), var->len);
+
     Chk(_estats_value_from_var_buf(value, buf, var->type));
 
 Cleanup:

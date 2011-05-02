@@ -165,7 +165,7 @@ estats_connection_read_value(estats_value** value,
                              const estats_var* var)
 {
     estats_error* err = NULL;
-    int size;
+//    int size;
     char* buf = NULL;
     char* filename = NULL;
     FILE* fp = NULL;
@@ -176,13 +176,12 @@ estats_connection_read_value(estats_value** value,
     ErrIf(conn->agent == NULL, ESTATS_ERR_INVAL);
     ErrIf(conn->agent->type != ESTATS_AGENT_TYPE_LOCAL, ESTATS_ERR_AGENT_TYPE);
 
-    Chk(_estats_var_size_from_type(&size, var->type));
-    Chk(Malloc((void**) &buf, size));
+    Chk(Malloc((void**) &buf, var->len));
     
     Chk(Asprintf(NULL, &filename, "%s/%d/%s", ESTATS_ROOT_DIR, conn->cid, var->group->name));
     Chk(Fopen(&fp, filename, "r"));
     Chk(Fseek(fp, var->offset, SEEK_SET));
-    Chk(Fread(NULL, buf, size, 1, fp));
+    Chk(Fread(NULL, buf, var->len, 1, fp));
 
     Chk(_estats_value_from_var_buf(value, buf, var->type));
 
