@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2011 The Board of Trustees of the University of Illinois,
  *                    Carnegie Mellon University.
@@ -20,44 +19,6 @@
  */
 #include <estats/estats-int.h>
 
-/*
-estats_error*
-_estats_var_size_from_type(int* size, ESTATS_TYPE type)
-{
-    estats_error* err = NULL;
-    
-    switch (type) {
-    case ESTATS_TYPE_INTEGER:
-    case ESTATS_TYPE_INTEGER32:
-    case ESTATS_TYPE_INET_ADDRESS_IPV4:
-    case ESTATS_TYPE_COUNTER32:
-    case ESTATS_TYPE_GAUGE32:
-    case ESTATS_TYPE_UNSIGNED32:
-    case ESTATS_TYPE_TIME_TICKS:
-        *size = 4;
-        break;
-    case ESTATS_TYPE_COUNTER64:
-        *size = 8;
-        break;
-    case ESTATS_TYPE_INET_PORT_NUMBER:
-        *size = 2;
-        break;
-    case ESTATS_TYPE_INET_ADDRESS:
-    case ESTATS_TYPE_INET_ADDRESS_IPV6:
-        *size = 17;
-        break;
-    case ESTATS_TYPE_OCTET:
-        *size = 1;
-        break;
-    default:
-        Err(ESTATS_ERR_UNKNOWN_TYPE);
-        break;
-    }
-
- Cleanup:
-    return err;
-}
-*/
 
 void
 _estats_var_dep_check(estats_var* var)
