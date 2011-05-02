@@ -17,6 +17,7 @@ int main(int argc, char *argv[])
             struct estats_connection_spec spec; 
             int cid;
             struct spec_ascii spec_asc;
+            estats_snapshot* snap;
             /* If no permission to access stats, ignore and go to next connection */
             if ((err = estats_connection_read_access(c_pos, R_OK)) != NULL) {
                 estats_error_free(&err);
@@ -29,13 +30,16 @@ int main(int argc, char *argv[])
 
             fprintf(stdout, "Connection %d (%s_%s %s_%s)\n", cid, spec_asc.src_addr, spec_asc.src_port, spec_asc.dst_addr, spec_asc.dst_port);
 
+            Chk(estats_snapshot_alloc(&snap, c_pos));
+            Chk(estats_get_snapshot(snap));
+
             Chk(estats_agent_get_var_head(&var_head, agent));
             ESTATS_VAR_FOREACH(var_pos, var_head) {
                 estats_value* value = NULL;
                 char* text = NULL;
 
                 Chk(estats_var_get_name(&varName, var_pos));
-                Chk(estats_connection_read_value(&value, c_pos, var_pos));
+                Chk(estats_snapshot_read_value(&value, snap, var_pos));
                 Chk(estats_value_as_string(&text, value));
 
                 fprintf(stdout, "    %-20s: %s\n", varName, text);
@@ -43,6 +47,8 @@ int main(int argc, char *argv[])
                 free(text);
                 estats_value_free(&value);
             }
+
+            estats_snapshot_free(&snap);
         }
 
 

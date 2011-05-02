@@ -45,15 +45,14 @@ main(int argc, char *argv[])
     for (ii = 0; ii < 5; ii++) {
         struct estats_timeval etv;
         char* str_time;
-        time_t cnt_time;
+        time_t c_time;
 
         Chk(estats_get_snapshot(snap));
 	Chk(estats_log_entry_write(log, snap));
         Chk(estats_snapshot_get_timeval(&etv, snap));
-        cnt_time = (time_t) etv.sec;
-        str_time = ctime(&cnt_time);
-        printf("Time is %s: %u\n", str_time, etv.usec);
-        printf("Time is %u: %u\n", etv.sec, etv.usec);
+        c_time = (time_t) etv.sec;
+        str_time = ctime(&c_time);
+        printf("Recording snapshot at %s (usec %u)\n", str_time, etv.usec); 
 	sleep(1);
     }
     estats_log_close(&log);

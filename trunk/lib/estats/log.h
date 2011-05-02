@@ -36,6 +36,9 @@ estats_error* estats_log_entry_read_value(estats_value** _value,
                                          const estats_log_entry* _entry,
                                          const estats_var* _var);
 
+estats_error* estats_log_entry_read_timestamp(struct estats_timeval *,
+                                              const estats_log_entry *);
+
 estats_error* estats_log_get_entry_head(estats_log_entry** _entry, estats_log* _log);
 estats_error* estats_log_entry_next(estats_log_entry** _next, const estats_log_entry* _prev);
 
