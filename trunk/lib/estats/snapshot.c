@@ -61,6 +61,19 @@ estats_snapshot_free(estats_snapshot** snap)
     Free((void**) snap);
 }
 
+estats_error*
+_estats_gettimeofday(struct estats_timeval* etv)
+{
+    estats_error* err = NULL;
+    struct timeval tv;
+
+    ErrIf((gettimeofday(&tv, NULL) != 0), ESTATS_ERR_LIBC);
+    etv->sec = (uint32_t) (tv.tv_sec & 0x00000000ffffffffULL);
+    etv->usec = (uint32_t) (tv.tv_usec & 0x00000000ffffffffULL);
+
+Cleanup:
+    return 0;
+}
 
 estats_error*
 estats_get_snapshot(estats_snapshot* snap)
@@ -77,6 +90,7 @@ estats_get_snapshot(estats_snapshot* snap)
     snprintf(filename, PATH_MAX - 1, "%s/%d/%s", ESTATS_ROOT_DIR, snap->cid, snap->group->name);
     Chk(Fopen(&fp, filename, "r"));
     Chk(Fread(NULL, snap->data, snap->group->size, 1, fp)); 
+    Chk(_estats_gettimeofday(&snap->tv)); // for rough chronology
    
 Cleanup:
     Fclose(&fp);
@@ -131,3 +145,18 @@ Cleanup:
     
     return err;
 }
+
+estats_error*
+estats_snapshot_get_timeval(struct estats_timeval* etv, estats_snapshot* snap)
+{
+    estats_error* err = NULL;
+
+    ErrIf(etv == NULL || snap == NULL, ESTATS_ERR_INVAL);
+
+    *etv = snap->tv;
+
+Cleanup:
+    return err;
+}
+
+

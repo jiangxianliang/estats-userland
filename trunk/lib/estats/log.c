@@ -109,7 +109,9 @@ _estats_log_entry_read(estats_log* log)
 
         Chk(_estats_log_entry_new(&entry, log));
 
-        if ((err = Fread(NULL, entry->data, log->bufsize, 1, log->fp)) != NULL) {
+        if (((err = Fread(NULL, &(entry->tv.sec), 4, 1, log->fp)) != NULL) ||
+            ((err = Fread(NULL, &(entry->tv.usec), 4, 1, log->fp)) != NULL) ||
+            ((err = Fread(NULL, entry->data, log->bufsize, 1, log->fp)) != NULL)) {
     
             if (estats_error_get_number(err) == ESTATS_ERR_EOF) {
                 dbgprintf("   ... caught expected EOF at %s:%d in function %s\n", __FILE__, __LINE__, __FUNCTION__);
@@ -137,6 +139,8 @@ estats_log_entry_write(estats_log* log, estats_snapshot* snap)
     ErrIf(log->mode != W_MODE, ESTATS_ERR_ACCESS);
     ErrIf(log->fp == NULL, ESTATS_ERR_FILE);
 
+    Chk(Fwrite(NULL, &(snap->tv.sec), 4, 1, log->fp));
+    Chk(Fwrite(NULL, &(snap->tv.usec), 4, 1, log->fp));
     Chk(Fwrite(NULL, snap->data, snap->group->size, 1, log->fp));
 
 Cleanup:
@@ -220,6 +224,21 @@ estats_log_entry_read_value(estats_value** value,
 Cleanup:
     Free((void**) &buf);
 
+    return err;
+}
+
+estats_error*
+estats_log_entry_read_timestamp(struct estats_timeval* etv,
+                                const estats_log_entry* entry)
+{
+    estats_error* err = NULL;
+    uint32_t sec = entry->tv.sec;
+    uint32_t usec = entry->tv.usec;
+
+    etv->sec = (entry->log->swap) ? bswap_32(sec) : sec;
+    etv->usec = (entry->log->swap) ? bswap_32(usec) : usec;
+
+Cleanup:
     return err;
 }
 
