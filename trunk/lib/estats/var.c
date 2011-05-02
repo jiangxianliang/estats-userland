@@ -20,7 +20,7 @@
  */
 #include <estats/estats-int.h>
 
-
+/*
 estats_error*
 _estats_var_size_from_type(int* size, ESTATS_TYPE type)
 {
@@ -57,14 +57,14 @@ _estats_var_size_from_type(int* size, ESTATS_TYPE type)
  Cleanup:
     return err;
 }
-
+*/
 
 void
 _estats_var_dep_check(estats_var* var)
 {
     if (var->flags & ESTATS_VAR_FL_DEP) {
         if (!(var->flags & ESTATS_VAR_FL_WARNED))
-            fprintf(stderr, "libestats: warning: accessing depricated variable %s\n", var->name);
+            fprintf(stderr, "libestats: warning: accessing deprecated variable %s\n", var->name);
         var->flags |= ESTATS_VAR_FL_WARNED;
     }
 }

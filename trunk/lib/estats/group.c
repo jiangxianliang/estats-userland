@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2011 The Board of Trustees of the University of Illinois,
  *                    Carnegie Mellon University.
@@ -22,51 +21,18 @@
 
 
 estats_error*
-estats_group_next(estats_group** next, const estats_group* prev)
+_estats_group_get_var_head(estats_var** var, estats_group* group)
 {
     estats_error* err = NULL;
-    struct estats_list* l;
-
-    ErrIf(next == NULL || prev == NULL, ESTATS_ERR_INVAL);
-
-    l = prev->list.next;
-    if (l == &(prev->agent->group_list_head))
-        *next = NULL;
-    else
-        *next = ESTATS_LIST_ENTRY(l, estats_group, list);
-
-Cleanup:
-    return err;
-}
-
-estats_group*
-estats_group_return_next(const estats_group* prev)
-{
-    estats_error* err = NULL;
-    estats_group* next = NULL;
-
-    Chk(estats_group_next(&next, prev));
-
-Cleanup:
-    if (err) return NULL;
-    else return next;
-}
-
-estats_error*
-estats_group_get_var_head(estats_var** var, estats_group* group)
-{
-    estats_error* err = NULL;
-    struct estats_list* lp = NULL;
+    struct estats_list* head = NULL;
 
     ErrIf(var == NULL || group == NULL, ESTATS_ERR_INVAL);
     ErrIf(group->agent == NULL, ESTATS_ERR_INVAL);
 
-    lp = (group->var_list_head).next;
-    if (lp) { 
-    *var = ESTATS_LIST_ENTRY(lp, estats_var, list);
-    Chk(_estats_var_next_undeprecated(var, *var));
-    }
-    else *var = NULL;
+    head = &(group->var_list_head);
+    *var = _estats_list_empty(head) ? NULL : ESTATS_LIST_ENTRY(head->next, estats_var, list);
+    if ((*var)->flags & ESTATS_VAR_FL_DEP)
+        Chk(_estats_var_next_undeprecated(var, *var));
 
 Cleanup:
     return err;
@@ -74,61 +40,7 @@ Cleanup:
 
 
 estats_error*
-estats_group_get_agent(estats_agent** agent, const estats_group* group)
-{
-    estats_error* err = NULL;
-
-    ErrIf(agent == NULL || group == NULL, ESTATS_ERR_INVAL);
-    *agent = group->agent;
-    
-Cleanup:
-    return err;
-}
-
-
-estats_error*
-estats_group_get_name(const char** name,
-                      const estats_group* group)
-{
-    estats_error* err = NULL;
-
-    ErrIf(name == NULL || group == NULL, ESTATS_ERR_INVAL);
-    *name = group->name;
-    
- Cleanup:
-    return err;
-}
-
-
-estats_error*
-estats_group_get_size(int* size,
-                      const estats_group* group)
-{
-    estats_error* err = NULL;
-
-    ErrIf(size == NULL || group == NULL, ESTATS_ERR_INVAL);
-    *size = group->size;
-
- Cleanup:
-    return err;
-}
-
-
-estats_error*
-estats_group_get_nvars(int* nvars,
-                       const estats_group* group)
-{
-    estats_error* err = NULL;
-
-    ErrIf(nvars == NULL || group == NULL, ESTATS_ERR_INVAL);
-    *nvars = group->nvars;
-
- Cleanup:
-    return err;
-}
-
-estats_error*
-estats_group_find_var_from_name(estats_var** var, const estats_group* group, const char* name)
+_estats_group_find_var_from_name(estats_var** var, const estats_group* group, const char* name)
 {
     estats_error* err = NULL;
     struct estats_list* currItem;

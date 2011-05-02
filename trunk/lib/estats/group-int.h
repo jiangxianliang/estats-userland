@@ -20,8 +20,10 @@
 #ifndef ESTATS_GROUP_H
 #define ESTATS_GROUP_H
 
-estats_error* estats_group_find_var_from_name(estats_var** _var,
-                                              const estats_group* _group,
-                                              const char* _name);
+estats_error* _estats_group_find_var_from_name( estats_var **,
+                                         const estats_group *,
+                                         const char * /* name */);
+
+estats_error* _estats_group_get_var_head( estats_var **, estats_group *);
 
 #endif /* ESTATS_GROUP_H */

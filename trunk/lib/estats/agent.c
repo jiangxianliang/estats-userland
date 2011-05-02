@@ -28,7 +28,7 @@ _estats_agent_parse_header(estats_agent* agent, FILE* fp)
 {
     estats_error* err = NULL;
     estats_group* group = NULL;
-    estats_group* curGroup = NULL; /* DO NOT FREE */
+    estats_group* curr_gp = NULL; /* DO NOT FREE */
     estats_var* var = NULL;
     char linebuf[256];
 
@@ -76,30 +76,30 @@ _estats_agent_parse_header(estats_agent* agent, FILE* fp)
             /* Distinguish between the group we are working on and the
                'current' group to use in the var logic.  If we don't do
                this right we may have a double-free scenario. */
-            curGroup = group;
+            curr_gp = group;
 
             if (strcmp(group->name, "spec") == 0) {
                 agent->spec = group;
                 group = NULL;
-            } else {
-                if (strcmp(group->name, "read") == 0) { agent->read = group; }
-                _estats_list_add_tail(&(group->list), &(agent->group_list_head));
+            } else if (strcmp(group->name, "read") == 0) {
+                agent->read = group;
                 group = NULL;
-            }
-        } else {
-            int nRead;
-            int fsize;
-            int varsize;
+            } else Err(ESTATS_ERR_HEADER);
             
+        } else {
+            int nread;
+            int fsize;
+
             /* Add a new variable */
-            ErrIf(curGroup == NULL, ESTATS_ERR_HEADER);
+            ErrIf(curr_gp == NULL, ESTATS_ERR_HEADER);
 
             Chk(Malloc((void**) &var, sizeof(estats_var)));
-            var->group = curGroup;
+            var->group = curr_gp;
             var->offset = 0; var->type = 0; var->len=0;
 
-            Chk(Sscanf(&nRead, linebuf, "%s%d%d%d", var->name, &var->offset, &var->type, &var->len));
-            ErrIf(nRead != 4, ESTATS_ERR_HEADER);
+
+            Chk(Sscanf(&nread, linebuf, "%s%d%d%d", var->name, &var->offset, &var->type, &var->len));
+            ErrIf(nread != 4, ESTATS_ERR_HEADER);
 
             /* Deprecated variable check */
             var->flags = 0;
@@ -115,24 +115,13 @@ _estats_agent_parse_header(estats_agent* agent, FILE* fp)
             dbgprintf_no_prefix("var: %s offset=%d type=%d len=%d\n", var->name, var->offset, var->type, var->len);
 #endif /* defined(DEBUG) */
 
-            if ((err = _estats_var_size_from_type(&varsize, var->type)) != NULL) {
-                estats_error_free(&err);
-                varsize = 0;
-            }
-            
-            /* increment group (== file) size if necessary */ 
-            fsize = var->offset + varsize;
-            curGroup->size = ((curGroup->size < fsize) ? fsize : curGroup->size); 
+            /* increment group (== file) size if necessary */
+            fsize = var->offset + var->len;
+            curr_gp->size = ((curr_gp->size < fsize) ? fsize : curr_gp->size);
 
-            /* if size_from_type 0 (i.e., type unrecognized),
-               forgo adding the variable */
-            if (varsize == 0) {
-                Free((void**) &var);
-                continue;
-            }
+            curr_gp->nvars++;
 
-            curGroup->nvars++;
-            _estats_list_add_tail(&(var->list), &(curGroup->var_list_head));
+            _estats_list_add_tail(&(var->list), &(curr_gp->var_list_head));
             var = NULL;
         }
     }
@@ -154,7 +143,7 @@ estats_agent_attach(estats_agent** agent, const ESTATS_AGENT_TYPE type, const vo
 
     ErrIf(agent == NULL, ESTATS_ERR_INVAL);
     Chk(Malloc((void**) agent, sizeof(estats_agent)));
-    _estats_list_init(&((*agent)->group_list_head));
+    memset((void*) *agent, 0, sizeof(estats_agent));
     _estats_list_init(&((*agent)->connection_list_head));
 
     switch (type) {
@@ -178,42 +167,38 @@ Cleanup:
 void
 estats_agent_detach(estats_agent** agent)
 {
-    struct estats_list* groupCurrPos;
-    struct estats_list* varCurrPos;
-    struct estats_list* connCurrPos;
+    struct estats_list* var_pos;
+    struct estats_list* conn_pos;
     struct estats_list* tmp;
-    estats_group* specGroup;
+
+    estats_group* group = NULL;
 
     if (agent == NULL || *agent == NULL)
         return;
 
-    ESTATS_LIST_FOREACH_SAFE(groupCurrPos, tmp, &((*agent)->group_list_head)) {
-        struct estats_list* tmp2;
-        estats_group* currGroup = ESTATS_LIST_ENTRY(groupCurrPos, estats_group, list);
+    group = (*agent)->spec;
         
-        ESTATS_LIST_FOREACH_SAFE(varCurrPos, tmp2, &(currGroup->var_list_head)) {
-            estats_var* currVar = ESTATS_LIST_ENTRY(varCurrPos, estats_var, list);
-            _estats_list_del(varCurrPos); /* Must be before free! */
-            free(currVar);
-        }
-
-        _estats_list_del(groupCurrPos); /* Must be before free! */
-        free(currGroup);
-    }
-
-    specGroup = (*agent)->spec;
-        
-    ESTATS_LIST_FOREACH_SAFE(varCurrPos, tmp, &(specGroup->var_list_head)) {
-        estats_var* currVar = ESTATS_LIST_ENTRY(varCurrPos, estats_var, list);
-        _estats_list_del(varCurrPos); /* Must be before free! */
+    ESTATS_LIST_FOREACH_SAFE(var_pos, tmp, &(group->var_list_head)) {
+        estats_var* currVar = ESTATS_LIST_ENTRY(var_pos, estats_var, list);
+        _estats_list_del(var_pos); /* Must be before free! */
         free(currVar);
     }
 
-    free(specGroup);
+    Free((void**) &group);
 
-    ESTATS_LIST_FOREACH_SAFE(connCurrPos, tmp, &((*agent)->connection_list_head)) {
-        estats_connection* currConn = ESTATS_LIST_ENTRY(connCurrPos, estats_connection, list);
-        _estats_list_del(connCurrPos); /* Must be before free! */
+    group = (*agent)->read;
+        
+    ESTATS_LIST_FOREACH_SAFE(var_pos, tmp, &(group->var_list_head)) {
+        estats_var* currVar = ESTATS_LIST_ENTRY(var_pos, estats_var, list);
+        _estats_list_del(var_pos); /* Must be before free! */
+        free(currVar);
+    }
+
+    Free((void**) &group);
+
+    ESTATS_LIST_FOREACH_SAFE(conn_pos, tmp, &((*agent)->connection_list_head)) {
+        estats_connection* currConn = ESTATS_LIST_ENTRY(conn_pos, estats_connection, list);
+        _estats_list_del(conn_pos); /* Must be before free! */
         free(currConn);
     }
 
@@ -315,8 +300,8 @@ estats_agent_find_connection_from_socket(estats_connection** conn,
 {
     estats_error* err = NULL;
     struct sockaddr_in6 ne6, fe6; /* near and far ends */
-    socklen_t namelen; /* may not be POSIX */
-    struct estats_connection_spec spec; /* connection tuple */
+    socklen_t namelen;
+    struct estats_connection_spec spec;
 
     ErrIf(conn == NULL || agent == NULL, ESTATS_ERR_INVAL);
    
@@ -333,7 +318,7 @@ estats_agent_find_connection_from_socket(estats_connection** conn,
     {
         struct sockaddr_in *ne4 = (struct sockaddr_in *)&ne6;
         struct sockaddr_in *fe4 = (struct sockaddr_in *)&fe6;
-	uint16_t nport = ntohs(ne4->sin_port); // JSE: check ordering.
+	uint16_t nport = ntohs(ne4->sin_port);
 	uint16_t fport = ntohs(fe4->sin_port);
 
 	memcpy(&spec.src_addr, &ne4->sin_addr.s_addr, 4);
@@ -393,6 +378,7 @@ estats_agent_find_var_from_name(estats_var** var, const estats_agent* agent, con
 Cleanup:
     return err;
 }
+
     
 estats_error*
 estats_agent_get_var_head(estats_var** var, const estats_agent* agent)
@@ -403,16 +389,13 @@ estats_agent_get_var_head(estats_var** var, const estats_agent* agent)
     ErrIf(var == NULL || agent == NULL, ESTATS_ERR_INVAL);
     ErrIf(agent->read == NULL, ESTATS_ERR_INVAL);
 
-    lp = (agent->read->var_list_head).next;
-    if (lp) { 
-    *var = ESTATS_LIST_ENTRY(lp, estats_var, list);
-    Chk(_estats_var_next_undeprecated(var, *var));
-    }
-    else *var = NULL;
+    Chk(_estats_group_get_var_head(var, agent->read));
 
 Cleanup:
     return err;
 }
+
+
 static estats_error*
 _estats_agent_refresh_connections(estats_agent* agent)
 {
@@ -465,23 +448,23 @@ _estats_agent_refresh_connections(estats_agent* agent)
         Chk(Malloc(&buf, spec_gp->size));
         Chk(Fread(NULL, buf, spec_gp->size, 1, fp));
 
-        Chk(estats_group_find_var_from_name(&var, spec_gp, "LocalAddressType"));
+        Chk(_estats_group_find_var_from_name(&var, spec_gp, "LocalAddressType"));
         memcpy(&addrtype, (void *)((unsigned long int)buf + var->offset), var->len);
 
         cp->addrtype = addrtype;
 
-        Chk(estats_group_find_var_from_name(&var, spec_gp, "LocalAddress"));
+        Chk(_estats_group_find_var_from_name(&var, spec_gp, "LocalAddress"));
         memcpy(cp->spec.src_addr, (void *)((unsigned long int)buf + var->offset), var->len);
 
-        Chk(estats_group_find_var_from_name(&var, spec_gp, "RemAddress")); 
+        Chk(_estats_group_find_var_from_name(&var, spec_gp, "RemAddress")); 
         memcpy(cp->spec.dst_addr, (void *)((unsigned long int)buf + var->offset), var->len);
 
 
-        Chk(estats_group_find_var_from_name(&var, spec_gp, "LocalPort"));
+        Chk(_estats_group_find_var_from_name(&var, spec_gp, "LocalPort"));
         memcpy(&(cp->spec.src_port), (void *)((unsigned long int)buf + var->offset), var->len);
 
 
-        Chk(estats_group_find_var_from_name(&var, spec_gp, "RemPort"));
+        Chk(_estats_group_find_var_from_name(&var, spec_gp, "RemPort"));
         memcpy(&(cp->spec.dst_port), (void *)((unsigned long int)buf + var->offset), var->len);
 
         _estats_list_add_tail(&(cp->list), connHead);
