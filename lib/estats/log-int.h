@@ -26,7 +26,7 @@ struct estats_log_entry {
     void*  data;
     struct estats_list list;
     struct estats_log* log;
-//    struct estats_log_timeval timeval;
+    struct estats_timeval tv;
 };
 
 typedef enum ESTATS_LOG_MODE {

@@ -40,6 +40,7 @@ estats_error* estats_log_get_entry_head(estats_log_entry** _entry, estats_log* _
 estats_error* estats_log_entry_next(estats_log_entry** _next, const estats_log_entry* _prev);
 
 estats_log_entry* estats_log_entry_return_next(const estats_log_entry* _prev);
+
 #define ESTATS_LOG_DATA_FOREACH(pos, head) \
     for (pos = head; pos != NULL; pos = estats_log_entry_return_next(pos))
 

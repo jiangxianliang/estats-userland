@@ -38,8 +38,12 @@ main(int argc, char *argv[])
     Chk(estats_log_get_entry_head(&entry_head, log));
 
     ESTATS_LOG_DATA_FOREACH(entry_pos, entry_head) {
+        struct estats_timeval etv;
         estats_value* value = NULL;
         char* res;
+
+        Chk(estats_log_entry_read_timestamp(&etv, entry_pos));
+        printf("Time is %u: %u\n", etv.sec, etv.usec);
 
         Chk(estats_log_entry_read_value(&value, entry_pos, var));
         Chk(estats_value_as_string(&res, value));

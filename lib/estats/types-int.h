@@ -70,6 +70,7 @@ struct estats_snapshot {
     struct estats_group*           group;
     int                            cid;
     struct estats_connection_spec  spec;
+    struct estats_timeval          tv;
     void*                          data;
 };
 

@@ -89,6 +89,10 @@ typedef enum ESTATS_VALUE_TYPE {
     ESTATS_VALUE_TYPE_OCTET   = 7,
 } ESTATS_VALUE_TYPE;
 
+struct estats_timeval {
+    uint32_t sec;
+    uint32_t usec;
+};
 
 struct estats_connection_spec {
     uint16_t dst_port;
@@ -99,9 +103,9 @@ struct estats_connection_spec {
 
 struct spec_ascii {
     char dst_port[6];
-    char dst_addr[46];
+    char dst_addr[INET6_ADDRSTRLEN];
     char src_port[6];
-    char src_addr[46];
+    char src_addr[INET6_ADDRSTRLEN];
 };
 
 typedef struct estats_agent      estats_agent;
