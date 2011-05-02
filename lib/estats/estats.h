@@ -30,10 +30,10 @@
 #include <estats/types.h> /* Must be first */
 #include <estats/agent.h>
 #include <estats/connection.h>
-#include <estats/conninfo.h>
 #include <estats/error.h>
 #include <estats/log.h>
 #include <estats/snapshot.h>
+#include <estats/sockinfo.h>
 #include <estats/value.h>
 #include <estats/var.h>
 

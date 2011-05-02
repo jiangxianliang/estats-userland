@@ -2,11 +2,11 @@
 estats_pub_h_sources = \
 	agent.h \
 	connection.h \
-	conninfo.h \
 	error.h \
 	estats.h \
 	log.h \
 	snapshot.h \
+	sockinfo.h \
 	types.h \
 	value.h \
 	var.h
@@ -29,13 +29,13 @@ estats_pri_h_sources = \
 estats_c_sources = \
 	agent.c \
 	connection.c \
-	conninfo.c \
 	debug-int.c \
 	error.c \
 	group.c \
 	libcwrap-int.c \
 	log.c \
 	snapshot.c \
+	sockinfo.c \
 	string-int.c \
 	value.c \
 	var.c
