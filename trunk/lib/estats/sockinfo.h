@@ -17,12 +17,12 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA
  *
  */
-#ifndef ESTATS_CONNINFO_H
-#define ESTATS_CONNINFO_H
+#ifndef ESTATS_SOCKINFO_H
+#define ESTATS_SOCKINFO_H
 
 #define ESTATS_CMDLINE_LEN_MAX 32
 
-typedef struct estats_conninfo {
+typedef struct estats_sockinfo {
     char                           cmdline[ESTATS_CMDLINE_LEN_MAX];
     int                            cid;
     pid_t                          pid;
@@ -31,34 +31,34 @@ typedef struct estats_conninfo {
     int                            state;
     ESTATS_ADDRTYPE                addrtype;
     struct estats_connection_spec  spec;
-    struct estats_conninfo        *next;
-} estats_conninfo;
+    struct estats_sockinfo        *next;
+} estats_sockinfo;
 
-estats_error* estats_get_conninfo_head( estats_conninfo **,
+estats_error* estats_get_sockinfo_head( estats_sockinfo **,
                                         estats_agent *);
 
-estats_error* estats_conninfo_next(estats_conninfo** _next, const estats_conninfo* _prev);
+estats_error* estats_sockinfo_next(estats_sockinfo** _next, const estats_sockinfo* _prev);
 
-#define ESTATS_CONNINFO_FOREACH(pos, head) \
-    for (pos = head; pos != NULL; pos = estats_conninfo_return_next(pos))
+#define ESTATS_SOCKINFO_FOREACH(pos, head) \
+    for (pos = head; pos != NULL; pos = estats_sockinfo_return_next(pos))
 
-estats_conninfo* estats_conninfo_return_next(const estats_conninfo* _prev);
+estats_sockinfo* estats_sockinfo_return_next(const estats_sockinfo* _prev);
 
-void          estats_conninfo_free(estats_conninfo** _conninfo);
+void          estats_sockinfo_free(estats_sockinfo** _sockinfo);
 
-estats_error* estats_conninfo_get_cid(int* _cid,
-                                  const estats_conninfo* _conninfo);
+estats_error* estats_sockinfo_get_cid(int* _cid,
+                                  const estats_sockinfo* _sockinfo);
 
-estats_error* estats_conninfo_get_pid(int* _pid,
-                                  const estats_conninfo* _conninfo);
+estats_error* estats_sockinfo_get_pid(int* _pid,
+                                  const estats_sockinfo* _sockinfo);
 
-estats_error* estats_conninfo_get_uid(int* _uid,
-                                  const estats_conninfo* _conninfo);
+estats_error* estats_sockinfo_get_uid(int* _uid,
+                                  const estats_sockinfo* _sockinfo);
 
-estats_error* estats_conninfo_get_state(int* _state,
-                                    const estats_conninfo* _conninfo);
+estats_error* estats_sockinfo_get_state(int* _state,
+                                    const estats_sockinfo* _sockinfo);
 
-estats_error* estats_conninfo_get_cmdline(char** _cmdline,
-                                      const estats_conninfo* _conninfo);
+estats_error* estats_sockinfo_get_cmdline(char** _cmdline,
+                                      const estats_sockinfo* _sockinfo);
 
-#endif /* ESTATS_CONNINFO_H */
+#endif /* ESTATS_SOCKINFO_H */

@@ -18,47 +18,47 @@
  *
  */
 #include <estats/estats-int.h>
-#include <estats/conninfo.h>
+#include <estats/sockinfo.h>
 
-static estats_error* _estats_conninfo_refresh(estats_conninfo** _conninfo, estats_agent* agent);
-static estats_error* _estats_conninfo_get_tcp_list(struct estats_conninfo** tcp_list, estats_agent* agent);
-static estats_error* _estats_conninfo_get_ino_list(struct estats_conninfo** ino_list);
-static estats_error* _estats_conninfo_get_pid_list(struct estats_conninfo** pid_list);
-static estats_error* _estats_conninfo_new_node(estats_conninfo** _conninfo);
-static void          _estats_conninfo_free_node(estats_conninfo** conninfo);
-static estats_error* _estats_conninfo_add_tail(struct estats_conninfo** head, struct estats_conninfo* ci);
+static estats_error* _estats_sockinfo_refresh(estats_sockinfo** _sockinfo, estats_agent* agent);
+static estats_error* _estats_sockinfo_get_tcp_list(struct estats_sockinfo** tcp_list, estats_agent* agent);
+static estats_error* _estats_sockinfo_get_ino_list(struct estats_sockinfo** ino_list);
+static estats_error* _estats_sockinfo_get_pid_list(struct estats_sockinfo** pid_list);
+static estats_error* _estats_sockinfo_new_node(estats_sockinfo** _sockinfo);
+static void          _estats_sockinfo_free_node(estats_sockinfo** sockinfo);
+static estats_error* _estats_sockinfo_add_tail(struct estats_sockinfo** head, struct estats_sockinfo* ci);
 
 
 estats_error*
-estats_get_conninfo_head(estats_conninfo** head, estats_agent* agent)
+estats_get_sockinfo_head(estats_sockinfo** head, estats_agent* agent)
 {
     estats_error* err = NULL;
 
     ErrIf(agent == NULL, ESTATS_ERR_INVAL);
 
-    Chk(_estats_conninfo_refresh(head, agent));
+    Chk(_estats_sockinfo_refresh(head, agent));
 
 Cleanup:
     return err;
 }
 
 static estats_error*
-_estats_conninfo_new_node(estats_conninfo** ci)
+_estats_sockinfo_new_node(estats_sockinfo** ci)
 {
     estats_error* err = NULL; 
 
     ErrIf(ci == NULL, ESTATS_ERR_INVAL);                                               
     *ci = NULL;
 
-    Chk(Malloc((void**) ci, sizeof(estats_conninfo)));
-    memset((void*) *ci, 0, sizeof(estats_conninfo));
+    Chk(Malloc((void**) ci, sizeof(estats_sockinfo)));
+    memset((void*) *ci, 0, sizeof(estats_sockinfo));
 
 Cleanup:
     return err;
 }
 
 estats_error*
-estats_conninfo_next(estats_conninfo** next, const estats_conninfo* prev)
+estats_sockinfo_next(estats_sockinfo** next, const estats_sockinfo* prev)
 {
     estats_error* err = NULL;
 
@@ -70,13 +70,13 @@ Cleanup:
     return err;
 }
 
-estats_conninfo*
-estats_conninfo_return_next(const estats_conninfo* prev)
+estats_sockinfo*
+estats_sockinfo_return_next(const estats_sockinfo* prev)
 {
     estats_error* err = NULL;
-    estats_conninfo* next = NULL;
+    estats_sockinfo* next = NULL;
 
-    Chk(estats_conninfo_next(&next, prev));
+    Chk(estats_sockinfo_next(&next, prev));
 
 Cleanup:
     if (err) return NULL;
@@ -84,31 +84,31 @@ Cleanup:
 }
 
 void
-estats_conninfo_free(estats_conninfo** conninfo)
+estats_sockinfo_free(estats_sockinfo** sockinfo)
 {
-    struct estats_conninfo* tmp;
+    struct estats_sockinfo* tmp;
 
-    if (conninfo == NULL || *conninfo == NULL)
+    if (sockinfo == NULL || *sockinfo == NULL)
         return;
 
-    while (*conninfo != NULL) {
-        tmp = *conninfo;
-        *conninfo = (*conninfo)->next;
-        _estats_conninfo_free_node(&tmp);
+    while (*sockinfo != NULL) {
+        tmp = *sockinfo;
+        *sockinfo = (*sockinfo)->next;
+        _estats_sockinfo_free_node(&tmp);
     }
 }
 
 void
-_estats_conninfo_free_node(estats_conninfo** conninfo)
+_estats_sockinfo_free_node(estats_sockinfo** sockinfo)
 {
-    if (conninfo == NULL || *conninfo == NULL)
+    if (sockinfo == NULL || *sockinfo == NULL)
 	return;
 
-    Free((void**) conninfo);
+    Free((void**) sockinfo);
 }
 
 estats_error*
-estats_conninfo_get_cid(int* cid, const estats_conninfo* ecl)
+estats_sockinfo_get_cid(int* cid, const estats_sockinfo* ecl)
 {
     estats_error* err = NULL;
 
@@ -121,12 +121,12 @@ Cleanup:
 
 
 estats_error*
-estats_conninfo_get_pid(int* pid, const estats_conninfo* conninfo)
+estats_sockinfo_get_pid(int* pid, const estats_sockinfo* sockinfo)
 {
     estats_error* err = NULL;
 
-    ErrIf(pid == NULL || conninfo == NULL, ESTATS_ERR_INVAL);
-    *pid = conninfo->pid;
+    ErrIf(pid == NULL || sockinfo == NULL, ESTATS_ERR_INVAL);
+    *pid = sockinfo->pid;
 
 Cleanup:
     return err;
@@ -134,12 +134,12 @@ Cleanup:
 
 
 estats_error*
-estats_conninfo_get_uid(int* uid, const estats_conninfo* conninfo)
+estats_sockinfo_get_uid(int* uid, const estats_sockinfo* sockinfo)
 {
     estats_error* err = NULL;
 
-    ErrIf(uid == NULL || conninfo == NULL, ESTATS_ERR_INVAL);
-    *uid = conninfo->uid;
+    ErrIf(uid == NULL || sockinfo == NULL, ESTATS_ERR_INVAL);
+    *uid = sockinfo->uid;
 
 Cleanup:
     return err;
@@ -147,12 +147,12 @@ Cleanup:
 
 
 estats_error*
-estats_conninfo_get_state(int* state, const estats_conninfo* conninfo)
+estats_sockinfo_get_state(int* state, const estats_sockinfo* sockinfo)
 {
     estats_error* err = NULL;
 
-    ErrIf(state == NULL || conninfo == NULL, ESTATS_ERR_INVAL);
-    *state = conninfo->state;
+    ErrIf(state == NULL || sockinfo == NULL, ESTATS_ERR_INVAL);
+    *state = sockinfo->state;
 
 Cleanup:
     return err;
@@ -160,12 +160,12 @@ Cleanup:
 
 
 estats_error*
-estats_conninfo_get_cmdline(char** str, const estats_conninfo* conninfo)
+estats_sockinfo_get_cmdline(char** str, const estats_sockinfo* sockinfo)
 {
     estats_error* err = NULL;
 
-    ErrIf(conninfo == NULL, ESTATS_ERR_INVAL);
-    Chk(Strdup(str, conninfo->cmdline));
+    ErrIf(sockinfo == NULL, ESTATS_ERR_INVAL);
+    Chk(Strdup(str, sockinfo->cmdline));
 
 Cleanup:
     return err;
@@ -173,35 +173,35 @@ Cleanup:
 
 
 static estats_error*
-_estats_conninfo_refresh(struct estats_conninfo** ecl, estats_agent* agent)
+_estats_sockinfo_refresh(struct estats_sockinfo** ecl, estats_agent* agent)
 {
     estats_error* err = NULL;
-    estats_conninfo* tcp_head = NULL;
-    estats_conninfo* ino_head = NULL;
-    estats_conninfo* pid_head = NULL;
-    estats_conninfo* tcp_pos;
-    estats_conninfo* ino_pos;
-    estats_conninfo* pid_pos;
-    estats_conninfo* newcl;
+    estats_sockinfo* tcp_head = NULL;
+    estats_sockinfo* ino_head = NULL;
+    estats_sockinfo* pid_head = NULL;
+    estats_sockinfo* tcp_pos;
+    estats_sockinfo* ino_pos;
+    estats_sockinfo* pid_pos;
+    estats_sockinfo* newcl;
     int dif;
     int tcp_entry, fd_entry;
 
     /* associate cid with address */ 
-    Chk(_estats_conninfo_get_tcp_list(&tcp_head, agent));
+    Chk(_estats_sockinfo_get_tcp_list(&tcp_head, agent));
 
     /* associate address with ino */
-    Chk(_estats_conninfo_get_ino_list(&ino_head));
+    Chk(_estats_sockinfo_get_ino_list(&ino_head));
 
     /* associate ino with pid */
-    Chk(_estats_conninfo_get_pid_list(&pid_head));
+    Chk(_estats_sockinfo_get_pid_list(&pid_head));
 
     /* collate above */
 
-    ESTATS_CONNINFO_FOREACH(tcp_pos, tcp_head) { 
+    ESTATS_SOCKINFO_FOREACH(tcp_pos, tcp_head) { 
 
 	tcp_entry = 0;
 
-        ESTATS_CONNINFO_FOREACH(ino_pos, ino_head) {
+        ESTATS_SOCKINFO_FOREACH(ino_pos, ino_head) {
 
 	    Chk(estats_connection_spec_compare(&dif, &ino_pos->spec, &tcp_pos->spec));
 
@@ -209,12 +209,12 @@ _estats_conninfo_refresh(struct estats_conninfo** ecl, estats_agent* agent)
 	       	tcp_entry = 1;
 	       	fd_entry = 0;
 
-                ESTATS_CONNINFO_FOREACH(pid_pos, pid_head) {
+                ESTATS_SOCKINFO_FOREACH(pid_pos, pid_head) {
 
 		    if(pid_pos->ino == ino_pos->ino) { //then create entry 
 			fd_entry = 1;
 
-                        Chk(_estats_conninfo_new_node(&newcl));
+                        Chk(_estats_sockinfo_new_node(&newcl));
 
 			newcl->pid = pid_pos->pid; 
 
@@ -228,12 +228,12 @@ _estats_conninfo_refresh(struct estats_conninfo** ecl, estats_agent* agent)
 
                         newcl->spec = tcp_pos->spec; // struct copy
 
-                        Chk(_estats_conninfo_add_tail(ecl, newcl));
+                        Chk(_estats_sockinfo_add_tail(ecl, newcl));
 		    }
 	       	}
 	       	if(!fd_entry) { // add entry w/out cmdline 
 
-                        Chk(_estats_conninfo_new_node(&newcl));
+                        Chk(_estats_sockinfo_new_node(&newcl));
 
 			newcl->pid = 0;
 			newcl->uid = ino_pos->uid;
@@ -245,14 +245,14 @@ _estats_conninfo_refresh(struct estats_conninfo** ecl, estats_agent* agent)
                         newcl->spec = tcp_pos->spec; // struct copy
 
                         strlcpy(newcl->cmdline, "\0", 1);
-                        Chk(_estats_conninfo_add_tail(ecl, newcl));
+                        Chk(_estats_sockinfo_add_tail(ecl, newcl));
 	       	}
 	    }
 	}
 	if(!tcp_entry) { // then connection has vanished; add residual cid info
 			 // (only for consistency with entries in /proc/web100) 
 
-            Chk(_estats_conninfo_new_node(&newcl));
+            Chk(_estats_sockinfo_new_node(&newcl));
 
 	    newcl->cid = tcp_pos->cid; 
 	    newcl->addrtype = tcp_pos->addrtype; 
@@ -261,21 +261,21 @@ _estats_conninfo_refresh(struct estats_conninfo** ecl, estats_agent* agent)
 
             strlcpy(newcl->cmdline, "\0", 1);
 
-            Chk(_estats_conninfo_add_tail(ecl, newcl));
+            Chk(_estats_sockinfo_add_tail(ecl, newcl));
        	}
     }
 
 Cleanup:
-    estats_conninfo_free(&tcp_head);
-    estats_conninfo_free(&ino_head);
-    estats_conninfo_free(&pid_head);
+    estats_sockinfo_free(&tcp_head);
+    estats_sockinfo_free(&ino_head);
+    estats_sockinfo_free(&pid_head);
 
     return err;
 }
 
 
 static estats_error*
-_estats_conninfo_get_tcp_list(struct estats_conninfo** head, estats_agent* agent)
+_estats_sockinfo_get_tcp_list(struct estats_sockinfo** head, estats_agent* agent)
 {
     estats_error* err = NULL; 
     estats_connection* conn;
@@ -286,15 +286,15 @@ _estats_conninfo_get_tcp_list(struct estats_conninfo** head, estats_agent* agent
     Chk(estats_agent_get_connection_head(&conn, agent));
 
     while (conn != NULL) { 
-	estats_conninfo* conninfo = NULL; 
+	estats_sockinfo* sockinfo = NULL; 
 
-        Chk(_estats_conninfo_new_node(&conninfo));
+        Chk(_estats_sockinfo_new_node(&sockinfo));
 
-	Chk(estats_connection_get_cid(&conninfo->cid, conn));
-       	Chk(estats_connection_get_connection_spec(&conninfo->spec, conn));
-	Chk(estats_connection_get_addrtype(&conninfo->addrtype, conn));
+	Chk(estats_connection_get_cid(&sockinfo->cid, conn));
+       	Chk(estats_connection_get_connection_spec(&sockinfo->spec, conn));
+	Chk(estats_connection_get_addrtype(&sockinfo->addrtype, conn));
 
-        Chk(_estats_conninfo_add_tail(head, conninfo));
+        Chk(_estats_sockinfo_add_tail(head, sockinfo));
 
 	Chk(estats_connection_next(&conn, conn));
     }
@@ -305,7 +305,7 @@ Cleanup:
 
 
 static estats_error*
-_estats_conninfo_get_ino_list(struct estats_conninfo** head)
+_estats_sockinfo_get_ino_list(struct estats_sockinfo** head)
 { 
     estats_error* err = NULL;
     FILE *file = NULL;
@@ -321,7 +321,7 @@ _estats_conninfo_get_ino_list(struct estats_conninfo** head)
     file6 = fopen("/proc/net/tcp6", "r");
 
     if (file) {
-	estats_conninfo* conninfo;
+	estats_sockinfo* sockinfo;
 	uint32_t srcAddr;
 	uint16_t srcPort;
 	uint32_t dstAddr;
@@ -329,30 +329,30 @@ _estats_conninfo_get_ino_list(struct estats_conninfo** head)
 
        	while (fgets(buf, sizeof(buf), file) != NULL) {
 
-	    Chk(_estats_conninfo_new_node(&conninfo));
+	    Chk(_estats_sockinfo_new_node(&sockinfo));
 
 	    if ((scan = sscanf(buf,
 			    "%*u: %x:%hx %x:%hx %x %*x:%*x %*x:%*x %*x %u %*u %lu",
-			    (uint32_t *) &(conninfo->spec.src_addr),
-			    (uint16_t *) &(conninfo->spec.src_port),
-			    (uint32_t *) &(conninfo->spec.dst_addr),
-			    (uint16_t *) &(conninfo->spec.dst_port),
-			    (int *) &(conninfo->state),
-			    (uid_t *) &(conninfo->uid),
-			    (ino_t *) &(conninfo->ino))) == 7) { 
+			    (uint32_t *) &(sockinfo->spec.src_addr),
+			    (uint16_t *) &(sockinfo->spec.src_port),
+			    (uint32_t *) &(sockinfo->spec.dst_addr),
+			    (uint16_t *) &(sockinfo->spec.dst_port),
+			    (int *) &(sockinfo->state),
+			    (uid_t *) &(sockinfo->uid),
+			    (ino_t *) &(sockinfo->ino))) == 7) { 
 
-		conninfo->addrtype = ESTATS_ADDRTYPE_IPV4;
+		sockinfo->addrtype = ESTATS_ADDRTYPE_IPV4;
 
-                Chk(_estats_conninfo_add_tail(head, conninfo));
+                Chk(_estats_sockinfo_add_tail(head, sockinfo));
 	    } else {
-	       	free(conninfo);
+	       	free(sockinfo);
 	    }
        	}
        	fclose(file);
     }
 
     if (file6) { 
-	estats_conninfo* conninfo;
+	estats_sockinfo* sockinfo;
 	char srcAddr[INET6_ADDRSTRLEN];
 	uint16_t srcPort;
 	char dstAddr[INET6_ADDRSTRLEN];
@@ -360,31 +360,31 @@ _estats_conninfo_get_ino_list(struct estats_conninfo** head)
 
 	while (fgets(buf, sizeof(buf), file6) != NULL) {
 
-	    Chk(_estats_conninfo_new_node(&conninfo));
+	    Chk(_estats_sockinfo_new_node(&sockinfo));
 
 	    if ((scan = sscanf(buf,
 			    "%*u: %64[0-9A-Fa-f]:%hx %64[0-9A-Fa-f]:%hx %x %*x:%*x %*x:%*x %*x %u %*u %u", 
 			    (char *) &srcAddr,
-			    (uint16_t *) &(conninfo->spec.src_port),
+			    (uint16_t *) &(sockinfo->spec.src_port),
 			    (char *) &dstAddr,
-			    (uint16_t *) &(conninfo->spec.dst_port),
-			    (int *) &(conninfo->state),
-			    (uid_t *) &(conninfo->uid),
-			    (pid_t *) &(conninfo->ino))) == 7) { 
+			    (uint16_t *) &(sockinfo->spec.dst_port),
+			    (int *) &(sockinfo->state),
+			    (uid_t *) &(sockinfo->uid),
+			    (pid_t *) &(sockinfo->ino))) == 7) { 
 
 		sscanf(srcAddr, "%8x%8x%8x%8x", &in6.s6_addr32[0], &in6.s6_addr32[1], &in6.s6_addr32[2], &in6.s6_addr32[3]); 
 
-                memcpy(&(conninfo->spec.src_addr), &in6.s6_addr, 16);
+                memcpy(&(sockinfo->spec.src_addr), &in6.s6_addr, 16);
 
 		sscanf(dstAddr, "%8x%8x%8x%8x", &in6.s6_addr32[0], &in6.s6_addr32[1], &in6.s6_addr32[2], &in6.s6_addr32[3]);
 
-                memcpy(&(conninfo->spec.dst_addr), &in6.s6_addr, 16);
+                memcpy(&(sockinfo->spec.dst_addr), &in6.s6_addr, 16);
 
-		conninfo->addrtype = ESTATS_ADDRTYPE_IPV6;
+		sockinfo->addrtype = ESTATS_ADDRTYPE_IPV6;
 
-                Chk(_estats_conninfo_add_tail(head, conninfo));
+                Chk(_estats_sockinfo_add_tail(head, sockinfo));
 	    } else { 
-		free(conninfo);
+		free(sockinfo);
 	    }
        	}
        	fclose(file6);
@@ -396,10 +396,10 @@ Cleanup:
 
 
 static estats_error*
-_estats_conninfo_get_pid_list(struct estats_conninfo** head)
+_estats_sockinfo_get_pid_list(struct estats_sockinfo** head)
 { 
     estats_error* err;
-    estats_conninfo* ecl;
+    estats_sockinfo* ecl;
     DIR *dir, *fddir; 
     struct dirent *direntp, *fddirentp;
     pid_t pid;
@@ -434,7 +434,7 @@ _estats_conninfo_get_pid_list(struct estats_conninfo** head)
 			if (fgets(buf, sizeof(buf), file) == NULL)
 			    goto FileCleanup; 
        	
-	                Chk(_estats_conninfo_new_node(&ecl));
+	                Chk(_estats_sockinfo_new_node(&ecl));
 
 			if (sscanf(buf, "Name: %16s\n", ecl->cmdline) != 1) {
 			    Free((void**) &ecl);
@@ -443,7 +443,7 @@ _estats_conninfo_get_pid_list(struct estats_conninfo** head)
 
 			ecl->ino = st.st_ino;
 		       	ecl->pid = pid;
-                        Chk(_estats_conninfo_add_tail(head, ecl));
+                        Chk(_estats_sockinfo_add_tail(head, ecl));
 
 FileCleanup:
 			fclose(file); 
@@ -460,7 +460,7 @@ Cleanup:
 }
 
 static estats_error*
-_estats_conninfo_add_tail(struct estats_conninfo** head, struct estats_conninfo* ci)
+_estats_sockinfo_add_tail(struct estats_sockinfo** head, struct estats_sockinfo* ci)
 {
     estats_error* err = NULL;
 
