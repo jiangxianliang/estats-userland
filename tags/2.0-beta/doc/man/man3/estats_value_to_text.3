@@ -1,0 +1,28 @@
+.\" $Id: estats_value_to_text.3,v 1.1 2003/01/06 20:50:35 engelhar Exp $
+.TH estats_value_to_text 3 "12 December 2002" "Estats Userland" "Estats"
+.SH NAME
+estats_value_to_text, estats_value_to_textn \- convert a measured Estats
+value to a string.
+.SH SYNOPSIS
+.B #include <estats/estats.h>
+.PP
+.nf
+.BI "char* estats_value_to_text(ESTATS_TYPE " type ", void* " buf ");"
+.BI "int   estats_value_to_textn(char* " dest ", size_t " size ", ESTATS_TYPE " type ", void* " buf ");"
+.fi
+.SH DESCRIPTION
+These functions convert a value measured using a function such as
+\fBestats_raw_read()\fR to a string, for ease of printing.  A Estats
+value is passed as a pair of \fItype\fR and \fIbuf\fR.
+.PP
+\fBestats_value_to_textn()\fR also takes in a character buffer and its
+length into which it will write the answer.
+.SH RETURN VALUES
+\fBestats_value_to_text()\fR returns a pointer to a static buffer which
+contains the string representation of the value.  Note that this is
+\fBnot reentrant\fR and \fBnot threadsafe\fR.
+.PP
+\fBestats_value_to_textn()\fR returns the number of characters printed
+into \fIdest\fR.
+.SH SEE ALSO
+.BR libestats (3)

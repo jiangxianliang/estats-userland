@@ -1,0 +1,93 @@
+.\" $Id: libestats.3,v 1.1 2003/01/06 20:50:31 engelhar Exp $
+.\" TODO:
+.\" - estats_log_eof()
+.\" - DEF_GAUGE/DEF_COUNTER?
+.\" - estats_types?  (what is a ESTATS_TYPE, ESTATS_ADDRTYPE, ...)
+.TH libestats 3 "12 December 2002" "Estats Userland" "Estats"
+.SH NAME
+libestats \- Estats connection staticstics handling and manipulation library
+.SH SYNOPSIS
+.B #include <estats/estats.h>
+.SH DESCRIPTION
+The \fBlibestats\fR library routines give the user an OS-independent
+method of accessing and manipulating the TCP connection statistics
+exposed by the Estats kernel.
+.PP
+As the \fBlibestats\fR header may be installed into a directory that the
+compiler does not automatically search for, developer's should use the
+output from \fIestats-config --cflags\fR to instruct the compiler to
+search in the correct directory.
+.PP
+A program using these routines must be linked with the \fB-lestats\fR
+option.  Using the output from \fIestats-config --libs\fR is a simple
+way to ensure that the library is found and linked in correctly.
+.PP
+.SS Routine Name Index
+The following table lists each \fBlibestats\fR
+routine and the name of the master manual page on which it is described
+(man "\fIroutine_name\fR" redirects to this page):
+.PP
+.nf
+\fBlibestats\fR Routine Name             Manual Page Name
+======================             =====================
+estats_agent_find_var_and_group    \fBestats_agent_find_var_and_group\fR(3)
+estats_attach                      \fBestats_attach\fR(3)
+estats_connection_data_copy        \fBestats_connection_copy\fR(3)
+estats_connection_find             \fBestats_connection_find\fR(3)
+estats_connection_find_v6          \fBestats_connection_find\fR(3)
+estats_connection_free_local_copy  \fBestats_connection_copy\fR(3)
+estats_connection_from_socket      \fBestats_connection_find\fR(3)
+estats_connection_head             \fBestats_connection_find\fR(3)
+estats_connection_lookup           \fBestats_connection_find\fR(3)
+estats_connection_new_local_copy   \fBestats_connection_copy\fR(3)
+estats_connection_next             \fBestats_connection_find\fR(3)
+estats_delta_any                   \fBestats_snap_read\fR(3)
+estats_detach                      \fBestats_attach\fR(3)
+estats_get_agent_type              \fBestats_agent_accessors\fR(3)
+estats_get_agent_version           \fBestats_agent_accessors\fR(3)
+estats_get_connection_agent        \fBestats_connection_accessors\fR(3)
+estats_get_connection_cid          \fBestats_connection_accessors\fR(3)
+estats_get_connection_spec         \fBestats_connection_accessors\fR(3)
+estats_get_group_name              \fBestats_group_accessors\fR(3)
+estats_get_group_nvars             \fBestats_group_accessors\fR(3)
+estats_get_group_size              \fBestats_group_accessors\fR(3)
+estats_get_log_agent               \fBestats_log_accessors\fR(3)
+estats_get_log_group               \fBestats_log_accessors\fR(3)
+estats_get_log_connection          \fBestats_log_accessors\fR(3)
+estats_get_log_time                \fBestats_log_accessors\fR(3)
+estats_get_snap_group              \fBestats_snap_accessors\fR(3)
+estats_get_snap_group_name         \fBestats_snap_accessors\fR(3)
+estats_get_var_name                \fBestats_var_accessors\fR(3)
+estats_get_var_size                \fBestats_var_accessors\fR(3)
+estats_get_var_type                \fBestats_var_accessors\fR(3)
+estats_group_find                  \fBestats_group_find\fR(3)
+estats_group_head                  \fBestats_group_find\fR(3)
+estats_group_next                  \fBestats_group_find\fR(3)
+estats_log_close_read              \fBestats_log_open_write\fR(3)
+estats_log_close_write             \fBestats_log_open_write\fR(3)
+estats_log_open_read               \fBestats_log_open_write\fR(3)
+estats_log_open_write              \fBestats_log_open_write\fR(3)
+estats_log_write                   \fBestats_log_open_write\fR(3)
+estats_perror                      \fBestats_perror\fR(3)
+estats_raw_read                    \fBestats_raw_read\fR(3)
+estats_raw_write                   \fBestats_raw_read\fR(3)
+estats_snap                        \fBestats_snap\fR(3)
+estats_snap_data_copy              \fBestats_snap_data_copy\fR(3)
+estats_snap_from_log               \fBestats_log_open_write\fR(3)
+estats_snap_group                  \fBestats_snap_accessors\fR(3)
+estats_snap_read                   \fBestats_snap_read\fR(3)
+estats_snapshot_alloc              \fBestats_snap\fR(3)
+estats_snapshot_alloc_from_log     \fBestats_log_open_write\fR(3)
+estats_snapshot_free               \fBestats_snap\fR(3)
+estats_strerror                    \fBestats_strerror\fR(3)
+estats_value_to_text               \fBestats_value_to_text\fR(3)
+estats_value_to_textn              \fBestats_value_to_text\fR(3)
+estats_var_find                    \fBestats_var_find\fR(3)
+estats_var_head                    \fBestats_var_find\fR(3)
+estats_var_next                    \fBestats_var_find\fR(3)
+.fi
+.SH SEE ALSO
+.BR estats-config (1),
+.BR estats (1),
+and section 3 man pages whose name bein "estats_" for
+detailed routine descriptions.

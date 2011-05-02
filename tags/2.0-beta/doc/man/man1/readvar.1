@@ -1,0 +1,22 @@
+.\" $Id: readvar.1,v 1.1 2003/01/06 20:50:30 engelhar Exp $
+.TH readvar 1 "12 December 2002" "Estats Userland" "Estats"
+.SH NAME
+readvar \- read the current value of a single Estats variable from one
+connection.
+.SH SYNOPSIS
+.B readvar
+.I connection_id
+.I var_name
+[\fIvar_name\fR ...]
+.SH DESCRIPTION
+\fBreadvar\fR prints out the current value of one or more variables with
+name \fIvar_name\fR from the connection \fIconnection_id\fR.  It is one
+of the simplest programs one can write to use \fIlibestats\fR, and thus
+may be a useful reference for developers.
+.SH SEE ALSO
+.BR gutil (1),
+.BR readall (1),
+.BR deltavar (1),
+.BR writevar (1),
+.BR libestats (3),
+.BR estats (7)

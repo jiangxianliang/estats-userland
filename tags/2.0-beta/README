@@ -1,0 +1,6 @@
+
+To build, run ./configure, make, make install.
+
+Basic tools and examples are in util/scripts.
+
+All material here is based on the NSF supported projects, Web100 and Web10Gig.

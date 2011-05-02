@@ -1,0 +1,31 @@
+.\" $Id: estats_agent_find_var_and_group.3,v 1.1 2003/01/06 20:50:31 engelhar Exp $
+.TH ESTATS_AGENT 3 "28 February 2002" "Estats Userland" "Estats"
+.SH NAME
+estats_agent_find_var_and_group \- given the name of a variable, return the appropriate estats_var and estats_group
+.SH SYNOPSIS
+.B #include <estats/estats.h>
+.PP
+.nf
+.BI "int estats_agent_find_var_and_group(estats_agent* " agent ", const char* " varname ", estats_group** " group ", estats_var** " var ");"
+.fi
+.SH DESCRIPTION
+\fBestats_agent_find_var_and_group()\fR finds the Estats variable with
+name \fIvarname\fR in \fIagent\fR and returns its \fIgroup\fR and
+\fIvar\fR values.
+.SH RETURN VALUES
+\fBestats_agent_find_var_and_group()\fR returns \fBESTATS_ERR_SUCCESS\fR
+if the variable is found or an error code otherwise.
+.SH EXAMPLE USE
+.nf
+/* Warning: no errorhandling below... */
+estats_agent* agent;
+estats_group* group;
+estats_var* var;
+
+agent = estats_attach(ESTATS_AGENT_TYPE_LOCAL, NULL);
+estats_agent_find_var_and_group(agent, "RemotePort", &group, &var);
+.fi
+.SH SEE ALSO
+.BR estats_group_find (3),
+.BR estats_var_find (3),
+.BR libestats (3)

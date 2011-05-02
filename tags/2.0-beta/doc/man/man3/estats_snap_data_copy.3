@@ -1,0 +1,17 @@
+.\" $Id: estats_snap_data_copy.3,v 1.1 2003/01/06 20:50:35 engelhar Exp $
+.TH estats_snap_data_copy 3 "12 December 2002" "Estats Userland "Estats"
+.SH NAME
+estats_snap_data_copy \- copy the data from one snapshot to another.
+.SH SYNOPSIS
+.B #include <estats/estats.h>
+.PP
+.nf
+.BI "int estats_snap_data_copy(estats_snapshot* " dest ", estats_snapshot* " src ");"
+.fi
+.SH DESCRIPTION
+Copy the snapshot from one structure to another.
+.SH RETURN VALUES
+Returns ESTATS_ERR_SUCCESS on success, and an error code on failure.
+.SH SEE ALSO
+.BR estats_snap (3),
+.BR libestats (3)

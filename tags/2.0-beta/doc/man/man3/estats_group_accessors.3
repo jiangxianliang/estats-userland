@@ -1,0 +1,26 @@
+.\" $Id: estats_group_accessors.3,v 1.1 2003/01/06 20:50:34 engelhar Exp $
+.TH ESTATS_GROUP 3 "12 December 2002" "Estats Userland" "Estats"
+.SH NAME
+estats_get_group_name, estats_get_group_nvars, estats_get_group_size \-
+get values from the Estats group opaque structure
+.SH SYNOPSIS
+.B #include <estats/estats.h>
+.PP
+.nf
+.BI "const char* estats_get_group_name(estats_group* " group ");"
+.BI "int         estats_get_group_size(estats_group* " group ");"
+.BI "int         estats_get_group_nvars(estats_group* " group ");"
+.fi
+.SH DESCRIPTION
+As the \fIestats_group\fR structure is opaque, these functions exist to
+fetch values from it without exposing its structure.
+.SH RETURN VALUES
+\fBestats_get_group_name()\fR returns the name of the group.
+.PP
+\fBestats_get_group_size()\fR returns the total size of all the group
+variables in bytes.
+.PP
+\fBestats_get_group_nvars()\fR returns the number of variables in the
+group.
+.SH SEE ALSO
+.BR libestats (3)

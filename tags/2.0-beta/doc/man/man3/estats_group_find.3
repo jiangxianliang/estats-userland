@@ -1,0 +1,35 @@
+.\" $Id: estats_group_find.3,v 1.1 2003/01/06 20:50:34 engelhar Exp $
+.TH ESTATS_GROUP 3 "26 February 2002" "Estats Userland" "Estats"
+.SH NAME
+estats_group_head, estats_group_next, estats_group_find \- find or
+iterate over Estats groups
+.SH SYNOPSIS
+.B #include <estats/estats.h>
+.PP
+.nf
+.BI "estats_group* estats_group_head(estats_agent* " agent ");"
+.BI "estats_group* estats_group_next(estats_group* " group ");"
+.BI "estats_group* estats_group_find(estats_agent* " agent ", const char* " name ");"
+.fi
+.SH DESCRIPTION
+The statistics from a Estats data source are divided into groups, which
+is represented by a \fIestats_group\fR.  A \fIestats_agent\fR contains a
+number of these groups, and these functions enable either the iteration
+over the groups or the search of a specific one by name.  Conceptually,
+you can consider an agent as having a linked list of these groups, and
+these functions allow the searching and traversal of the list.
+.PP
+\fBestats_group_head()\fR obtains the first group in \fIagent\fR.
+\fBestats_group_next()\fR returns the next group in the agent after
+\fIgroup\fR.  \fBestats_group_find()\fR searches for a specific group in
+\fIagent\fR that has the name \fIname\fR.
+.SH RETURN VALUES
+For \fBestats_group_head()\fR and \fBestats_group_next()\fR, the value
+returned is the next group in the sequence, or \fBNULL\fR if there is an
+error or there are no groups left.
+.PP
+\fBestats_group_find()\fR returns the group with the specified name, or
+\fBNULL\fR if there is an error or the group is not found.
+.SH SEE ALSO
+.BR estats_agent_find_var_and_group (3),
+.BR libestats (3)
