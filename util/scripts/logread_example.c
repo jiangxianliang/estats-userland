@@ -2,6 +2,7 @@
  *
  */
 #include "scripts.h"
+#include <time.h>
 
 static const char* argv0 = NULL;
 
@@ -41,14 +42,18 @@ main(int argc, char *argv[])
         struct estats_timeval etv;
         estats_value* value = NULL;
         char* res;
-
-        Chk(estats_log_entry_read_timestamp(&etv, entry_pos));
-        printf("Time is %u: %u\n", etv.sec, etv.usec);
+        char* str_time;
+        time_t c_time;
 
         Chk(estats_log_entry_read_value(&value, entry_pos, var));
         Chk(estats_value_as_string(&res, value));
-        printf("Value is %s\n", res);
+        printf("Value is %s, ", res);
         
+        Chk(estats_log_entry_read_timestamp(&etv, entry_pos));
+        c_time = (time_t) etv.sec;
+        str_time = ctime(&c_time);
+        printf("recorded at %s\n", str_time);
+
         free(res);
         estats_value_free(&value);
     }

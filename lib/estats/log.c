@@ -47,7 +47,7 @@ estats_log_open(estats_log** log, const char* path, const char* mode)
 
 Cleanup:
     if (err != NULL) {
-	Free((void**) log);
+        _estats_log_free(log);
     }
 
     return err;
@@ -352,10 +352,6 @@ Cleanup:
     Fclose(&header);
     Remove("./log_header");
 
-    if (err != NULL) {
-        _estats_log_free(&log);
-    }
-        
     return err;
 }
 

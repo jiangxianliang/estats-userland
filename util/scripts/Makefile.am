@@ -1,4 +1,4 @@
-bin_PROGRAMS = deltavar listconns listvars logrtest logwtest readall readconn readvar writevar
+bin_PROGRAMS = deltavar listconns listvars logread_example logwrite_example readall readconn readvar writevar
 
 LIBESTATS_LDADDS = @STRIP_BEGIN@ \
 	$(top_builddir)/lib/estats/libestats.la \
@@ -17,11 +17,11 @@ listconns_LDADD = $(LIBESTATS_LDADDS)
 listvars_SOURCES = listvars.c scripts.h
 listvars_LDADD = $(LIBESTATS_LDADDS)
 
-logrtest_SOURCES = logrtest.c scripts.h
-logrtest_LDADD = $(LIBESTATS_LDADDS)
+logread_example_SOURCES = logread_example.c scripts.h
+logread_example_LDADD = $(LIBESTATS_LDADDS)
 
-logwtest_SOURCES = logwtest.c scripts.h
-logwtest_LDADD = $(LIBESTATS_LDADDS)
+logwrite_example_SOURCES = logwrite_example.c scripts.h
+logwrite_example_LDADD = $(LIBESTATS_LDADDS)
 
 readall_SOURCES = readall.c scripts.h
 readall_LDADD = $(LIBESTATS_LDADDS)
