@@ -99,16 +99,17 @@ static estats_error*
 _estats_log_entry_read(estats_log* log)
 {
     estats_error* err = NULL;
+    estats_log_entry* entry = NULL;
 
     ErrIf(log == NULL, ESTATS_ERR_INVAL);
     ErrIf(log->mode != R_MODE, ESTATS_ERR_ACCESS);
     ErrIf(log->fp == NULL, ESTATS_ERR_FILE);
 
     while (1) {
-        estats_log_entry* entry = NULL;
+//        estats_log_entry* entry = NULL;
 
         Chk(_estats_log_entry_new(&entry, log));
-
+/*
         if (((err = Fread(NULL, &(entry->tv.sec), 4, 1, log->fp)) != NULL) ||
             ((err = Fread(NULL, &(entry->tv.usec), 4, 1, log->fp)) != NULL) ||
             ((err = Fread(NULL, entry->data, log->bufsize, 1, log->fp)) != NULL)) {
@@ -121,11 +122,24 @@ _estats_log_entry_read(estats_log* log)
             _estats_log_entry_free(&entry);
             break;
         }
+*/
+        Chk(Fread(NULL, &(entry->tv.sec), 4, 1, log->fp));
+        Chk(Fread(NULL, &(entry->tv.usec), 4, 1, log->fp));
+        Chk(Fread(NULL, entry->data, log->bufsize, 1, log->fp));
 
         _estats_list_add_tail(&(entry->list), &(log->entry_list_head));
+        entry = NULL;
     }
 
 Cleanup:
+    if (err != NULL) {
+        if (estats_error_get_number(err) == ESTATS_ERR_EOF) {
+            dbgprintf("   ... caught expected EOF at %s:%d in function %s\n", __FILE__, __LINE__, __FUNCTION__);
+
+            estats_error_free(&err);
+        }
+        _estats_log_entry_free(&entry);
+    }
 
     return err;
 }
