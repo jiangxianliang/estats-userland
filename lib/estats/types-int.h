@@ -32,45 +32,45 @@ struct estats_list {
 };
 
 struct estats_connection {
+    struct estats_connection_spec    spec;
     struct estats_list               list;
+    struct estats_agent*             agent;
     int                              cid;
     ESTATS_ADDRTYPE                  addrtype;
-    struct estats_connection_spec    spec;
-    struct estats_agent*             agent;
 };
 
 struct estats_var {
-    struct estats_list   list;
     char                 name[ESTATS_VARNAME_LEN_MAX];
+    struct estats_list   list;
+    struct estats_group* group;
+    size_t               len;
     int                  type;
     int                  offset;
-    size_t               len;
-    struct estats_group* group;
     int                  flags;
 };
 
 struct estats_group {
-    struct estats_list   list;
     char                 name[ESTATS_GROUPNAME_LEN_MAX];
+    struct estats_list   list;
+    struct estats_agent* agent;
     int                  size;
     int                  nvars;
-    struct estats_agent* agent;
     struct estats_list   var_list_head;
 };
 
 struct estats_agent {
-    ESTATS_AGENT_TYPE         type;
     char                      version[ESTATS_VERSTR_LEN_MAX];
-    struct estats_list        connection_list_head;
     struct estats_group*      spec;
     struct estats_group*      read;
+    struct estats_list        connection_list_head;
+    ESTATS_AGENT_TYPE         type;
 };
 
 struct estats_snapshot {
-    struct estats_group*           group;
-    int                            cid;
     struct estats_connection_spec  spec;
     struct estats_timeval          tv;
+    struct estats_group*           group;
+    int                            cid;
     void*                          data;
 };
 

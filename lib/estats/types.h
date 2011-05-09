@@ -95,17 +95,17 @@ struct estats_timeval {
 };
 
 struct estats_connection_spec {
-    uint16_t dst_port;
     char dst_addr[17];
-    uint16_t src_port;
+    uint16_t dst_port;
     char src_addr[17];
+    uint16_t src_port;
 };
 
 struct spec_ascii {
-    char dst_port[6];
     char dst_addr[INET6_ADDRSTRLEN];
-    char src_port[6];
+    char dst_port[6];
     char src_addr[INET6_ADDRSTRLEN];
+    char src_port[6];
 };
 
 typedef struct estats_agent      estats_agent;

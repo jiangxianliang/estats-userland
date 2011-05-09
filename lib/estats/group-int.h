@@ -20,10 +20,16 @@
 #ifndef ESTATS_GROUP_H
 #define ESTATS_GROUP_H
 
+estats_error* _estats_group_new( estats_group **,
+                                 estats_agent *);
+
+void _estats_group_free( estats_group **);
+
 estats_error* _estats_group_find_var_from_name( estats_var **,
                                          const estats_group *,
                                          const char * /* name */);
 
-estats_error* _estats_group_get_var_head( estats_var **, estats_group *);
+estats_error* _estats_group_get_var_head( estats_var **,
+                                          estats_group *);
 
 #endif /* ESTATS_GROUP_H */

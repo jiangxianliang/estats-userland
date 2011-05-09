@@ -40,7 +40,7 @@ _estats_agent_parse_header(estats_agent* agent, FILE* fp)
 
     while (1) {
         size_t len;
-        
+
         if ((err = Fgets(linebuf, sizeof(linebuf), fp)) != NULL) {
             if (estats_error_get_number(err) == ESTATS_ERR_EOF) {
                 dbgprintf("   ... caught expected EOF at %s:%d in function %s\n", __FILE__, __LINE__, __FUNCTION__);
@@ -61,14 +61,17 @@ _estats_agent_parse_header(estats_agent* agent, FILE* fp)
             continue;
 
         if (linebuf[0] == '/') {
+//            char name[ESTATS_GROUPNAME_LEN_MAX];
+
             /* Add a new group */
-            Free((void**) &group);
+/*
             Chk(Malloc((void**) &group, sizeof(estats_group)));
             group->size = 0;
             group->nvars = 0;
             group->agent = agent;
             _estats_list_init(&(group->var_list_head));
-
+*/
+            _estats_group_new(&group, agent);
             strlcpy(group->name, linebuf + 1, sizeof(group->name));
 
             dbgprintf("New group: %s\n", group->name);
@@ -84,15 +87,19 @@ _estats_agent_parse_header(estats_agent* agent, FILE* fp)
             } else if (strcmp(group->name, "read") == 0) {
                 agent->read = group;
                 group = NULL;
-            } else Err(ESTATS_ERR_HEADER);
+            } else {
+                Free((void**) &group);
+                curr_gp = NULL;
+            }
             
         } else {
             int nread;
             int fsize;
 
-            /* Add a new variable */
-            ErrIf(curr_gp == NULL, ESTATS_ERR_HEADER);
+            /* Ignore unhandled group(s), for compatability with web100 */
+            if (curr_gp == NULL) continue;
 
+            /* Add a new variable */
             Chk(Malloc((void**) &var, sizeof(estats_var)));
             var->group = curr_gp;
             var->offset = 0; var->type = 0; var->len=0;
@@ -411,7 +418,7 @@ _estats_agent_refresh_connections(estats_agent* agent)
     estats_value* val = NULL;
 
     ErrIf(agent == NULL, ESTATS_ERR_INVAL);
-    
+   
     connHead = &(agent->connection_list_head);
     ESTATS_LIST_FOREACH_SAFE(connCurrPos, tmp, connHead) {
         estats_connection* currConn = ESTATS_LIST_ENTRY(connCurrPos, estats_connection, list);

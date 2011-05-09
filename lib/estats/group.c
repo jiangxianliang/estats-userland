@@ -21,6 +21,40 @@
 
 
 estats_error*
+_estats_group_new(estats_group** group, estats_agent* agent)
+{
+    estats_error* err = NULL;
+
+    ErrIf(group == NULL, ESTATS_ERR_INVAL);
+
+    Chk(Malloc((void**) group, sizeof(estats_group)));
+    memset((void*) *group, 0, sizeof(estats_group));
+    (*group)->agent = agent;
+    _estats_list_init(&((*group)->var_list_head));
+
+Cleanup:
+    return err;
+}
+
+void
+_estats_group_free(estats_group** group)
+{
+    struct estats_list* var_pos;
+    struct estats_list* tmp;
+
+    if (group == NULL || *group == NULL)
+        return;
+
+    ESTATS_LIST_FOREACH_SAFE(var_pos, tmp, &((*group)->var_list_head)) {
+        estats_var* currVar = ESTATS_LIST_ENTRY(var_pos, estats_var, list);
+        _estats_list_del(var_pos); /* Must be before free! */
+        free(currVar);
+    }
+
+    Free((void**) &group);
+}
+
+estats_error*
 _estats_group_get_var_head(estats_var** var, estats_group* group)
 {
     estats_error* err = NULL;
