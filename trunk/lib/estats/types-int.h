@@ -20,6 +20,7 @@
 #ifndef ESTATS_TYPES_INT_H
 #define ESTATS_TYPES_INT_H
 
+
 #define ESTATS_VERSTR_LEN_MAX 64
 #define ESTATS_GROUPNAME_LEN_MAX 32
 #define ESTATS_VARNAME_LEN_MAX 32
@@ -97,6 +98,29 @@ struct estats_value {
     } u;
 };
 
+struct estats_log_entry {
+    struct estats_list    list;
+    struct estats_timeval tv;
+    void*                 data;
+    struct estats_log*    log;
+};
+
+typedef enum ESTATS_LOG_MODE {
+    R_MODE,
+    W_MODE
+} ESTATS_LOG_MODE;
+
+struct estats_log {
+    struct estats_list  var_list_head;
+    struct estats_list  entry_list_head;
+    FILE*               fp;
+    int                 swap;
+    int                 bufsize;
+    int                 nvars;
+    ESTATS_LOG_MODE     mode;
+};
+
 typedef struct estats_group estats_group;
+
 
 #endif /* ESTATS_TYPES_INT_H */

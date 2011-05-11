@@ -20,6 +20,7 @@
 #ifndef ESTATS_TYPES_H
 #define ESTATS_TYPES_H
 
+
 #if !defined(NULL)
 # define NULL 0
 #endif
@@ -96,23 +97,26 @@ struct estats_timeval {
 
 struct estats_connection_spec {
     char dst_addr[17];
-    uint16_t dst_port;
     char src_addr[17];
+    uint16_t dst_port;
     uint16_t src_port;
 };
 
 struct spec_ascii {
     char dst_addr[INET6_ADDRSTRLEN];
-    char dst_port[6];
     char src_addr[INET6_ADDRSTRLEN];
+    char dst_port[6];
     char src_port[6];
 };
 
-typedef struct estats_agent      estats_agent;
-typedef struct estats_connection estats_connection;
-typedef struct estats_error      estats_error;
-typedef struct estats_snapshot   estats_snapshot;
-typedef struct estats_value      estats_value;
-typedef struct estats_var        estats_var;
+typedef struct estats_agent       estats_agent;
+typedef struct estats_connection  estats_connection;
+typedef struct estats_error       estats_error;
+typedef struct estats_snapshot    estats_snapshot;
+typedef struct estats_value       estats_value;
+typedef struct estats_var         estats_var;
+typedef struct estats_log         estats_log;
+typedef struct estats_log_entry   estats_log_entry;
+
 
 #endif /* ESTATS_TYPES_H */
