@@ -48,7 +48,7 @@ main(int argc, char *argv[])
         time_t c_time;
 
         Chk(estats_get_snapshot(snap));
-	Chk(estats_log_entry_write(log, snap));
+	Chk(estats_log_write_entry(log, snap));
         Chk(estats_snapshot_get_timeval(&etv, snap));
         c_time = (time_t) etv.sec;
         str_time = ctime(&c_time);
