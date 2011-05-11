@@ -85,6 +85,8 @@ _estats_log_entry_new(estats_log_entry** entry, estats_log* log)
 {
     estats_error* err = NULL;
 
+    ErrIf(entry == NULL, ESTATS_ERR_INVAL);
+
     Chk(Malloc((void**) entry, sizeof(estats_log_entry)));
     memset((void*) *entry, 0, sizeof(estats_log_entry));
 
@@ -97,15 +99,17 @@ Cleanup:
     return err;
 }
 
-static void
-_estats_log_entry_free(estats_log_entry** entry)
+void
+estats_log_entry_free(estats_log_entry** entry)
 {
+    if (entry == NULL || *entry == NULL) return;
+
     Free(&((*entry)->data));
     Free((void**) entry);
 }
 
-static estats_error*
-_estats_log_entry_read(estats_log* log)
+estats_error*
+estats_log_read_all_entries(estats_log* log)
 {
     estats_error* err = NULL;
     estats_log_entry* entry = NULL;
@@ -114,24 +118,10 @@ _estats_log_entry_read(estats_log* log)
     ErrIf(log->mode != R_MODE, ESTATS_ERR_ACCESS);
     ErrIf(log->fp == NULL, ESTATS_ERR_FILE);
 
-    while (1) {
-//        estats_log_entry* entry = NULL;
+    while (1) { 
 
         Chk(_estats_log_entry_new(&entry, log));
-/*
-        if (((err = Fread(NULL, &(entry->tv.sec), 4, 1, log->fp)) != NULL) ||
-            ((err = Fread(NULL, &(entry->tv.usec), 4, 1, log->fp)) != NULL) ||
-            ((err = Fread(NULL, entry->data, log->bufsize, 1, log->fp)) != NULL)) {
-    
-            if (estats_error_get_number(err) == ESTATS_ERR_EOF) {
-                dbgprintf("   ... caught expected EOF at %s:%d in function %s\n", __FILE__, __LINE__, __FUNCTION__);
 
-                estats_error_free(&err);
-            }
-            _estats_log_entry_free(&entry);
-            break;
-        }
-*/
         Chk(Fread(NULL, &(entry->tv.sec), 4, 1, log->fp));
         Chk(Fread(NULL, &(entry->tv.usec), 4, 1, log->fp));
         Chk(Fread(NULL, entry->data, log->bufsize, 1, log->fp));
@@ -147,14 +137,39 @@ Cleanup:
 
             estats_error_free(&err);
         }
-        _estats_log_entry_free(&entry);
+        estats_log_entry_free(&entry);
     }
 
     return err;
 }
 
 estats_error*
-estats_log_entry_write(estats_log* log, estats_snapshot* snap)
+estats_log_read_entry(estats_log_entry** entry, estats_log* log)
+{
+    estats_error* err = NULL;
+    
+    ErrIf(log == NULL, ESTATS_ERR_INVAL);
+    ErrIf(log->mode != R_MODE, ESTATS_ERR_ACCESS);
+    ErrIf(log->fp == NULL, ESTATS_ERR_FILE);
+    ErrIf(entry == NULL, ESTATS_ERR_INVAL);
+    *entry = NULL;
+
+    Chk(_estats_log_entry_new(entry, log));
+
+    Chk(Fread(NULL, &((*entry)->tv.sec), 4, 1, log->fp));
+    Chk(Fread(NULL, &((*entry)->tv.usec), 4, 1, log->fp));
+    Chk(Fread(NULL, (*entry)->data, log->bufsize, 1, log->fp));
+
+Cleanup:
+    if (err != NULL) {
+        estats_log_entry_free(entry);
+    }
+
+    return err;
+}
+
+estats_error*
+estats_log_write_entry(estats_log* log, estats_snapshot* snap)
 {
     estats_error* err = NULL;
 
@@ -369,7 +384,7 @@ _estats_log_open_read(estats_log* log, const char* path)
 
     log->mode = R_MODE;
 
-    Chk(_estats_log_entry_read(log));
+//    Chk(_estats_log_entry_read(log));
 
 Cleanup: 
     Fclose(&header);
@@ -508,7 +523,7 @@ _estats_log_free(estats_log** log)
     ESTATS_LIST_FOREACH_SAFE(pos, tmp, &((*log)->entry_list_head)) {
         estats_log_entry* entry = ESTATS_LIST_ENTRY(pos, estats_log_entry, list);
         _estats_list_del(pos);
-        _estats_log_entry_free(&entry);
+        estats_log_entry_free(&entry);
     }
 
     ESTATS_LIST_FOREACH_SAFE(pos, tmp, &((*log)->var_list_head)) {

@@ -21,28 +21,42 @@
 #define ESTATS_LOG_H
 
 
-estats_error* estats_log_open(estats_log** _log, const char* _path, const char* _mode);
-estats_error* estats_log_close(estats_log** _log);
+estats_error* estats_log_open( estats_log **,
+                         const char * /* path */,
+                         const char * /* mode */);
 
-estats_error* estats_log_entry_write(estats_log* _log, estats_snapshot* _snap);
+estats_error* estats_log_close( estats_log **);
 
-estats_error* estats_log_find_var_from_name(estats_var** _var,
-                                            const estats_log* _log,
-                                            const char* _name);
+estats_error* estats_log_read_entry( estats_log_entry **,
+                                     estats_log *);
 
-estats_error* estats_log_entry_read_value(estats_value** _value,
-                                         const estats_log_entry* _entry,
-                                         const estats_var* _var);
+void          estats_log_entry_free( estats_log_entry **);
 
-estats_error* estats_log_entry_read_timestamp(struct estats_timeval *,
-                                              const estats_log_entry *);
+estats_error* estats_log_write_entry( estats_log *,
+                                      estats_snapshot *);
 
-estats_error* estats_log_get_entry_head(estats_log_entry** _entry, estats_log* _log);
-estats_error* estats_log_entry_next(estats_log_entry** _next, const estats_log_entry* _prev);
+estats_error* estats_log_find_var_from_name( estats_var **,
+                                       const estats_log *,
+                                       const char * /* name */);
 
-estats_log_entry* estats_log_entry_return_next(const estats_log_entry* _prev);
+estats_error* estats_log_entry_read_value( estats_value **,
+                                     const estats_log_entry *,
+                                     const estats_var *);
 
-#define ESTATS_LOG_DATA_FOREACH(pos, head) \
+estats_error* estats_log_entry_read_timestamp( struct estats_timeval *,
+                                                const estats_log_entry *);
+
+estats_error* estats_log_read_all_entries( estats_log *);
+
+estats_error* estats_log_get_entry_head( estats_log_entry **,
+                                         estats_log *);
+
+estats_error* estats_log_entry_next( estats_log_entry **,
+                               const estats_log_entry *);
+
+estats_log_entry* estats_log_entry_return_next( const estats_log_entry *);
+
+#define ESTATS_LOG_ENTRY_FOREACH(pos, head) \
     for (pos = head; pos != NULL; pos = estats_log_entry_return_next(pos))
 
 #endif /* ESTATS_LOG_H */
