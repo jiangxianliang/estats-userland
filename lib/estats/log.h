@@ -20,8 +20,6 @@
 #ifndef ESTATS_LOG_H
 #define ESTATS_LOG_H
 
-typedef struct estats_log estats_log;
-typedef struct estats_log_entry estats_log_entry;
 
 estats_error* estats_log_open(estats_log** _log, const char* _path, const char* _mode);
 estats_error* estats_log_close(estats_log** _log);

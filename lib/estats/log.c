@@ -26,6 +26,15 @@ static estats_error* _estats_log_calculate_checksum(estats_log* _log, uint16_t* 
 static estats_error* _estats_log_write_checksum(estats_log* _log);
 static void          _estats_log_free(estats_log** _log);
 
+#include <endian.h>
+#include <byteswap.h>
+
+#if __BYTE_ORDER == __LITTLE_ENDIAN
+#define LOG_HOST_ORDER 0
+#else
+#define LOG_HOST_ORDER 1
+# endif
+
 estats_error*
 estats_log_open(estats_log** log, const char* path, const char* mode)
 {

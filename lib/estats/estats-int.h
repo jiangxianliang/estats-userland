@@ -56,7 +56,6 @@
 #include <estats/group-int.h>
 #include <estats/libcwrap-int.h>
 #include <estats/list-int.h>
-#include <estats/log-int.h>
 #include <estats/string-int.h>
 #include <estats/value-int.h>
 #include <estats/var-int.h>
