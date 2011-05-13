@@ -19,6 +19,7 @@ estats_pri_h_sources = \
 	group-int.h \
 	libcwrap-int.h \
 	list-int.h \
+	sockinfo-int.h \
 	string-int.h \
 	types-int.h \
 	value-int.h \
