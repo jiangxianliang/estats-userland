@@ -61,16 +61,7 @@ _estats_agent_parse_header(estats_agent* agent, FILE* fp)
             continue;
 
         if (linebuf[0] == '/') {
-//            char name[ESTATS_GROUPNAME_LEN_MAX];
 
-            /* Add a new group */
-/*
-            Chk(Malloc((void**) &group, sizeof(estats_group)));
-            group->size = 0;
-            group->nvars = 0;
-            group->agent = agent;
-            _estats_list_init(&(group->var_list_head));
-*/
             _estats_group_new(&group, agent);
             strlcpy(group->name, linebuf + 1, sizeof(group->name));
 
@@ -108,7 +99,7 @@ _estats_agent_parse_header(estats_agent* agent, FILE* fp)
             Chk(Sscanf(&nread, linebuf, "%s%d%d%d", var->name, &var->offset, &var->type, &var->len));
             ErrIf(nread != 4, ESTATS_ERR_HEADER);
 
-            /* Deprecated variable check */
+            /* Deprecated variable check, for compatability with web100 */
             var->flags = 0;
             if (var->name[0] == '_') {
                 var->flags |= ESTATS_VAR_FL_DEP;

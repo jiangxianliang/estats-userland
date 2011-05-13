@@ -10,6 +10,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <estats/estats.h>
+#include <estats/sockinfo.h>
 
 #define Chk(x) \
     do { \

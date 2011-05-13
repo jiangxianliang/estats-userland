@@ -17,23 +17,29 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA
  *
  */
-#ifndef ESTATS_H
-#define ESTATS_H
+#ifndef ESTATS_SOCKINFO_INT_H
+#define ESTATS_SOCKINFO_INT_H
 
-#include <sys/types.h>  /* For size_t */
-#include <netinet/in.h> /* For struct in_addr, in6_addr */
-#include <inttypes.h>   /* For uint8_t and friends, C99 standard header */
-#include <unistd.h>     /* For R_OK, W_OK, ... */
-#include <stdio.h>      /* For FILE* */
-#include <stdlib.h>     /* For NULL */
 
-#include <estats/types.h> /* Must be first */
-#include <estats/agent.h>
-#include <estats/connection.h>
-#include <estats/error.h>
-#include <estats/log.h>
-#include <estats/snapshot.h>
-#include <estats/value.h>
-#include <estats/var.h>
+#define ESTATS_CMDLINE_LEN_MAX 32
 
-#endif /* ESTATS_H */
+struct estats_sockinfo {
+    struct estats_agent*  agent;
+    struct estats_list    list_head;
+};
+
+struct estats_sockinfo_item {
+    struct estats_connection_spec  spec;
+    char                           cmdline[ESTATS_CMDLINE_LEN_MAX];
+    struct estats_list             list;
+    struct estats_sockinfo*        sockinfo;
+    pid_t                          pid;
+    uid_t                          uid;
+    ino_t                          ino;
+    int                            state;
+    int                            cid;
+    ESTATS_ADDRTYPE                addrtype;
+};
+
+
+#endif /* ESTATS_SOCKINFO_INT_H */
