@@ -77,7 +77,7 @@ dnl AM_CONDITIONAL(BUILD_PYTHON, [test "$PYTHON" != :])
 AM_CONDITIONAL([BUILD_PYTHON], [test x$enable_python = xyes])
 
 if test x$enable_swig = xyes ; then
-    AX_PKG_SWIG([2.0.1],,)
+    AX_PKG_SWIG([1.3.7],[],[])
 fi
 AM_CONDITIONAL([BUILD_SWIG], [test x$enable_swig = xyes])
 

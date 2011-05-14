@@ -76,10 +76,26 @@
 };
 
 %extend estats_var {
-        void print_name() {
-            const char* ename;
-            estats_var_get_name(&ename, $self);
-            printf("%s\n", ename);
+        estats_var* var_next() {
+            estats_error* err = NULL;
+            estats_var* _var = NULL;
+            err = estats_var_next(&_var, $self);
+            if (err) estats_error_print(stderr, err);
+            return _var;
+        }
+        const char* return_name() {
+            estats_error* err = NULL;
+            const char* _name;
+            err = estats_var_get_name(&_name, $self);
+            if (err) estats_error_print(stderr, err);
+            return _name;
+        }
+        ESTATS_TYPE return_type() {
+            estats_error* err = NULL;
+            ESTATS_TYPE _type;
+            err = estats_var_get_type(&_type, $self);
+            if (err) estats_error_print(stderr, err);
+            return _type;
         }
 };
 

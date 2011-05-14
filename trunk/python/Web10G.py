@@ -20,23 +20,29 @@ class error(exceptions.Exception):
     def __str__(self):
         return self.msg
 
-class Web10GAgent(py_agent):
+class Web10Gagent(py_agent):
 
     def __init__(self, data=None):
-        super(Web10GAgent, self).__init__()
+        super(Web10Gagent, self).__init__()
+        self.read_vars = {}
+        _cur = self.var_head()
+        while _cur != None:
+            var = Web10Gvar(_cur)
+            self.read_vars[str(var)] = var
+            _cur = _cur.var_next()
 
     def __del__(self):
-        super(Web10GAgent, self).__del__()
+        super(Web10Gagent, self).__del__()
 
     def all_connections(self):
         conns = []
         cur = self.connection_head()
         while cur != None:
-            conns.append(Web10GConnection(self, cur))
+            conns.append(Web10Gconnection(self, cur))
             cur = cur.connection_next()
         return conns
 
-class Web10GConnection(object):
+class Web10Gconnection(object):
 
     def __init__(self, agent, _connection):
         self.agent = agent
@@ -48,9 +54,6 @@ class Web10GConnection(object):
     def __del__(self):
         print("dead conn")
 
-    def dumb(self):
-        print("im dumb")
-
 class Web10Gsnapshot(py_snapshot):
 
     def __init__(self, conn):
@@ -59,8 +62,14 @@ class Web10Gsnapshot(py_snapshot):
     def __del__(self):
         super(Web10Gsnapshot, self).__del__()
 
+class Web10Gvar(object):
 
+    def __init__(self, _var):
+        self._var = _var
+        self._type = _var.return_type()
 
+    def __str__(self):
+        return self._var.return_name()
 
 
 
