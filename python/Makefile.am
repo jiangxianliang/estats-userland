@@ -32,4 +32,4 @@ install-exec-hook: python-install
 
 uninstall-local: python-clean
 
-EXTRA_DIST=Web10G.py libestats.i libestats.py libestats_wrap.c readall.py setup.py
+EXTRA_DIST=Web10G.py libestats.i libestats.py libestats_wrap.c test.py setup.py
