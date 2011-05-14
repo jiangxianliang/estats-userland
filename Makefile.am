@@ -1,4 +1,9 @@
-SUBDIRS = compat doc lib util
+if BUILD_PYTHON
+    MAY_PY = python
+else
+    MAY_PY =
+endif
+SUBDIRS = compat doc lib $(MAY_PY) util
 
 bin_SCRIPTS = estats-config
 CLEANFILES = estats-config

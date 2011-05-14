@@ -30,6 +30,9 @@ AC_PROG_INSTALL
 AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 
+AC_PROG_LN_S
+dnl AC_PYTHON_DEVEL
+
 dnl Initialize libtool
 AM_PROG_LIBTOOL
 
@@ -54,6 +57,30 @@ AC_ARG_ENABLE(deprecated-variable-warnings,
                              [disable libestats printing warnings when attempting to access deprecated variables]),
               enable_deprecated_variable_warnings=$enableval,
               enable_deprecated_variable_warnings=yes)
+
+AC_ARG_ENABLE(python,
+              AC_HELP_STRING([--disable-python],
+		             [disable building of python module]),
+	      enable_python=$enableleval,
+	      enable_python=yes)
+
+AC_ARG_ENABLE(swig,
+              AC_HELP_STRING([--enable-swig],
+		             [rebuild python wrapper]),
+	      enable_swig=$enableleval,
+	      enable_swig=no)
+
+if test x$enable_python = xyes ; then
+    AM_PATH_PYTHON([2.6],,)
+fi
+dnl AM_CONDITIONAL(BUILD_PYTHON, [test "$PYTHON" != :])
+AM_CONDITIONAL([BUILD_PYTHON], [test x$enable_python = xyes])
+
+if test x$enable_swig = xyes ; then
+    AX_PKG_SWIG([2.0.1],,)
+fi
+AM_CONDITIONAL([BUILD_SWIG], [test x$enable_swig = xyes])
+
 AC_ARG_VAR(ESTATS_ROOT_DIR,
            [Directory where the Estats connection info is located (default=/proc/web100)])
 
@@ -163,6 +190,7 @@ doc/man/man3/Makefile
 doc/man/man7/Makefile
 lib/Makefile
 lib/estats/Makefile
+python/Makefile
 util/Makefile
 util/scripts/Makefile
 ])
