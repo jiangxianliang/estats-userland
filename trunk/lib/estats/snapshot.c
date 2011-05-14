@@ -76,7 +76,7 @@ Cleanup:
 }
 
 estats_error*
-estats_get_snapshot(estats_snapshot* snap)
+estats_take_snapshot(estats_snapshot* snap)
 {
     estats_error* err = NULL;
     FILE *fp = NULL;

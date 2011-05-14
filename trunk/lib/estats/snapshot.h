@@ -25,7 +25,7 @@ estats_error* estats_snapshot_alloc( estats_snapshot **,
 
 void          estats_snapshot_free( estats_snapshot **);
 
-estats_error* estats_get_snapshot( estats_snapshot *);
+estats_error* estats_take_snapshot( estats_snapshot *);
 
 estats_error* estats_snapshot_read_value( estats_value **,
                                     const estats_snapshot *,

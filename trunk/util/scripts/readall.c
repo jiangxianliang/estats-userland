@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
             fprintf(stdout, "Connection %d (%s_%s %s_%s)\n", cid, spec_asc.src_addr, spec_asc.src_port, spec_asc.dst_addr, spec_asc.dst_port);
 
             Chk(estats_snapshot_alloc(&snap, c_pos));
-            Chk(estats_get_snapshot(snap));
+            Chk(estats_take_snapshot(snap));
 
             Chk(estats_agent_get_var_head(&var_head, agent));
             ESTATS_VAR_FOREACH(var_pos, var_head) {
