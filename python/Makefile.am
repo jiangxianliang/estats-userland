@@ -1,6 +1,5 @@
 all-am: Makefile python-build swig-build
 
-if BUILD_PYTHON
 
 python-build: libestats.py libestats_wrap.c
 	$(PYTHON) $(srcdir)/setup.py build_ext --include-dirs=$(top_srcdir)/lib/estats:$(top_srcdir)/python
@@ -28,19 +27,6 @@ SWIG_OUTPUTS = libestats.py libestats_wrap.c
 
 # Maintainer-clean the swig generated files, however, include them in EXTRA_DIST
 MAINTAINERCLEANFILES = $(SWIG_OUTPUTS)
-
-else
-
-python-build:
-
-swig-build:
-
-python-install:
-
-python-clean:
-
-endif
-
 
 install-exec-hook: python-install
 

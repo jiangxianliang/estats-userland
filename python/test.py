@@ -2,14 +2,13 @@
 
 from Web10G import *
 
-a = Web10GAgent()
+a = Web10Gagent()
 
 cl = a.all_connections()
 
 for c in cl:
     print("here, what")
     print("cid %i"%c.cid)
-    
-#    c.dumb()
 
-
+for item in a.read_vars:
+    print item
