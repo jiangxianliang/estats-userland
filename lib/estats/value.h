@@ -53,6 +53,9 @@ estats_error* estats_value_as_ip4addr( struct in_addr *,
 estats_error* estats_value_as_ip6addr( struct in6_addr *,
                                        const estats_value *);
 
+estats_error* estats_value_as_octet( uint8_t *,
+                                const estats_value *);
+
 estats_error* estats_value_compare( int *,
                               const estats_value *,
                               const estats_value *);

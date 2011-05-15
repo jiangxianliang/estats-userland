@@ -11,6 +11,7 @@ from libestats import s_agent
 from libestats import s_connection
 from libestats import s_snapshot
 from libestats import s_value
+from libestats import *
 from Web10G import *
 
 class error(exceptions.Exception):
@@ -39,7 +40,8 @@ class Web10Gagent(s_agent):
         conns = []
         cur = self.s_get_connection_head()
         while cur != None:
-            conns.append(Web10Gconnection(self, cur))
+            if (cur.s_access()):
+                conns.append(Web10Gconnection(self, cur))
             cur = cur.s_next()
         return conns
 
@@ -50,10 +52,6 @@ class Web10Gconnection(object):
         self._connection = _connection
         self._readsnap = Web10Gsnapshot(_connection)
         self.cid = _connection.cid
-        print("new conn")
-
-    def __del__(self):
-        print("dead conn")
 
     def read(self, name):
         """Read the value of a single variable."""
@@ -64,7 +62,7 @@ class Web10Gconnection(object):
             raise error("No variable named '%s' found."%name)
 
         val = self.read_value(var)
-        return str(val)
+        return val.out()
 
     def read_value(self, n_var):
         _val = self._connection.s_read_value(n_var._var)
@@ -113,15 +111,21 @@ class Web10Gvar(object):
 class Web10Gvalue(object):
 
     def __init__(self, _val):
-        self._val = _val
+        self.s_val = _val
+        self.s_type = _val.s_get_type()
 
     def __str__(self):
-        return self._val.s_as_string()
+        return self.s_val.s_as_string()
 
-
-
-
-
-
+    def out(self):
+        if  self.s_type == ESTATS_VALUE_TYPE_UINT16 or \
+            self.s_type == ESTATS_VALUE_TYPE_UINT32 or \
+            self.s_type == ESTATS_VALUE_TYPE_INT32 or \
+            self.s_type == ESTATS_VALUE_TYPE_OCTET: 
+            return self.s_val.s_as_int()
+        elif self.s_type == ESTATS_VALUE_TYPE_UINT64:
+            return self.s_val.s_as_long()
+        else:
+            return self.s_val.s_as_string()
 
 

@@ -490,6 +490,24 @@ estats_value_as_ip6addr(struct in6_addr* ip6addr,
 
 
 estats_error*
+estats_value_as_octet(uint8_t* u8,
+                       const estats_value* value)
+{
+    estats_error* err = NULL;
+    estats_value* newValue = NULL;
+
+    Chk(_estats_value_copy(&newValue, value));
+    Chk(estats_value_change_type(&newValue, ESTATS_VALUE_TYPE_UINT16));
+    *u8 = newValue->u.u8_val;
+
+ Cleanup:
+    estats_value_free(&newValue);
+    
+    return err;
+}
+
+
+estats_error*
 estats_value_compare(int* result,
 	             const estats_value* v1,
                      const estats_value* v2)
