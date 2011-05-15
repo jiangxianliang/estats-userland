@@ -59,27 +59,41 @@ AC_ARG_ENABLE(deprecated-variable-warnings,
               enable_deprecated_variable_warnings=yes)
 
 AC_ARG_ENABLE(python,
-              AC_HELP_STRING([--disable-python],
-		             [disable building of python module]),
-	      enable_python=$enableleval,
-	      enable_python=yes)
+              AC_HELP_STRING([--enable-python],
+		             [enable building of python module]),
+	      [enable_python=$enableval have_python=$enableval],
+	      [enable_python=autodetect have_python=yes])
 
 AC_ARG_ENABLE(swig,
               AC_HELP_STRING([--enable-swig],
 		             [rebuild python wrapper]),
-	      enable_swig=$enableleval,
+	      enable_swig=$enableval,
 	      enable_swig=no)
 
-if test x$enable_python = xyes ; then
-    AM_PATH_PYTHON([2.6],,)
+if test "x$have_python" != "xno" ; then
+    AM_PATH_PYTHON([2.6],[],[no])
+    if test "x$PYTHON" = "x:"; then
+        have_python=no
+    fi
 fi
-dnl AM_CONDITIONAL(BUILD_PYTHON, [test "$PYTHON" != :])
-AM_CONDITIONAL([BUILD_PYTHON], [test x$enable_python = xyes])
 
-if test x$enable_swig = xyes ; then
-    AX_PKG_SWIG([1.3.7],[],[])
+if test "x$have_python" != "xyes"; then
+    if test "x$enable_python" = "xyes"; then
+        AC_MSG_ERROR([Python not found])
+    elif test "x$enable_python" = "xautodetect"; then
+        enable_python=no
+        AC_MSG_WARN([sufficient python version not found, disabling python support])
+    fi
 fi
-AM_CONDITIONAL([BUILD_SWIG], [test x$enable_swig = xyes])
+AM_CONDITIONAL([BUILD_PYTHON], [test "x$enable_python" = "xyes"])
+
+if test "x$enable_swig" != "xno" ; then
+    AX_PKG_SWIG([1.3.7],[],[])
+    if test "x$SWIG" = "x:"; then
+        enable_swig=no
+    fi
+fi
+AM_CONDITIONAL([BUILD_SWIG], [test "x$enable_swig" != "xno"])
 
 AC_ARG_VAR(ESTATS_ROOT_DIR,
            [Directory where the Estats connection info is located (default=/proc/web100)])
