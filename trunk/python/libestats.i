@@ -1,6 +1,7 @@
 %module libestats
 %{
 #include <netinet/in.h>
+#include <stdint.h>
 #include <estats/types.h>
 #include <estats/types-int.h>
 #include <estats/agent.h>
@@ -61,6 +62,14 @@
             err = estats_connection_next(&econn, $self);
             if (err) estats_error_print(stderr, err);
             return econn;
+        }
+        int s_access() {
+            estats_error* err = NULL;
+            if ((err = estats_connection_read_access($self, R_OK)) != NULL) {
+                estats_error_free(&err);
+                return 0;
+            }
+            else return 1;
         }
         estats_value* s_read_value(estats_var* _var) {
             estats_error* err = NULL;
@@ -123,6 +132,48 @@
 %extend estats_value {
         ~estats_value() {
             estats_value_free(&($self));
+        }
+        ESTATS_VALUE_TYPE s_get_type() {
+            estats_error* err = NULL;
+            ESTATS_VALUE_TYPE _type;
+            err = estats_value_get_type(&_type, $self);
+            if (err) estats_error_print(stderr, err);
+            return _type;
+        }
+        int s_as_int() {
+            estats_error* err = NULL;
+            if ($self->type == ESTATS_VALUE_TYPE_UINT16) {
+                uint16_t _intval;
+                err = estats_value_as_uint16(&_intval, $self);
+                if (err) estats_error_print(stderr, err);
+                return (int)_intval;
+            }
+            if ($self->type == ESTATS_VALUE_TYPE_UINT32) {
+                uint32_t _intval;
+                err = estats_value_as_uint32(&_intval, $self);
+                if (err) estats_error_print(stderr, err);
+                return (int)_intval;
+            }
+            if ($self->type == ESTATS_VALUE_TYPE_INT32) {
+                int32_t _intval;
+                err = estats_value_as_int32(&_intval, $self);
+                if (err) estats_error_print(stderr, err);
+                return (int)_intval;
+            }
+            if ($self->type == ESTATS_VALUE_TYPE_OCTET) {
+                uint8_t _intval;
+                err = estats_value_as_octet(&_intval, $self);
+                if (err) estats_error_print(stderr, err);
+                return (int)_intval;
+            }
+            return 0;
+        }
+        long s_as_long() {
+            estats_error* err = NULL;
+            uint64_t _intval;
+            err = estats_value_as_uint64(&_intval, $self);
+            if (err) estats_error_print(stderr, err);
+            return (long)_intval;
         }
         char* s_as_string() {
             estats_error* err = NULL;
