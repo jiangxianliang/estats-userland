@@ -1,15 +1,14 @@
-.\" $Id: readall.1,v 1.1 2003/01/06 20:50:29 engelhar Exp $
-.TH readall 1 "26 February 2002" "Estats Userland" "Estats"
+.TH readall 1 "15 May 2011" "Estats Userland" "Estats"
 .SH NAME
-readall \- read the current value of all Estats variables from all connections.
+readall \- read the current value of all TCP-Estats variables from all connections.
 .SH SYNOPSIS
 .B readall
 .SH DESCRIPTION
-\fBreadall\fR iterates over all connections, grouping and printing out each
-Estats variable from each one.
+\fBreadall\fR iterates over all connections, taking a snapshot of and printing out
+all TCP-Estats variables from each one.
 .SH SEE ALSO
-.BR gutil (1),
 .BR readvar (1),
 .BR writevar (1),
 .BR deltavar (1),
-.BR estats (7)
+.BR libestats (3)
+
