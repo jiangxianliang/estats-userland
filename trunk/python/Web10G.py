@@ -1,18 +1,11 @@
-"""A Python module for accessing Web100 statistics.
+"""A Python module for accessing tcp_estats statistics.
 
 
 """
 
-
-import libestats
 import exceptions
-import fnmatch
-from libestats import s_agent
-from libestats import s_connection
-from libestats import s_snapshot
-from libestats import s_value
 from libestats import *
-from Web10G import *
+
 
 class error(exceptions.Exception):
 

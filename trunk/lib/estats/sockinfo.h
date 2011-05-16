@@ -35,6 +35,8 @@ estats_error* estats_sockinfo_item_next( estats_sockinfo_item **,
 
 estats_sockinfo_item* estats_sockinfo_item_return_next(const estats_sockinfo_item* _prev);
 
+estats_error* estats_sockinfo_new(estats_sockinfo **, estats_agent *);
+
 void          estats_sockinfo_free(estats_sockinfo** _sockinfo);
 
 estats_error* estats_sockinfo_get_cid(int* _cid,
