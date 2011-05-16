@@ -1,5 +1,4 @@
-.\" $Id: estats-config.1,v 1.1 2003/01/06 20:50:30 engelhar Exp $
-.TH estats-config 1 "26 February 2002" "Estats Userland" "Estats"
+.TH estats-config 1 "15 May 2011" "Estats Userland" "Estats"
 .SH NAME
 estats-config \- script to get information about the installed version of
 \fIlibestats\fR
@@ -10,6 +9,8 @@ estats-config \- script to get information about the installed version of
 [\fB\-\-version\fR]
 [\fB\-\-libs\fR]
 [\fB\-\-cflags\fR]
+[\fB\-\-libdir\fR]
+[\fB\-\-includedir\fR]
 .SH DESCRIPTION
 \fBestats-config\fR is a tool for developers that are writing software
 which uses \fIlibestats\fP.  It provides such information as the
@@ -25,6 +26,12 @@ output.
 Print the linker flags that are necessary to link a \fIlibestats\fP
 program.
 .TP 4
+.B \-\-libdir
+Print the path location of \fIlibestats\fP.
+.TP 4
+.B \-\-includedir
+Print the path location of \fIlibestats\fP include files.
+.TP 4
 .B \-\-cflags
 Print the compiler flags that are necessary to compile a
 \fIlibestats\fP program.
@@ -35,6 +42,4 @@ Print the prefix that \fIlibestats\fP was installed into.
 .B \-\-exec-prefix
 Print the exec prefix that \fIlibestats\fP was installed into.
 .SH SEE ALSO
-.BR libestats (3),
-.BR estats (7),
-.BR gtk-config (1)
+.BR libestats (3)
