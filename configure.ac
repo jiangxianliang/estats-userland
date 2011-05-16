@@ -205,6 +205,6 @@ lib/Makefile
 lib/estats/Makefile
 python/Makefile
 util/Makefile
-util/scripts/Makefile
+util/C/Makefile
 ])
 AC_OUTPUT
