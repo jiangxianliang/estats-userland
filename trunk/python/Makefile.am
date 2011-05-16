@@ -1,4 +1,4 @@
-all-am: Makefile python-build swig-build
+all-am: Makefile python-build
 
 
 python-build: libestats.py libestats_wrap.c
@@ -11,16 +11,8 @@ python-install:
 python-clean:
 	$(PYTHON) $(srcdir)/setup.py clean
 
-if BUILD_SWIG
-
-swig-build: $(top_srcdir)/python/libestats.i
+libestats.py libestats_wrap.c: $(top_srcdir)/python/libestats.i
 	$(SWIG) -python -I$(top_srcdir)/lib -o libestats_wrap.c $(srcdir)/libestats.i
-
-else
-
-swig-build:
-
-endif
 
 SWIG_OUTPUTS = libestats.py libestats_wrap.c
 
