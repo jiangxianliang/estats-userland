@@ -1,0 +1,19 @@
+.TH readvar 1 "15 May 2011" "Estats Userland" "Estats"
+.SH NAME
+readvar \- read the current value of a single TCP-Estats variable from one
+connection.
+.SH SYNOPSIS
+.B readvar
+.I connection_id
+.I var_name
+[\fIvar_name\fR ...]
+.SH DESCRIPTION
+\fBreadvar\fR prints out the current value of one or more variables with
+name \fIvar_name\fR from the connection \fIconnection_id\fR.  It is one
+of the simplest programs one can write to use \fIlibestats\fR, and thus
+may be a useful reference for developers.
+.SH SEE ALSO
+.BR readall (1),
+.BR deltavar (1),
+.BR writevar (1),
+.BR libestats (3)
