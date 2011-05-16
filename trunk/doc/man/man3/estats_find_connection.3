@@ -1,0 +1,48 @@
+.TH ESTATS_FIND_CONNECTION 3 "15 May 2011" "Estats Userland" "Estats"
+.SH NAME
+estats_agent_get_connection_head, estats_connection_next,
+.RS 0
+estats_agent_find_connection_from_cid,
+.RS 0
+estats_agent_find_connection_from_socket,
+.RS 0
+estats_agent_find_connection_from_spec \- search for or iterate over Estats connections.
+.SH SYNOPSIS
+.B #include <estats/estats.h>
+.PP
+.nf
+.BI "estats_error* estats_agent_get_connection_head(estats_connection** " conn ", estats_agent* " agent ");"
+.BI "estats_error* estats_connection_next(estats_connection** " conn ", const estats_connection* " prev ");"
+.PP
+.BI "estats_error* estats_agent_find_connection_from_cid(estats_connection** " conn ", estats_agent* " agent ", int " cid ");"
+.PP
+.BI "estats_error* estats_agent_find_connection_from_socket(estats_connection** " conn ", estats_agent* " agent ", int " sockfd ");"
+.PP
+.BI "estats_error* estats_agent_find_connection_from_spec(estats_connection** " conn ", estats_agent* " agent ", int " cid ", const struct estats_connection_spec* " spec ");"
+.fi
+.SH DESCRIPTION
+The TCP-Estats MIB defines per-connection statistics; connections in libestats are
+represented by the \fBestats_connection\fR struct. The above functions enable the
+searching and transversal of the list of connections.
+.PP
+\fBestats_agent_get_connection_head()\fR obtains the first connection known to the
+\fIagent\fR; \fBestats_connection_next()\fR returns the connection subsequent to
+\fIprev\fR in the maintained list.
+.PP
+Upon obtaining the list head with \fBestats_agent_get_connection_head()\fR, subsequent
+connections may be iterated over with the provided macro \fBESTATS_CONNECTIONS_FOREACH\fR.
+.PP
+\fBestats_agent_find_connection_from_cid()\fR,
+.RS 0
+\fBestats_agent_find_connection_from_socket()\fR, and
+.RS 0
+\fBestats_agent_find_connection_from_spec()\fR return the connection struct matching,
+respectively, the internal connection id, a socket file descriptor,
+and a \fBconnection_spec\fR struct encapsulating internet addresses.
+.SH RETURN VALUES
+Each function returns a pointer to \fBestats_error\fR, \fBNULL\fR upon success.
+.PP
+The out parameter, \fIconn\fR, of each function is a pointer to the found
+\fBestats_connection\fR struct, \fBNULL\fR if none found.
+.SH SEE ALSO
+.BR libestats (3)
