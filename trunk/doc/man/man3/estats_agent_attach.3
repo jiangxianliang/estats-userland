@@ -1,0 +1,36 @@
+.TH ESTATS_AGENT_ATTACH 3 "15 May 2011" "Estats Userland" "Estats"
+.SH NAME
+estats_agent_attach, estats_agent_detach \- attach to and detach from a TCP-Estats data
+source.
+.SH SYNOPSIS
+.B #include <estats/estats.h>
+.PP
+.nf
+.BI "estats_error* estats_agent_attach(estats_agent** " agent ", int " type ", void* " data ");"
+.BI "void          estats_agent_detach(estats_agent** " agent ");"
+.fi
+.SH DESCRIPTION
+The \fBestats_agent_attach()\fR function attaches to a TCP-Estats data source.
+Most commonly, the data source is the local machine, but future versions
+may support additional sources.  It is typically
+the first function called by users of \fIlibestats\fR, and it returns an
+\fIestats_agent\fR used by subsequent functions.
+.PP
+The argument \fItype\fR denotes how the data will be gathered.  Each
+\fItype\fR has its own requirements for the contents of \fIdata\fR.
+These requirements are explained below.
+.TP
+\fBESTATS_AGENT_TYPE_LOCAL\fR
+The data source is the local machine, running a TCP-Estats-aware kernel;
+\fIdata\fR should be NULL.
+.PP
+\fBestats_detach()\fR closes and deallocates a previously obtained
+\fIagent\fR.
+.SH RETURN VALUES
+A pointer to \fBestats_error\fR, \fBNULL\fR upon success.
+.PP
+An initialized \fIestats_agent\fR as out parameter, or \fBNULL\fR upon failure.
+.PP
+\fBestats_detach()\fR returns no value.
+.SH SEE ALSO
+.BR libestats (3)
