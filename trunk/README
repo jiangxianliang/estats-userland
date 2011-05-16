@@ -1,6 +1,12 @@
 
+Estast-userland provides a library and tools for the Web10G project.
+
+http://web10g.org/
+
+
+
 To build, run ./configure, make, make install.
 
-Basic tools and examples are in util/scripts.
+Basic tools and examples are in util/C.
 
 All material here is based on the NSF supported projects, Web100 and Web10Gig.
