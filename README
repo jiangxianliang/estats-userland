@@ -1,11 +1,23 @@
 
-Estast-userland provides a library and tools for the Web10G project.
+Estats-userland provides a library and tools for the Web10G project.
 
 http://web10g.org/
 
+Estats-userland uses the standard autotools setup; to build, run
 
+./configure
+make
+make install
 
-To build, run ./configure, make, make install.
+By default, the libraries are installed in /usr/local/lib, so one may need to run
+"ldconfig" after verifying that /usr/local/lib is listed in /etc/ld.so.conf;
+for installation to other locations, use the --prefix arg to configure (cf. INSTALL).
+
+To build the Python module, run configure with --enable-python, and set your
+PYTHONPATH appropriately, e.g.
+
+export PYTHONPATH=/usr/local/lib/python2.6/site-packages
+
 
 Basic tools and examples are in util/C.
 
