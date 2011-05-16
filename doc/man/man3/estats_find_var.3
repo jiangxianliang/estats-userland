@@ -1,4 +1,4 @@
-.TH ESTATS_VAR 3 "15 May 2011" "Estats Userland" "Estats"
+.TH ESTATS_FIND_VAR 3 "15 May 2011" "Estats Userland" "Estats"
 .SH NAME
 estats_agent_get_var_head, estats_var_next,
 .RS 0
@@ -13,13 +13,13 @@ estats_agent_find_var_from_name \- find or iterate over TCP-Estats variables
 .fi
 .SH DESCRIPTION
 TCP-Estats variables returned from the kernel are represented by the \fBestats_var\fR
-struct. These functions enable the searching and traversal of the list of variables.
+struct. The above functions enable the searching and traversal of the list of variables.
 .PP
 \fBestats_agent_get_var_head()\fR obtains the first variable known to the \fIagent\fR;
 \fBestats_var_next()\fR returns the variable subsequent to \fIprev\fR in the maintained list.
 .PP
-Upon obtaining the list head with \fBestats_agent_get_var_head()\fR, subsequent variables may be iterated over with
-the provided macro \fBESTATS_VAR_FOREACH\fR.
+Upon obtaining the list head with \fBestats_agent_get_var_head()\fR, subsequent
+variables may be iterated over with the provided macro \fBESTATS_VAR_FOREACH\fR.
 .PP
 \fBestats_agent_find_var_from_name()\fR searches for the \fIname\fR'd variable in
 the list.
