@@ -30,13 +30,13 @@ estats_error* estats_agent_find_connection_from_cid( estats_connection **,
                                                      estats_agent *,
                                                      int /* cid */);
 
-estats_error* estats_agent_find_connection_from_spec( estats_connection **,
-                                                      estats_agent *,
-                                         const struct estats_connection_spec *);
-
 estats_error* estats_agent_find_connection_from_socket( estats_connection **,
                                                         estats_agent *,
                                                         int /* fd */);
+
+estats_error* estats_agent_find_connection_from_spec( estats_connection **,
+                                                      estats_agent *,
+                                         const struct estats_connection_spec *);
 
 estats_error* estats_agent_get_connection_head( estats_connection **,
                                                 estats_agent *);

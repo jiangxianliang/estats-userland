@@ -18,6 +18,8 @@ Options:
         [--version]
         [--libs]
         [--cflags]
+        [--libdir]
+        [--includedir]
 EOF
   exit $1
 }

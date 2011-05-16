@@ -13,7 +13,6 @@ python-clean:
 
 if BUILD_SWIG
 
-#libestats.py libestats_wrap.c: $(top_srcdir)/python/libestats.i
 swig-build: $(top_srcdir)/python/libestats.i
 	$(SWIG) -python -I$(top_srcdir)/lib -o libestats_wrap.c $(srcdir)/libestats.i
 

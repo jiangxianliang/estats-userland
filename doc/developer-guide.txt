@@ -1,12 +1,12 @@
-                            Web10gig Developer's Guide
+                            Web10G Developer's Guide
                             ------------------------
 
 Introduction
 ============
 
-This is the Developer's Guide for the Web10gig library API.  The
+This is the Developer's Guide for the Web10G library API.  The
 companion document, "User's Guide", provides a quick overview of
-the Web10gig software.
+the Web10G software.
 
 This document provides examples and suggestions for those interested
 in writing applications using the estats library API. This is an
@@ -20,7 +20,7 @@ to the document proc_interface.txt to be found in
 
 	 /usr/src/linux/Documentation/estats
 
-after installing the Web10gig patch.
+after installing the Web10G patch.
 
 Overview of the Primary Objects in the Library
 ==============================================
@@ -114,7 +114,7 @@ Expample Code Illustrating the Use of the Library
 =================================================
 
 The use of the estats library is explained with the help of two simple
-examples, readvar and HelloWeb10gig.  Other tools and utilities provided
+examples, readvar and HelloWeb10G.  Other tools and utilities provided
 with the distribution should help you understand the library usage
 once you have gone through these examples.
 
@@ -126,7 +126,7 @@ has been removed for clarity;  please see the code in the distribution
 for complete details.
 
 This example code takes 2 arguments, a connection ID and the name of a
-Web10gig variable, as its arguments and prints the value of that
+Web10G variable, as its arguments and prints the value of that
 variable for that connection.
 
 You can choose a connection ID by getting a listing of directories in
@@ -180,7 +180,7 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-HelloWeb10gig:
+HelloWeb10G:
 This example gets a connection ID (= directory name in /proc/web100
 referring to the connection) as an argument, and prints all the 
 variables for that particular connection, organized by groups.
@@ -188,10 +188,10 @@ variables for that particular connection, organized by groups.
 Please note that the part about "spec" in the code below may be skipped
 without any loss of continuity.
 
-/*** Begin HelloWeb10gig.c: gcc -o HelloWeb10gig HelloWeb10gig.c estatslib.c ***/
+/*** Begin HelloWeb10G.c: gcc -o HelloWeb10G HelloWeb10G.c estatslib.c ***/
 
 /*
- * HelloWeb10gig: read all variables from a given connection and
+ * HelloWeb10G: read all variables from a given connection and
  * print them to stdout.
  */
 #include <stdio.h>
@@ -293,7 +293,7 @@ main(int argc, char *argv[])
 	return 0;
 }
 
-/*** End HelloWeb10gig.c ***/
+/*** End HelloWeb10G.c ***/
 
 Explanation:
 

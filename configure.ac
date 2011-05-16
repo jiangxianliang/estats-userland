@@ -201,7 +201,6 @@ doc/Makefile
 doc/man/Makefile
 doc/man/man1/Makefile
 doc/man/man3/Makefile
-doc/man/man7/Makefile
 lib/Makefile
 lib/estats/Makefile
 python/Makefile
