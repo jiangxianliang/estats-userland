@@ -103,21 +103,6 @@ Cleanup:
     return err;
 }
 
-estats_error*
-estats_connection_spec_addr_as_string(char** str, const char* addr)
-{
-    estats_error* err = NULL;
-    estats_value* val = NULL;
-
-    Chk(_estats_value_from_var_buf(&val, (void*) addr, ESTATS_TYPE_INET_ADDRESS));
-    Chk(estats_value_as_string(str, val));
-
- Cleanup:
-    estats_value_free(&val);
-    return err;
-}
-
-
 estats_error* estats_connection_spec_as_strings(struct spec_ascii* spec_asc, struct estats_connection_spec* spec)
 {
     estats_error* err = NULL;
