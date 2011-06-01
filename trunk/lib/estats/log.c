@@ -90,7 +90,7 @@ _estats_log_entry_new(estats_log_entry** entry, estats_log* log)
     Chk(Malloc((void**) entry, sizeof(estats_log_entry)));
     memset((void*) *entry, 0, sizeof(estats_log_entry));
 
-    Chk(Malloc((void**) &((*entry)->data), log->bufsize));
+    Chk(Malloc((void**) &((*entry)->data), (size_t)(log->bufsize)));
 
     (*entry)->log = log;
 
@@ -124,7 +124,7 @@ estats_log_read_all_entries(estats_log* log)
 
         Chk(Fread(NULL, &(entry->tv.sec), 4, 1, log->fp));
         Chk(Fread(NULL, &(entry->tv.usec), 4, 1, log->fp));
-        Chk(Fread(NULL, entry->data, log->bufsize, 1, log->fp));
+        Chk(Fread(NULL, entry->data, (size_t)(log->bufsize), 1, log->fp));
 
         _estats_list_add_tail(&(entry->list), &(log->entry_list_head));
         entry = NULL;
@@ -158,7 +158,7 @@ estats_log_read_entry(estats_log_entry** entry, estats_log* log)
 
     Chk(Fread(NULL, &((*entry)->tv.sec), 4, 1, log->fp));
     Chk(Fread(NULL, &((*entry)->tv.usec), 4, 1, log->fp));
-    Chk(Fread(NULL, (*entry)->data, log->bufsize, 1, log->fp));
+    Chk(Fread(NULL, (*entry)->data, (size_t)(log->bufsize), 1, log->fp));
 
 Cleanup:
     if (err != NULL) {
@@ -179,7 +179,7 @@ estats_log_write_entry(estats_log* log, estats_snapshot* snap)
 
     Chk(Fwrite(NULL, &(snap->tv.sec), 4, 1, log->fp));
     Chk(Fwrite(NULL, &(snap->tv.usec), 4, 1, log->fp));
-    Chk(Fwrite(NULL, snap->data, snap->group->size, 1, log->fp));
+    Chk(Fwrite(NULL, snap->data, (size_t)(snap->group->size), 1, log->fp));
 
 Cleanup:
 
@@ -272,6 +272,8 @@ estats_log_entry_read_timestamp(struct estats_timeval* etv,
     estats_error* err = NULL;
     uint32_t sec = entry->tv.sec;
     uint32_t usec = entry->tv.usec;
+
+    ErrIf(etv == NULL || entry == NULL, ESTATS_ERR_INVAL);
 
     etv->sec = (entry->log->swap) ? bswap_32(sec) : sec;
     etv->usec = (entry->log->swap) ? bswap_32(usec) : usec;
@@ -610,7 +612,7 @@ _estats_log_parse_header(estats_log* log, FILE* fp)
 #endif /* defined(DEBUG) */
 
             /* increment group (== file) size if necessary */ 
-            fsize = var->offset + var->len;
+            fsize = var->offset + (int)(var->len);
             log->bufsize = ((log->bufsize < fsize) ? fsize : log->bufsize); 
 
             log->nvars++;

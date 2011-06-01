@@ -114,7 +114,7 @@ _estats_agent_parse_header(estats_agent* agent, FILE* fp)
 #endif /* defined(DEBUG) */
 
             /* increment group (== file) size if necessary */
-            fsize = var->offset + var->len;
+            fsize = var->offset + (int)(var->len);
             curr_gp->size = ((curr_gp->size < fsize) ? fsize : curr_gp->size);
 
             curr_gp->nvars++;
@@ -382,7 +382,6 @@ estats_error*
 estats_agent_get_var_head(estats_var** var, const estats_agent* agent)
 {
     estats_error* err = NULL;
-    struct estats_list* lp = NULL;
 
     ErrIf(var == NULL || agent == NULL, ESTATS_ERR_INVAL);
     ErrIf(agent->read == NULL, ESTATS_ERR_INVAL);
@@ -406,7 +405,6 @@ _estats_agent_refresh_connections(estats_agent* agent)
     estats_connection* cp = NULL;
     estats_group* spec_gp;
     estats_var* var;
-    estats_value* val = NULL;
 
     ErrIf(agent == NULL, ESTATS_ERR_INVAL);
    
@@ -421,13 +419,9 @@ _estats_agent_refresh_connections(estats_agent* agent)
     
     while ((ent = readdir(dir))) {
         int cid;
-        const char* addr_name;
-        const char* port_name;
         FILE *fp = NULL;
         char filename[PATH_MAX];
         void* buf = NULL;
-        struct in_addr ip4addr_val;
-        char* str_val;
         uint32_t addrtype = 0;
 
         cid = atoi(ent->d_name);
@@ -443,8 +437,8 @@ _estats_agent_refresh_connections(estats_agent* agent)
 
         Chk(Sprintf(NULL, filename, "%s/%d/%s", ESTATS_ROOT_DIR, cid, spec_gp->name));
         Chk(Fopen(&fp, filename, "r"));
-        Chk(Malloc(&buf, spec_gp->size));
-        Chk(Fread(NULL, buf, spec_gp->size, 1, fp));
+        Chk(Malloc(&buf, (size_t)(spec_gp->size)));
+        Chk(Fread(NULL, buf, (size_t)(spec_gp->size), 1, fp));
 
         Chk(_estats_group_find_var_from_name(&var, spec_gp, "LocalAddressType"));
         memcpy(&addrtype, (void *)((unsigned long int)buf + var->offset), var->len);

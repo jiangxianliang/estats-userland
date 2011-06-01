@@ -35,8 +35,8 @@ estats_error* estats_snapshot_get_timeval(struct estats_timeval *,
                                                  estats_snapshot *);
 
 estats_error* estats_snapshot_delta( estats_value **,
-                               const estats_snapshot *,
-                               const estats_snapshot *,
+                               const estats_snapshot * /* new */,
+                               const estats_snapshot * /* old */,
                                const estats_var *);
 
 #endif /* ESTATS_SNAPSHOT_H */

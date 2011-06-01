@@ -167,7 +167,7 @@ estats_sockinfo_get_uid(int* uid, const estats_sockinfo_item* sockinfo)
     estats_error* err = NULL;
 
     ErrIf(uid == NULL || sockinfo == NULL, ESTATS_ERR_INVAL);
-    *uid = sockinfo->uid;
+    *uid = (int)(sockinfo->uid);
 
 Cleanup:
     return err;
@@ -387,10 +387,6 @@ _estats_sockinfo_get_ino_list(struct estats_list* head)
 
     if (file) {
 	estats_sockinfo_item* sockinfo;
-	uint32_t srcAddr;
-	uint16_t srcPort;
-	uint32_t dstAddr;
-	uint16_t dstPort;
 
        	while (fgets(buf, sizeof(buf), file) != NULL) {
 
@@ -419,9 +415,7 @@ _estats_sockinfo_get_ino_list(struct estats_list* head)
     if (file6) { 
 	estats_sockinfo_item* sockinfo;
 	char srcAddr[INET6_ADDRSTRLEN];
-	uint16_t srcPort;
 	char dstAddr[INET6_ADDRSTRLEN];
-	uint16_t dstPort;
 
 	while (fgets(buf, sizeof(buf), file6) != NULL) {
 

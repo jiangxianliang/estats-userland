@@ -34,9 +34,9 @@ estats_snapshot_alloc(estats_snapshot** snap, estats_connection* conn)
     size = conn->agent->read->size;
 
     Chk(Malloc((void**) snap, sizeof(estats_snapshot)));
-    Chk(Malloc((void**) &((*snap)->data), size));
+    Chk(Malloc((void**) &((*snap)->data), (size_t)size));
 
-    memset((*snap)->data, 0, size);
+    memset((*snap)->data, 0, (size_t)size);
 
     (*snap)->group = conn->agent->read;
     (*snap)->cid = conn->cid;
@@ -61,7 +61,7 @@ estats_snapshot_free(estats_snapshot** snap)
     Free((void**) snap);
 }
 
-estats_error*
+static estats_error*
 _estats_gettimeofday(struct estats_timeval* etv)
 {
     estats_error* err = NULL;
