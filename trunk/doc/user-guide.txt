@@ -1,0 +1,58 @@
+
+
+Summary:
+=======
+
+Estats-userland provides a C library, some example applications in C, and Python wrappers, for use with the Web10G kernel patch:
+
+		http://web10g.org/
+
+The userland tools are meaningful _only_ for a Linux kernel patched with the instruments of the TCP-ESTATS MIB (RFC4898), using the Web10G patch.
+
+Installation:
+============
+
+Estats-userland uses GNU autotools, so installation follows the standard sequence:
+
+./configure
+make
+make install
+
+"./configure --help" lists available configure options; notably, to build the Python module, one needs to use the option "--enable-python".
+
+Tools:
+=====
+
+The build process installs a collection of tools for reading the TCP-Estats instruments for a given connection; a utility "listconns" lists available connections, with associated data, and their defining "connection id" (cid).
+
+A list of included utilities with brief descriptions follows; cf. the man pages for details.
+
+readall
+---read all instruments from all connections for which the user has read privileges.
+
+readconn <cid1> [<cid2> ...]
+---read all instruments from the given connection(s).
+
+readvar <connection id> <var name> [<var name> ...]
+---read the named instrument(s) value from the given connection; note that the variable values of an instrument are as often referred to as "variables", hence "var name".
+
+writevar <connection id> <var name> <value>
+---write a value to the named variable; applies only to a pertinent subset of instruments.
+
+deltavar <connection id> <var name>
+---read the difference of consecutive values, meaningful for those metrics of type ZeroBasedCounter32 or ZeroBasedCounter64.
+
+listvars
+---list all variable names.
+
+listconns
+---list all connections, their inet addresses, invoking command, and associated cid, uid, and pid.
+
+logwrite_example <connection id>
+---an example C program to write a log of all TCP-Estats, polled at a regular interval, for a given connection.
+
+logread_example <variable name>
+---an example C program to read a log.
+
+In addition to their immediate utility in accessing the kernel instruments, the provided C programs give a model for using the API; cf. the developer-guide.txt for additional details.
+
