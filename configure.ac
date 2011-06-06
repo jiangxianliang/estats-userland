@@ -93,7 +93,6 @@ if test "x$enable_swig" != "xno" ; then
         enable_swig=no
     fi
 fi
-AM_CONDITIONAL([BUILD_SWIG], [test "x$enable_swig" != "xno"])
 
 AC_ARG_VAR(ESTATS_ROOT_DIR,
            [Directory where the Estats connection info is located (default=/proc/web100)])

@@ -934,6 +934,11 @@ typedef destructor freefunc;
 # define SWIGPY_CAPSULE_NAME ((char*)"swig_runtime_data" SWIG_RUNTIME_VERSION ".type_pointer_capsule" SWIG_TYPE_TABLE_NAME)
 #endif
 
+#if PY_VERSION_HEX < 0x03020000
+#define PyDescr_TYPE(x) (((PyDescrObject *)(x))->d_type)
+#define PyDescr_NAME(x) (((PyDescrObject *)(x))->d_name)
+#endif
+
 /* -----------------------------------------------------------------------------
  * error manipulation
  * ----------------------------------------------------------------------------- */
@@ -2192,6 +2197,7 @@ SWIG_Python_GetSwigThis(PyObject *pyobj)
     return (SwigPyObject *) pyobj;
 
 #ifdef SWIGPYTHON_BUILTIN
+  (void)obj;
 # ifdef PyWeakref_CheckProxy
   if (PyWeakref_CheckProxy(pyobj)) {
     pyobj = PyWeakref_GET_OBJECT(pyobj);
@@ -3401,8 +3407,10 @@ SWIGINTERN ESTATS_TYPE estats_var_s_get_type(struct estats_var *self){
             return _type;
         }
 SWIGINTERN struct estats_agent *new_estats_agent(){
+            estats_error* err = 0;
             estats_agent* agent = 0;
-            estats_agent_attach(&agent, ESTATS_AGENT_TYPE_LOCAL, 0);
+            err = estats_agent_attach(&agent, ESTATS_AGENT_TYPE_LOCAL, 0);
+            if (err) estats_error_print(stderr, err);
             return agent;
         }
 SWIGINTERN void delete_estats_agent(struct estats_agent *self){
@@ -10549,7 +10557,7 @@ extern "C" {
       const PyTypeObject tmp = {
         /* PyObject header changed in Python 3 */
 #if PY_VERSION_HEX >= 0x03000000
-        PyVarObject_HEAD_INIT(&PyType_Type, 0)
+        PyVarObject_HEAD_INIT(NULL, 0)
 #else
         PyObject_HEAD_INIT(NULL)
         0,                                  /* ob_size */
@@ -10592,11 +10600,13 @@ extern "C" {
 #endif
       };
       varlink_type = tmp;
-      /* for Python 3 we already assigned ob_type in PyVarObject_HEAD_INIT() */
-#if PY_VERSION_HEX < 0x03000000
-      varlink_type.ob_type = &PyType_Type;
-#endif
       type_init = 1;
+#if PY_VERSION_HEX < 0x02020000
+      varlink_type.ob_type = &PyType_Type;
+#else
+      if (PyType_Ready(&varlink_type) < 0)
+      return NULL;
+#endif
     }
     return &varlink_type;
   }
@@ -10731,7 +10741,16 @@ SWIG_init(void) {
   PyObject *m, *d, *md;
 #if PY_VERSION_HEX >= 0x03000000
   static struct PyModuleDef SWIG_module = {
+# if PY_VERSION_HEX >= 0x03020000
     PyModuleDef_HEAD_INIT,
+# else
+    {
+      PyObject_HEAD_INIT(NULL)
+      NULL, /* m_init */
+      0,    /* m_index */
+      NULL, /* m_copy */
+    },
+# endif
     (char *) SWIG_name,
     NULL,
     -1,
