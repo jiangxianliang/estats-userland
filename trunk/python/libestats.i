@@ -29,8 +29,10 @@
 
 %extend estats_agent {
         estats_agent() {
+            estats_error* err = NULL;
             estats_agent* agent = NULL;
-            estats_agent_attach(&agent, ESTATS_AGENT_TYPE_LOCAL, NULL);
+            err = estats_agent_attach(&agent, ESTATS_AGENT_TYPE_LOCAL, NULL);
+            if (err) estats_error_print(stderr, err);
             return agent;
         }
         ~estats_agent() {
