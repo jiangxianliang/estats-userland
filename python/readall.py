@@ -8,7 +8,7 @@ cl = a.all_connections()
 
 for c in cl:
 
-    print("Connection %d (%s %d  %s %d)"%(c.cid, \
+    print("Connection %d (%s %s  %s %s)"%(c.cid, \
                                         c.read('LocalAddress'), \
                                         c.read('LocalPort'), \
                                         c.read('RemAddress'), \

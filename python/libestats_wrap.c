@@ -3310,6 +3310,20 @@ SWIGINTERN estats_value *estats_connection_s_read_value(struct estats_connection
             return _val;
         }
 
+
+
+SWIGINTERN void estats_connection_s_write_value(struct estats_connection *self,char *str_val,estats_var *_var){
+            estats_error* err = 0;
+            estats_value* _val = 0;
+            err = estats_value_new(&_val, str_val, ESTATS_VALUE_TYPE_STRING);
+            if (err) {
+                estats_error_print(stderr, err);
+                return;
+            }
+            err = estats_connection_write_value(_val, self, _var);
+            if (err) estats_error_print(stderr, err);
+        }
+
 SWIGINTERN int
 SWIG_AsVal_unsigned_SS_long (PyObject *obj, unsigned long *val) 
 {
@@ -3455,9 +3469,6 @@ SWIGINTERN estats_value *estats_snapshot_s_read_value(struct estats_snapshot *se
             if (err) estats_error_print(stderr, err);
             return _val;
         }
-
-
-
 typedef union {
   uint8_t         u8_val;
   uint16_t        u16_val;
@@ -3480,7 +3491,7 @@ SWIGINTERN ESTATS_VALUE_TYPE estats_value_s_get_type(struct estats_value *self){
             if (err) estats_error_print(stderr, err);
             return _type;
         }
-SWIGINTERN int estats_value_s_as_int(struct estats_value *self){
+SWIGINTERN long estats_value_s_as_int(struct estats_value *self){
             estats_error* err = 0;
             if (self->type == ESTATS_VALUE_TYPE_UINT16) {
                 uint16_t _intval;
@@ -3492,13 +3503,13 @@ SWIGINTERN int estats_value_s_as_int(struct estats_value *self){
                 uint32_t _intval;
                 err = estats_value_as_uint32(&_intval, self);
                 if (err) estats_error_print(stderr, err);
-                return (int)_intval;
+                return (long int)_intval;
             }
             if (self->type == ESTATS_VALUE_TYPE_INT32) {
                 int32_t _intval;
                 err = estats_value_as_int32(&_intval, self);
                 if (err) estats_error_print(stderr, err);
-                return (int)_intval;
+                return (long int)_intval;
             }
             if (self->type == ESTATS_VALUE_TYPE_OCTET) {
                 uint8_t _intval;
@@ -3508,13 +3519,29 @@ SWIGINTERN int estats_value_s_as_int(struct estats_value *self){
             }
             return 0;
         }
-SWIGINTERN long estats_value_s_as_long(struct estats_value *self){
+SWIGINTERN unsigned long long estats_value_s_as_long(struct estats_value *self){
             estats_error* err = 0;
             uint64_t _intval;
             err = estats_value_as_uint64(&_intval, self);
             if (err) estats_error_print(stderr, err);
-            return (long)_intval;
+            return (unsigned long long int)_intval;
         }
+
+SWIGINTERNINLINE PyObject* 
+SWIG_From_long_SS_long  (long long value)
+{
+  return ((value < LONG_MIN) || (value > LONG_MAX)) ?
+    PyLong_FromLongLong(value) : PyInt_FromLong((long)(value)); 
+}
+
+
+SWIGINTERNINLINE PyObject* 
+SWIG_From_unsigned_SS_long_SS_long  (unsigned long long value)
+{
+  return (value > LONG_MAX) ?
+    PyLong_FromUnsignedLongLong(value) : PyInt_FromLong((long)(value)); 
+}
+
 SWIGINTERN char *estats_value_s_as_string(struct estats_value *self){
             estats_error* err = 0;
             char* _strval;
@@ -4710,6 +4737,48 @@ SWIGINTERN PyObject *_wrap_s_connection_s_read_value(PyObject *SWIGUNUSEDPARM(se
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_estats_value, 0 |  0 );
   return resultobj;
 fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_s_connection_s_write_value(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  struct estats_connection *arg1 = (struct estats_connection *) 0 ;
+  char *arg2 = (char *) 0 ;
+  estats_var *arg3 = (estats_var *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OOO:s_connection_s_write_value",&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_estats_connection, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "s_connection_s_write_value" "', argument " "1"" of type '" "struct estats_connection *""'"); 
+  }
+  arg1 = (struct estats_connection *)(argp1);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "s_connection_s_write_value" "', argument " "2"" of type '" "char *""'");
+  }
+  arg2 = (char *)(buf2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3,SWIGTYPE_p_estats_var, 0 |  0 );
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "s_connection_s_write_value" "', argument " "3"" of type '" "estats_var *""'"); 
+  }
+  arg3 = (estats_var *)(argp3);
+  estats_connection_s_write_value(arg1,arg2,arg3);
+  resultobj = SWIG_Py_Void();
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
   return NULL;
 }
 
@@ -6835,7 +6904,7 @@ SWIGINTERN PyObject *_wrap_s_value_s_as_int(PyObject *SWIGUNUSEDPARM(self), PyOb
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
-  int result;
+  long result;
   
   if (!PyArg_ParseTuple(args,(char *)"O:s_value_s_as_int",&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_estats_value, 0 |  0 );
@@ -6843,8 +6912,8 @@ SWIGINTERN PyObject *_wrap_s_value_s_as_int(PyObject *SWIGUNUSEDPARM(self), PyOb
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "s_value_s_as_int" "', argument " "1"" of type '" "struct estats_value *""'"); 
   }
   arg1 = (struct estats_value *)(argp1);
-  result = (int)estats_value_s_as_int(arg1);
-  resultobj = SWIG_From_int((int)(result));
+  result = (long)estats_value_s_as_int(arg1);
+  resultobj = SWIG_From_long((long)(result));
   return resultobj;
 fail:
   return NULL;
@@ -6857,7 +6926,7 @@ SWIGINTERN PyObject *_wrap_s_value_s_as_long(PyObject *SWIGUNUSEDPARM(self), PyO
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
-  long result;
+  unsigned long long result;
   
   if (!PyArg_ParseTuple(args,(char *)"O:s_value_s_as_long",&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_estats_value, 0 |  0 );
@@ -6865,8 +6934,8 @@ SWIGINTERN PyObject *_wrap_s_value_s_as_long(PyObject *SWIGUNUSEDPARM(self), PyO
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "s_value_s_as_long" "', argument " "1"" of type '" "struct estats_value *""'"); 
   }
   arg1 = (struct estats_value *)(argp1);
-  result = (long)estats_value_s_as_long(arg1);
-  resultobj = SWIG_From_long((long)(result));
+  result = (unsigned long long)estats_value_s_as_long(arg1);
+  resultobj = SWIG_From_unsigned_SS_long_SS_long((unsigned long long)(result));
   return resultobj;
 fail:
   return NULL;
@@ -9808,6 +9877,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"s_connection_s_next", _wrap_s_connection_s_next, METH_VARARGS, NULL},
 	 { (char *)"s_connection_s_access", _wrap_s_connection_s_access, METH_VARARGS, NULL},
 	 { (char *)"s_connection_s_read_value", _wrap_s_connection_s_read_value, METH_VARARGS, NULL},
+	 { (char *)"s_connection_s_write_value", _wrap_s_connection_s_write_value, METH_VARARGS, NULL},
 	 { (char *)"new_s_connection", _wrap_new_s_connection, METH_VARARGS, NULL},
 	 { (char *)"delete_s_connection", _wrap_delete_s_connection, METH_VARARGS, NULL},
 	 { (char *)"s_connection_swigregister", s_connection_swigregister, METH_VARARGS, NULL},
