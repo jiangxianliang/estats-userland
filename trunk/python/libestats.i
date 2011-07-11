@@ -80,6 +80,17 @@
             if (err) estats_error_print(stderr, err);
             return _val;
         }
+        void s_write_value(char* str_val, estats_var* _var) {
+            estats_error* err = NULL;
+            estats_value* _val = NULL;
+            err = estats_value_new(&_val, str_val, ESTATS_VALUE_TYPE_STRING);
+            if (err) {
+                estats_error_print(stderr, err);
+                return;
+            }
+            err = estats_connection_write_value(_val, $self, _var);
+            if (err) estats_error_print(stderr, err);
+        }
 };
 
 %extend estats_snapshot {
@@ -142,7 +153,7 @@
             if (err) estats_error_print(stderr, err);
             return _type;
         }
-        int s_as_int() {
+        long int s_as_int() {
             estats_error* err = NULL;
             if ($self->type == ESTATS_VALUE_TYPE_UINT16) {
                 uint16_t _intval;
@@ -154,13 +165,13 @@
                 uint32_t _intval;
                 err = estats_value_as_uint32(&_intval, $self);
                 if (err) estats_error_print(stderr, err);
-                return (int)_intval;
+                return (long int)_intval;
             }
             if ($self->type == ESTATS_VALUE_TYPE_INT32) {
                 int32_t _intval;
                 err = estats_value_as_int32(&_intval, $self);
                 if (err) estats_error_print(stderr, err);
-                return (int)_intval;
+                return (long int)_intval;
             }
             if ($self->type == ESTATS_VALUE_TYPE_OCTET) {
                 uint8_t _intval;
@@ -170,12 +181,12 @@
             }
             return 0;
         }
-        long s_as_long() {
+        unsigned long long int s_as_long() {
             estats_error* err = NULL;
             uint64_t _intval;
             err = estats_value_as_uint64(&_intval, $self);
             if (err) estats_error_print(stderr, err);
-            return (long)_intval;
+            return (unsigned long long int)_intval;
         }
         char* s_as_string() {
             estats_error* err = NULL;

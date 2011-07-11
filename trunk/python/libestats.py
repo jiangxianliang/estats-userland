@@ -243,6 +243,7 @@ class s_connection(_object):
     def s_next(self): return _libestats.s_connection_s_next(self)
     def s_access(self): return _libestats.s_connection_s_access(self)
     def s_read_value(self, *args): return _libestats.s_connection_s_read_value(self, *args)
+    def s_write_value(self, *args): return _libestats.s_connection_s_write_value(self, *args)
     def __init__(self): 
         this = _libestats.new_s_connection()
         try: self.this.append(this)
