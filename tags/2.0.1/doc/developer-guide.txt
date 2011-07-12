@@ -1,0 +1,47 @@
+
+
+API:
+===
+
+Note: While the current API serves well in providing continuity between the
+Web100 and Web10g projects---in compatibility with the former kernel, and in
+familiarity of form---there will necessarily be a major version upgrade upon
+release of the new kernel interface.
+
+Examples: It is recommended to review the simple examples in util/C provided
+in the distribution in order to quickly get a sense of the practice of using
+the API; those familiar with the Web100 tools will not find anything too
+surprising.
+
+Memory allocation patterns: a quick summary is as follows. 
+==========================
+
+All estats_userland programs should begin with "estats_agent_attach" and close
+with "estats_agent_detach".
+
+"Snapshots" of kernel statistics should be allocated with
+"estats_snapshot_alloc" and free'd with "estats_snapshot_free".
+
+Any "estats_value" is implicitly allocated and should be free'd with
+"estats_value_free"; any string that is the result of "estats_value_as_string"
+is strdup'd, hence should be free'd with "free".
+
+All other structures are handled internally, with the following exception:
+
+The "sockinfo" structure is a mechanism for correlating the Web10g kernel's
+connection id's (CID) with characteristics of the socket in question: invoking
+cmdline, PID, UID, etc., and it quite useful. It is built by wandering through
+/proc and collating the needed information and is essentially independent of
+Web10g additions.
+
+In this case, allocation/deallocation of the sockinfo struct should be done
+explicitly with "estats_sockinfo_new" and "estats_sockinfo_free"; see the
+listconns.c example in util/C.
+
+
+Note on Python bindings:
+=======================
+
+This is a work in progress, though is sufficient to reproduce the readall.py
+example from Web100. The general form of the bindings seems correct.
+

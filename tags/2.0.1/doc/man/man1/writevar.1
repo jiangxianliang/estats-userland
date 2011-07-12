@@ -1,0 +1,16 @@
+.TH writevar 1 "15 May 2011" "Estats Userland" "Estats"
+.SH NAME
+writevar \- write a value to a single Estats variable in one connection.
+.SH SYNOPSIS
+.B writevar
+.I connection_id
+.I var_name
+.I value
+.SH DESCRIPTION
+\fBwritevar\fR writes \fIvalue\fR to the Estats variable named
+\fIvar_name\fR in connection \fIconnection_id\fR.
+.SH SEE ALSO
+.BR readvar (1),
+.BR readall (1),
+.BR deltavar (1),
+.BR libestats (3)
