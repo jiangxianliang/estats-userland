@@ -6,7 +6,7 @@ int main(int argc, char *argv[])
     estats_agent* agent = NULL;
     estats_connection* c_head;
     estats_connection* c_pos;
-    const char* varName;
+    const char* varname;
     
     Chk(estats_agent_attach(&agent, ESTATS_AGENT_TYPE_LOCAL, NULL));
 
@@ -38,11 +38,11 @@ int main(int argc, char *argv[])
                 estats_value* value = NULL;
                 char* text = NULL;
 
-                Chk(estats_var_get_name(&varName, var_pos));
+                Chk(estats_var_get_name(&varname, var_pos));
                 Chk(estats_snapshot_read_value(&value, snap, var_pos));
                 Chk(estats_value_as_string(&text, value));
 
-                fprintf(stdout, "    %-20s: %s\n", varName, text);
+                fprintf(stdout, "    %-20s: %s\n", varname, text);
 
                 free(text);
                 estats_value_free(&value);
