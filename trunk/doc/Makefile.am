@@ -1,5 +1,5 @@
 SUBDIRS = man
-DOC_FILES = user-guide.txt
+DOC_FILES = user-guide.txt developer-guide.txt
 
 docdir = $(ESTATS_DOC_DIR)
 doc_DATA = $(DOC_FILES)
